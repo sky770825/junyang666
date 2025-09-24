@@ -538,84 +538,6 @@
             }
         }
         
-        /* 地圖彈窗現代化樣式 */
-        .modal {
-            position: fixed;
-            top: 0; 
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            align-items: flex-end; /* 從下方彈出 */
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .map-modal {
-            width: 100%;
-            max-width: 500px;
-            background: #fff;
-            border-radius: 16px 16px 0 0;
-            overflow: hidden;
-            height: 75vh;          /* 整個彈窗高度 */
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background: #f7f7f7;
-        }
-
-        .modal-body {
-            flex: 1;              /* 自動撐滿中間空間 */
-            overflow: hidden;
-        }
-
-        .modal-body iframe {
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 10px;
-            padding: 12px 16px;
-            border-top: 1px solid #eee;
-            background: #fafafa;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 12px;
-            font-size: 1rem;
-            margin: 0;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .action-btn.primary {
-            background: #007AFF;
-            color: white;
-        }
-
-        .action-btn.secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .action-btn:hover {
-            opacity: 0.8;
-            transform: translateY(-1px);
-        }
-
         /* 地圖容器樣式優化 */
         .map-container {
             width: 100%;       /* 讓地圖跟隨容器寬度 */
@@ -953,15 +875,8 @@
             .loan-modal-content {
                 margin: 3% auto;
                 width: 95%;
-                max-width: 500px;
+                max-width: 750px;
                 max-height: 90vh;
-                background: #fff;
-                border-radius: 12px;
-                padding: 20px;
-                box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-                font-family: "Microsoft JhengHei", sans-serif;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
             }
             
             .loan-modal-header {
@@ -989,15 +904,8 @@
             .loan-modal-content {
                 margin: 1% auto;
                 width: 98%;
-                max-width: 500px;
-                max-height: 90vh;
-                background: #fff;
-                border-radius: 12px;
-                padding: 20px;
-                box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-                font-family: "Microsoft JhengHei", sans-serif;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
+                max-height: 98vh;
+                border-radius: 8px;
             }
             
             .loan-modal-header {
@@ -2598,7 +2506,7 @@
                         </div>
                         
                         <div style="display: flex; gap: 10px; justify-content: center; align-items: center; position: relative;">
-                            <button onclick="showModernModal('${property.id}')" 
+                            <button onclick="showPropertyDetails('${property.id}')" 
                                     style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); flex: 1; font-size: 1rem;">
                                 <i class="fas fa-info-circle"></i> 詳細資訊
                             </button>
@@ -4328,154 +4236,6 @@
                 propertyInfoMenu.addEventListener('click', (e) => {
                     e.stopPropagation();
                 });
-            }
-        });
-    </script>
-
-    <!-- 新的現代化模態框 -->
-    <div id="modernModal" class="modal" style="display: none;">
-        <div class="modal__panel">
-            
-            <!-- 標題區 -->
-            <div class="modal__header">
-                <h3 id="modalTitle">低自備｜近龍科｜2房＋車位</h3>
-                <button class="modal__close" onclick="closeModernModal()">✕</button>
-            </div>
-            
-            <!-- 中間可滾動內容 -->
-            <div class="modal__body">
-                <!-- 售價、坪數、格局卡片 -->
-                <div id="modalInfoCards" class="info-cards">
-                    <!-- 這裡會動態插入物件資訊 -->
-                </div>
-                
-                <!-- 物件詳細資訊 -->
-                <div id="modalDetails" class="detail">
-                    <!-- 這裡會動態插入詳細資訊 -->
-                </div>
-                
-                <!-- 物件照片 -->
-                <div id="modalPhotos" class="photos">
-                    <!-- 這裡會動態插入照片 -->
-                </div>
-            </div>
-
-            <!-- 底部固定按鈕 -->
-            <div class="modal__footer">
-                <a href="#" id="modalGoogleMaps" class="btn btn-primary">在 Google Maps 開啟</a>
-                <a href="#" id="modalDirections" class="btn btn-secondary">規劃路線</a>
-            </div>
-
-        </div>
-    </div>
-
-    <script>
-        // 新的現代化模態框功能
-        function showModernModal(propertyId) {
-            const property = embeddedPropertiesData.properties.find(p => p.id === propertyId);
-            if (!property) return;
-
-            // 更新標題
-            document.getElementById('modalTitle').textContent = property.title;
-
-            // 更新資訊卡片
-            document.getElementById('modalInfoCards').innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 20px;">
-                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 16px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 4px;">💰 售價</div>
-                        <div style="font-size: 1.4rem; font-weight: 700;">${property.price}</div>
-                    </div>
-                    <div style="background: linear-gradient(135deg, #10b981, #3b82f6); color: white; padding: 16px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 4px;">📐 坪數</div>
-                        <div style="font-size: 1.4rem; font-weight: 700;">${property.total_area}</div>
-                    </div>
-                    <div style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; padding: 16px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 4px;">🏠 格局</div>
-                        <div style="font-size: 1.4rem; font-weight: 700;">${property.layout}</div>
-                    </div>
-                </div>
-            `;
-
-            // 更新詳細資訊
-            document.getElementById('modalDetails').innerHTML = `
-                <div style="background: #f8f9fa; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
-                    <h3 style="margin: 0 0 12px 0; color: #2c3e50; font-size: 1.1rem; display: flex; align-items: center;">
-                        <i class="fas fa-info-circle" style="margin-right: 8px; color: #667eea;"></i>物件詳細資訊
-                    </h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 0.95rem;">
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
-                            <span style="color: #666; font-weight: 500;">屋齡：</span>
-                            <span style="color: #2c3e50; font-weight: 600;">${property.age || '未設定'}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
-                            <span style="color: #666; font-weight: 500;">樓層：</span>
-                            <span style="color: #2c3e50; font-weight: 600;">${property.floor || '未設定'}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
-                            <span style="color: #666; font-weight: 500;">車位：</span>
-                            <span style="color: #2c3e50; font-weight: 600;">${property.parking || '未設定'}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
-                            <span style="color: #666; font-weight: 500;">管理費：</span>
-                            <span style="color: #e74c3c; font-weight: 600;">${property.management_fee || '未設定'}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // 更新照片
-            document.getElementById('modalPhotos').innerHTML = `
-                <div style="margin-bottom: 20px;">
-                    <h3 style="margin: 0 0 12px 0; color: #2c3e50; font-size: 1.1rem; display: flex; align-items: center;">
-                        <i class="fas fa-images" style="margin-right: 8px; color: #667eea;"></i>物件照片
-                    </h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;">
-                        ${property.images.slice(0, 6).map(img => `
-                            <img src="${img}" 
-                                 alt="物件照片" 
-                                 loading="lazy"
-                                 style="
-                                     width: 100%;
-                                     height: 120px;
-                                     object-fit: cover;
-                                     border-radius: 8px;
-                                     cursor: pointer;
-                                     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                     transition: transform 0.3s ease;
-                                 "
-                                 onmouseover="this.style.transform='scale(1.05)'"
-                                 onmouseout="this.style.transform='scale(1)'"
-                                 onclick="openLightbox(${property.images.indexOf(img)}, '${property.id}');">
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-
-            // 更新按鈕連結
-            if (property.google_maps) {
-                document.getElementById('modalGoogleMaps').href = property.google_maps;
-                document.getElementById('modalGoogleMaps').target = '_blank';
-            }
-
-            // 顯示模態框
-            document.getElementById('modernModal').style.display = 'grid';
-        }
-
-        function closeModernModal() {
-            document.getElementById('modernModal').style.display = 'none';
-        }
-
-        // 點擊背景關閉模態框
-        document.getElementById('modernModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModernModal();
-            }
-        });
-
-        // ESC 鍵關閉模態框
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModernModal();
             }
         });
     </script>

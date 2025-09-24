@@ -4,28 +4,32 @@
     box-sizing: border-box;
 }
 
-html, body {
+        html {
+            overflow: hidden;
+            touch-action: manipulation;
             height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
+        }
+
+body {
             font-family: 'Microsoft JhengHei', Arial, sans-serif;
-            line-height: 1.6;
+    line-height: 1.6;
             color: #333;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow-x: hidden;       /* 僅隱藏橫向 */
-            overflow-y: auto;         /* 允許直向滾動 */
-            position: relative;       /* 移除固定定位 */
-        }
+            overflow: hidden;
+            touch-action: manipulation;
+            height: 100%;
+            position: fixed;
+            width: 100%;
+}
 
 .container {
             max-width: 1200px;
     margin: 0 auto;
     background: white;
             box-shadow: 0 0 30px rgba(0,0,0,0.1);
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100vh;
             overflow-y: auto;
+            overflow-x: hidden;
 }
 
 .header {
@@ -88,41 +92,23 @@ html, body {
             margin-top: 2rem;
         }
         
-        /* 原本卡片容器 */
-        .card {
-            max-width: 100%;         /* 先解除限制 */
-            width: 100%;             /* 滿版 */
-            margin: 0 auto;          /* 保持置中 */
-            border-radius: 12px;
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,.08);
-            overflow: hidden;
-        }
-
-        /* 外層的 section / container */
-        section {
-            max-width: 1000px;       /* 桌機時候保持限制 */
-            margin: 0 auto;
-            padding: 0 8px;          /* 手機左右縮小到 8px */
-        }
-
         .property-card {
-            max-width: 100%;         /* 先解除限制 */
-            width: 100%;             /* 滿版 */
-            margin: 0 auto;          /* 保持置中 */
             background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 12px;     /* 使用新的圓角設定 */
+            border-radius: 15px;
             padding: 1.2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,.08);  /* 使用新的陰影設定 */
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 25px rgba(0,0,0,0.12),
+                0 4px 12px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid rgba(52, 152, 219, 0.2);
             background-clip: padding-box;
             height: 100%;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
 
         .property-card::before {
             content: '';
@@ -1431,139 +1417,6 @@ html, body {
             }
         }
         
-        /* 新的現代化模態框樣式 */
-        .modal {
-            position: fixed; 
-            inset: 0;
-            background: rgba(0,0,0,.5);
-            display: grid; 
-            place-items: center;
-            padding: 12px;
-            z-index: 9999;
-        }
-
-        .modal__panel {
-            width: 96vw; 
-            max-width: 920px;
-            height: 92dvh;              /* 高度限制 */
-            background: #fff;
-            border-radius: 16px;
-            display: flex; 
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .modal__header {
-            position: sticky; 
-            top: 0; 
-            z-index: 2;
-            padding: 12px 16px;
-            background: #3F51B5; 
-            color: #fff;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-        }
-
-        .modal__body {
-            flex: 1 1 auto;
-            overflow-y: auto;           /* 核心：中間可滾動 */
-            -webkit-overflow-scrolling: touch;
-            padding: 16px;
-        }
-
-        .modal__footer {
-            position: sticky; 
-            bottom: 0;
-            background: #fff;
-            border-top: 1px solid #eee;
-            padding: 12px;
-            display: flex; 
-            gap: 12px;
-        }
-
-        .modal__close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .modal__close:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: #3F51B5;
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: #303F9F;
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-            transform: translateY(-1px);
-        }
-
-        /* 手機優化 */
-        @media (max-width: 600px) {
-            section {
-                padding: 0 4px;        /* 手機左右邊更貼齊 */
-            }
-            .card {
-                border-radius: 8px;    /* 小螢幕邊角收斂一點 */
-            }
-            
-            .modal {
-                padding: 8px;
-            }
-            
-            .modal__panel {
-                width: 98vw;
-                height: 95vh;
-                border-radius: 12px;
-            }
-            
-            .modal__header {
-                padding: 10px 12px;
-            }
-            
-            .modal__body {
-                padding: 12px;
-            }
-            
-            .modal__footer {
-                padding: 10px;
-                flex-direction: column;
-                gap: 8px;
-            }
-        }
-
         @media (max-width: 480px) {
             .loan-modal-content {
                 margin: 1% auto;
@@ -1748,5 +1601,17 @@ html, body {
             .loan-result-card {
                 padding: 0.8rem;
             }
+        }
+        
+        .modal {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal > div {
+            margin: auto;
+            max-height: 90vh;
+            overflow-y: auto;
         }
     </style>

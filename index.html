@@ -413,11 +413,29 @@
                 margin-top: 15px !important;
                 padding: 10px !important;
                 max-width: 90vw !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: thin !important;
+            }
+            
+            .modal .thumbnails::-webkit-scrollbar {
+                height: 4px !important;
+            }
+            
+            .modal .thumbnails::-webkit-scrollbar-track {
+                background: #f1f1f1 !important;
+                border-radius: 2px !important;
+            }
+            
+            .modal .thumbnails::-webkit-scrollbar-thumb {
+                background: #667eea !important;
+                border-radius: 2px !important;
             }
             
             .modal .thumbnails img {
                 width: 50px !important;
                 height: 37px !important;
+                flex-shrink: 0 !important;
             }
             
             /* 詳細資訊彈窗手機優化 */
@@ -472,7 +490,7 @@
             }
             
             .modal .property-detail-grid > div {
-                padding: 0.4rem 0 !important;
+                padding: 0.3rem 0 !important;
                 border-bottom: 1px solid #f0f0f0 !important;
                 display: flex !important;
                 justify-content: space-between !important;
@@ -1233,6 +1251,33 @@
                         "images/2-1/陽台照片2.jpg",
                         "images/2-1/格局圖.png"
                     ],
+                    transportation: {
+                        facilities: [
+                            "梅獅路商圈",
+                            "龍潭科學園區",
+                            "全聯福利中心",
+                            "7-ELEVEN",
+                            "萊爾富",
+                            "楊梅市場"
+                        ],
+                        transport: [
+                            "台1線",
+                            "縣道115號",
+                            "楊梅交流道",
+                            "龍潭交流道",
+                            "楊梅火車站",
+                            "公車站牌"
+                        ],
+                        schools: [
+                            "楊明國中",
+                            "楊明國小",
+                            "楊梅國中",
+                            "楊梅國小",
+                            "瑞塘國小"
+                        ],
+                        market: "楊梅市場",
+                        park: "楊明公園"
+                    },
                     google_maps: "https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469"
                 },
                 {
@@ -2290,10 +2335,10 @@
                         
                         ${property.layout ? `
                         <div style="margin-bottom: 0.6rem; display: flex; gap: 0.3rem;">
-                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 0.8rem;">
+                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1rem;">
                                 <strong>格局：</strong>${property.layout}
                             </div>
-                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 0.8rem;">
+                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1rem;">
                                 <strong>屋齡：</strong>${property.age || '未設定'}
                             </div>
                         </div>
@@ -2313,11 +2358,11 @@
                         
                         <div style="display: flex; gap: 10px; justify-content: center; align-items: center; position: relative;">
                             <button onclick="showPropertyDetails('${property.id}')" 
-                                    style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); flex: 1;">
+                                    style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); flex: 1; font-size: 1rem;">
                                 <i class="fas fa-info-circle"></i> 詳細資訊
                             </button>
                             <button onclick="showLoanCalculator('${property.id}')" 
-                                    style="background: linear-gradient(45deg, #10b981, #3b82f6); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); flex: 1;">
+                                    style="background: linear-gradient(45deg, #10b981, #3b82f6); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); flex: 1; font-size: 1rem;">
                                 <i class="fas fa-calculator"></i> 貸款試算
                             </button>
                             ${property.number ? `
@@ -2499,7 +2544,7 @@
                     <div style="
                         background: #667eea;
                         color: white;
-                        padding: 20px 25px;
+                        padding: 15px 20px;
                     ">
                         <h2 style="margin: 0; font-size: 1.3rem; font-weight: 600;">
                             🏠 ${property.title}
@@ -2767,14 +2812,24 @@
                 overflow: hidden;
             `;
 
-            // 計算位置（在點擊元素附近）
+            // 計算位置（手機版居中顯示）
             const clickedElement = event.target;
             const rect = clickedElement.getBoundingClientRect();
-            const tooltipX = rect.left + rect.width / 2 - 200; // 居中對齊
-            const tooltipY = rect.top - 15; // 在元素上方
-
-            tooltip.style.left = Math.max(10, tooltipX) + 'px';
-            tooltip.style.top = Math.max(10, tooltipY) + 'px';
+            
+            // 手機版居中顯示
+            if (window.innerWidth <= 768) {
+                tooltip.style.left = '50%';
+                tooltip.style.top = '50%';
+                tooltip.style.transform = 'translate(-50%, -50%)';
+                tooltip.style.maxWidth = '90vw';
+                tooltip.style.maxHeight = '80vh';
+            } else {
+                // 桌面版在點擊元素附近
+                const tooltipX = rect.left + rect.width / 2 - 200;
+                const tooltipY = rect.top - 15;
+                tooltip.style.left = Math.max(10, tooltipX) + 'px';
+                tooltip.style.top = Math.max(10, tooltipY) + 'px';
+            }
 
             // 顯示機能特色內容
             const featuresList = property.features && property.features.length > 0 
@@ -2871,18 +2926,26 @@
                 overflow: hidden;
             `;
 
-            // 計算位置（居中顯示）
+            // 計算位置（手機版居中顯示）
             const clickedElement = event.target;
             const rect = clickedElement.getBoundingClientRect();
-            const tooltipX = rect.left + rect.width / 2 - 350; // 居中對齊（調整為浮框寬度的一半）
-            const tooltipY = rect.top - 20; // 在元素上方
-
-            // 確保浮框不會超出視窗邊界
-            const maxLeft = Math.max(10, Math.min(tooltipX, window.innerWidth - 710));
-            const maxTop = Math.max(10, Math.min(tooltipY, window.innerHeight - 400));
-
-            tooltip.style.left = maxLeft + 'px';
-            tooltip.style.top = maxTop + 'px';
+            
+            // 手機版居中顯示
+            if (window.innerWidth <= 768) {
+                tooltip.style.left = '50%';
+                tooltip.style.top = '50%';
+                tooltip.style.transform = 'translate(-50%, -50%)';
+                tooltip.style.maxWidth = '95vw';
+                tooltip.style.maxHeight = '85vh';
+            } else {
+                // 桌面版在點擊元素附近
+                const tooltipX = rect.left + rect.width / 2 - 350;
+                const tooltipY = rect.top - 20;
+                const maxLeft = Math.max(10, Math.min(tooltipX, window.innerWidth - 710));
+                const maxTop = Math.max(10, Math.min(tooltipY, window.innerHeight - 400));
+                tooltip.style.left = maxLeft + 'px';
+                tooltip.style.top = maxTop + 'px';
+            }
 
             // 顯示學區交通內容
             const transportation = property.transportation || {};
@@ -3056,14 +3119,24 @@
                 overflow: hidden;
             `;
 
-            // 計算位置（在點擊元素附近）
+            // 計算位置（手機版居中顯示）
             const clickedElement = event.target;
             const rect = clickedElement.getBoundingClientRect();
-            const tooltipX = rect.left + rect.width / 2 - 160; // 居中對齊
-            const tooltipY = rect.top - 15; // 在元素上方
-
-            tooltip.style.left = Math.max(10, tooltipX) + 'px';
-            tooltip.style.top = Math.max(10, tooltipY) + 'px';
+            
+            // 手機版居中顯示
+            if (window.innerWidth <= 768) {
+                tooltip.style.left = '50%';
+                tooltip.style.top = '50%';
+                tooltip.style.transform = 'translate(-50%, -50%)';
+                tooltip.style.maxWidth = '90vw';
+                tooltip.style.maxHeight = '80vh';
+            } else {
+                // 桌面版在點擊元素附近
+                const tooltipX = rect.left + rect.width / 2 - 160;
+                const tooltipY = rect.top - 15;
+                tooltip.style.left = Math.max(10, tooltipX) + 'px';
+                tooltip.style.top = Math.max(10, tooltipY) + 'px';
+            }
 
             // 直接顯示完整內容，添加點擊關閉功能
             tooltip.innerHTML = `
@@ -3600,7 +3673,7 @@
                         
                         <!-- 簡化的縮圖導航 -->
                         ${property.images.length > 1 ? `
-                        <div style="display: flex; gap: 8px; margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.9); border-radius: 10px; max-width: 80vw; overflow-x: auto;">
+                        <div class="thumbnails" style="display: flex; gap: 8px; margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.9); border-radius: 10px; max-width: 80vw; overflow-x: auto; -webkit-overflow-scrolling: touch;">
                             ${property.images.map((img, idx) => `
                                 <img src="${img}" 
                                      alt="縮圖 ${idx + 1}" 

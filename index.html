@@ -411,11 +411,12 @@
             
             .modal .thumbnails {
                 margin-top: 15px !important;
-                padding: 10px !important;
+                padding: 10px 40px !important;
                 max-width: 90vw !important;
                 overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch !important;
                 scrollbar-width: thin !important;
+                scroll-behavior: smooth !important;
             }
             
             .modal .thumbnails::-webkit-scrollbar {
@@ -499,6 +500,22 @@
             
             .modal .property-detail-grid > div:last-child {
                 border-bottom: none !important;
+            }
+            
+            /* 手機版彈窗滾動條優化 */
+            .modal div[style*="overflow-y: auto"]::-webkit-scrollbar {
+                width: 6px !important;
+            }
+            .modal div[style*="overflow-y: auto"]::-webkit-scrollbar-track {
+                background: #f1f1f1 !important;
+                border-radius: 3px !important;
+            }
+            .modal div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb {
+                background: #667eea !important;
+                border-radius: 3px !important;
+            }
+            .modal div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb:hover {
+                background: #5a6fd8 !important;
             }
         }
         
@@ -2310,7 +2327,7 @@
                             ${property.images.map((img, index) => `
                                 <div class="photo-item" onclick="openLightbox(${index}, '${property.id}')" 
                                      style="flex-shrink: 0; width: 80px; height: 60px; border-radius: 4px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                    <img src="${img}" alt="物件照片" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <img src="${img}" alt="物件照片" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" onerror="this.style.display='none'">
                                 </div>
                             `).join('')}
                         </div>
@@ -2321,11 +2338,11 @@
                         <div style="display: flex; gap: 0.3rem; margin-bottom: 0.6rem;">
                             <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 4px; font-weight: 600;">
                                 <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">售價</div>
-                                <div style="font-size: 1rem;">${property.price}</div>
+                                <div style="font-size: 1.2rem;">${property.price}</div>
                             </div>
                             <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-radius: 4px; font-weight: 600;">
                                 <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">坪數</div>
-                                <div style="font-size: 1rem;">${property.total_area || property.area || '未設定'}</div>
+                                <div style="font-size: 1.2rem;">${property.total_area || property.area || '未設定'}</div>
                             </div>
                         </div>
                         
@@ -2555,12 +2572,12 @@
                     </div>
                     
                     <!-- 內容區域 -->
-                    <div style="padding: 15px 20px; max-height: 75vh; overflow-y: auto;">
+                    <div style="padding: 10px 15px; max-height: 80vh; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #667eea #f1f1f1;">
                         <!-- 主要資訊卡片 -->
                         <div class="main-info-grid" style="
                             display: flex;
                             gap: 0.3rem;
-                            margin-bottom: 20px;
+                            margin-bottom: 15px;
                         ">
                             <div style="
                                 flex: 1;
@@ -2603,49 +2620,49 @@
                         <div style="
                             background: #f8f9fa;
                             border-radius: 12px;
-                            padding: 15px;
-                            margin-bottom: 15px;
+                            padding: 12px;
+                            margin-bottom: 12px;
                             border-left: 4px solid #667eea;
                         ">
-                            <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 1rem; display: flex; align-items: center;">
+                            <h3 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 1rem; display: flex; align-items: center;">
                                 <i class="fas fa-info-circle" style="margin-right: 6px; color: #667eea; font-size: 0.9rem;"></i>物件詳細資訊
                             </h3>
-                            <div class="property-detail-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; font-size: 0.95rem;">
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                            <div class="property-detail-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; font-size: 0.95rem;">
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                                     <span style="color: #666; font-weight: 500;">屋齡：</span>
                                     <span style="color: #2c3e50; font-weight: 600;">${property.age || '未設定'}</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                                     <span style="color: #666; font-weight: 500;">樓層：</span>
                                     <span style="color: #2c3e50; font-weight: 600;">${property.floor || '未設定'}</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                                     <span style="color: #666; font-weight: 500;">車位：</span>
                                     <span style="color: #2c3e50; font-weight: 600;">${property.parking_type || '平面車位'}</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                                     <span style="color: #666; font-weight: 500;">類型：</span>
                                     <span style="color: #2c3e50; font-weight: 600;">${property.type}</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                                     <span style="color: #666; font-weight: 500;">座向：</span>
                                     <span style="color: #2c3e50; font-weight: 600;">${property.orientation || '座北朝南'}</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                                     <span style="color: #666; font-weight: 500;">學區交通：</span>
                                     <span style="color: #667eea; font-weight: 600; cursor: pointer; text-decoration: underline;" 
                                           onclick="showTransportationDetails('${property.id}')" 
                                           onmouseover="this.style.color='#5a6fd8'" 
                                           onmouseout="this.style.color='#667eea'">查看詳情</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                                     <span style="color: #666; font-weight: 500;">權狀坪數：</span>
                                     <span style="color: #667eea; font-weight: 600; cursor: pointer; text-decoration: underline;" 
                                           onclick="showAreaDetails('${property.id}')" 
                                           onmouseover="this.style.color='#5a6fd8'" 
                                           onmouseout="this.style.color='#667eea'">${property.total_area || '未設定'}</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                                     <span style="color: #666; font-weight: 500;">機能特色：</span>
                                     <span style="color: #667eea; font-weight: 600; cursor: pointer; text-decoration: underline;" 
                                           onclick="showFeaturesDetails('${property.id}')" 
@@ -2658,8 +2675,8 @@
                         </div>
                         
                         <!-- 照片預覽 -->
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 1.1rem; display: flex; align-items: center;">
+                        <div style="margin-bottom: 15px;">
+                            <h3 style="margin: 0 0 12px 0; color: #2c3e50; font-size: 1.1rem; display: flex; align-items: center;">
                                 <i class="fas fa-images" style="margin-right: 8px; color: #667eea;"></i>物件照片
                             </h3>
                             <div style="
@@ -2672,6 +2689,7 @@
                                 ${property.images.slice(0, 6).map(img => `
                                     <img src="${img}" 
                                          alt="物件照片" 
+                                         loading="lazy"
                                          style="
                                              width: 80px;
                                              height: 60px;
@@ -3553,6 +3571,19 @@
             }
         }
 
+        // 縮圖滾動功能
+        function scrollThumbnails(direction) {
+            const thumbnailsContainer = document.querySelector('.thumbnails');
+            if (thumbnailsContainer) {
+                const scrollAmount = 200; // 每次滾動的距離
+                if (direction === 'left') {
+                    thumbnailsContainer.scrollLeft -= scrollAmount;
+                } else if (direction === 'right') {
+                    thumbnailsContainer.scrollLeft += scrollAmount;
+                }
+            }
+        }
+
         // 更新燈箱照片內容
         function updateLightboxImage(newImageIndex, propertyId) {
             const property = embeddedPropertiesData.properties.find(p => p.id === propertyId);
@@ -3645,6 +3676,7 @@
                         ">
                             <img src="${property.images[imageIndex]}" 
                                  alt="物件照片" 
+                                 loading="eager"
                                  style="
                                      max-width: 80vw;
                                      max-height: 70vh;
@@ -3681,13 +3713,58 @@
                         
                         <!-- 簡化的縮圖導航 -->
                         ${property.images.length > 1 ? `
-                        <div class="thumbnails" style="display: flex; gap: 8px; margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.9); border-radius: 10px; width: 100%; max-width: 90vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
-                            ${property.images.map((img, idx) => `
-                                <img src="${img}" 
-                                     alt="縮圖 ${idx + 1}" 
-                                     onclick="updateLightboxImage(${idx}, '${propertyId}')"
-                                     style="width: 50px; height: 38px; object-fit: cover; border-radius: 6px; cursor: pointer; border: ${idx === imageIndex ? '2px solid #667eea' : '1px solid #ddd'}; flex-shrink: 0;">
-                            `).join('')}
+                        <div style="position: relative; margin-top: 15px;">
+                            <!-- 左箭頭 -->
+                            <button onclick="scrollThumbnails('left')" style="
+                                position: absolute;
+                                left: 5px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                background: rgba(102, 126, 234, 0.8);
+                                color: white;
+                                border: none;
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                                cursor: pointer;
+                                z-index: 10;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 14px;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                            ">‹</button>
+                            
+                            <!-- 右箭頭 -->
+                            <button onclick="scrollThumbnails('right')" style="
+                                position: absolute;
+                                right: 5px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                background: rgba(102, 126, 234, 0.8);
+                                color: white;
+                                border: none;
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 50%;
+                                cursor: pointer;
+                                z-index: 10;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 14px;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                            ">›</button>
+                            
+                            <div class="thumbnails" style="display: flex; gap: 8px; padding: 10px 40px; background: rgba(255,255,255,0.9); border-radius: 10px; width: 100%; max-width: 90vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
+                                ${property.images.map((img, idx) => `
+                                    <img src="${img}" 
+                                         alt="縮圖 ${idx + 1}" 
+                                         loading="lazy"
+                                         onclick="updateLightboxImage(${idx}, '${propertyId}')"
+                                         style="width: 50px; height: 38px; object-fit: cover; border-radius: 6px; cursor: pointer; border: ${idx === imageIndex ? '2px solid #667eea' : '1px solid #ddd'}; flex-shrink: 0;">
+                                `).join('')}
+                            </div>
                         </div>
                         ` : ''}
                     </div>

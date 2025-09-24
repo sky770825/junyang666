@@ -60,7 +60,7 @@
                     // ✅ 新版：允許所有彈窗內容可滑動
                     const target = e.target;
                     const scrollableParent = target.closest(
-                        '.photo-scroll-container, .property-card, .info-card, .container, .loan-modal, .modal-body, .modal-content, .map-container, .streetview-container'
+                        '.photo-scroll-container, .property-card, .info-card, .container, .loan-modal, .modal-body, .modal-content, .map-container, .streetview-container, .modal, div[style*="overflow-y: auto"]'
                     );
                     
                     if (!scrollableParent) {

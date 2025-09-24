@@ -1608,12 +1608,11 @@ body {
             }
         }
         
-        /* 彈窗基礎 */
         .modal {
             position: fixed;
             inset: 0;
             z-index: 1000;
-            display: none;
+            display: none;              /* JS 控制顯示 */
             align-items: center;
             justify-content: center;
             background: rgba(0,0,0,0.6);
@@ -1634,46 +1633,24 @@ body {
             color: white;
             padding: 1rem 1.5rem;
             border-radius: 12px 12px 0 0;
-            position: relative;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
         }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
+        .modal-header h2 { margin: 0; font-size: 1.3rem; font-weight: 600; }
         .modal-header .close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background-color 0.2s ease;
+            background: none; border: none; color: white; font-size: 2rem;
+            cursor: pointer; width: 30px; height: 30px; border-radius: 50%;
         }
 
-        .modal-header .close:hover {
-            background-color: rgba(255,255,255,0.2);
-        }
-
-        /* ✅ 可滾動內容 */
         .modal-body {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            max-height: calc(90vh - 120px); /* 預留 header 和 footer 空間 */
-            min-height: 200px; /* 確保有最小高度 */
+            max-height: calc(90vh - 120px);
+            min-height: 200px;
+            padding: 1rem;
         }
 
         .modal-body::-webkit-scrollbar {
@@ -1694,7 +1671,6 @@ body {
             background: #059669;
         }
 
-        /* 避免按鈕被擠出視窗 */
         .modal-footer {
             flex-shrink: 0;
             padding: 12px 16px;
@@ -1737,25 +1713,36 @@ body {
             }
         }
 
-        /* 地圖容器 */
-        .map-container {
+        .map-container,
+        .streetview-container {
             width: 100%;
-            margin: 0 auto;
+            display: flex;              /* 讓裡面的 iframe 可置中 */
+            justify-content: center;
+            margin-top: 12px;
         }
 
-        .map-container iframe {
-            width: 100%;
-            height: 300px; /* 桌機 */
+        .map-container iframe,
+        .streetview-container iframe {
+            width: 90%;                 /* 控制寬度，不會太貼邊 */
+            max-width: 700px;           /* 限制桌機不要太寬 */
+            height: 300px;              /* 桌機高度 */
             border-radius: 8px;
+            border: none;
         }
 
         @media (max-width: 768px) {
-            .map-container iframe {
-                height: 250px; /* 手機 */
+            .container { max-width: 100vw; height: 100vh; overflow-y: auto; }
+            .properties-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .modal-body { max-height: calc(92vh - 100px); min-height: 150px; }
+            .loan-modal-content { width: 95%; max-width: 750px; }
+            .map-container iframe,
+            .streetview-container iframe {
+                width: 100%;              /* 手機就滿版 */
+                height: 250px;            /* 高度縮小 */
             }
-            .modal-body {
-                max-height: calc(92vh - 100px); /* 手機版調整 */
-                min-height: 150px;
-            }
+        }
+        @media (max-width: 480px) {
+            .loan-modal-content { width: 98%; max-height: 98vh; }
+            .modal-header h2 { font-size: 1rem; }
         }
     </style>

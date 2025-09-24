@@ -639,13 +639,38 @@
             .modal div[style*="max-height: 90vh"] {
                 max-height: 95vh !important;
                 height: auto !important;
+                overflow: hidden !important;
+                display: flex !important;
+                flex-direction: column !important;
             }
             
             .modal div[style*="overflow-y: auto"] {
-                max-height: calc(95vh - 150px) !important;
+                max-height: none !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch !important;
                 padding: 15px !important;
+                flex: 1 !important;
+                min-height: 0 !important;
+                touch-action: pan-y !important;
+            }
+            
+            /* 強制滑動區域 */
+            .modal div[style*="flex: 1"] {
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+            
+            /* 詳細資訊彈窗強制滑動 */
+            .modal {
+                touch-action: pan-y !important;
+            }
+            
+            .modal div[style*="flex: 1"][style*="overflow-y: auto"] {
+                overflow-y: scroll !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+                pointer-events: auto !important;
             }
             
             .modal > div {
@@ -2714,7 +2739,7 @@
                     max-height: 90vh;
                     position: relative;
                     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                    overflow: visible;
+                    overflow: hidden;
                     display: flex;
                     flex-direction: column;
                 ">
@@ -2752,7 +2777,7 @@
                     </div>
                     
                     <!-- 內容區域 -->
-                    <div style="padding: 10px 15px; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #667eea #f1f1f1; min-height: 200px; max-height: calc(90vh - 120px);">
+                    <div style="padding: 10px 15px; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #667eea #f1f1f1; min-height: 0; max-height: none;">
                         <!-- 主要資訊卡片 -->
                         <div class="main-info-grid" style="
                             display: flex;

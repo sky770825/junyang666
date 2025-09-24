@@ -1614,4 +1614,10 @@ body {
             max-height: 90vh;
             overflow-y: auto;
         }
+        
+        @media (max-width: 768px) {
+            .modal-body {
+                max-height: 65vh; /* 手機螢幕更小一點 */
+            }
+        }
     </style>

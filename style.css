@@ -917,8 +917,10 @@ body {
             max-width: 1200px;
             max-height: 90vh;
             display: flex;
-        flex-direction: column;
+            flex-direction: column;
             align-items: center;
+            overflow-y: auto; /* 允許垂直滾動 */
+            -webkit-overflow-scrolling: touch; /* iOS 慣性滑動 */
         }
         
         .lightbox-main-image {
@@ -1056,6 +1058,7 @@ body {
             .lightbox-content {
                 width: 95%;
                 margin: 5% auto;
+                max-height: 95vh; /* 手機版給更多空間 */
             }
             
             .lightbox-main-image {
@@ -1116,7 +1119,7 @@ body {
             width: 95%;
             max-width: 950px;
             max-height: 90vh;
-            overflow: visible;
+            overflow: hidden; /* 改為 hidden 確保內容不會溢出 */
             box-shadow: 0 15px 35px rgba(0,0,0,0.15);
             animation: modalSlideIn 0.3s ease-out;
             display: flex;
@@ -1669,6 +1672,8 @@ body {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            max-height: calc(90vh - 120px); /* 預留 header 和 footer 空間 */
+            min-height: 200px; /* 確保有最小高度 */
         }
 
         .modal-body::-webkit-scrollbar {
@@ -1749,7 +1754,8 @@ body {
                 height: 250px; /* 手機 */
             }
             .modal-body {
-                max-height: 65vh;
+                max-height: calc(92vh - 100px); /* 手機版調整 */
+                min-height: 150px;
             }
         }
     </style>

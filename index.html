@@ -2808,7 +2808,6 @@
                 z-index: 10001;
                 max-width: 400px;
                 font-size: 0.9rem;
-                animation: tooltipSlideIn 0.3s ease-out;
                 overflow: hidden;
             `;
 
@@ -3018,7 +3017,7 @@
                                 <h4 style="margin: 0 0 10px 0; color: #2ecc71; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
                                     <span>🏢</span> 鄰近明顯設施
                                 </h4>
-                                <div style="max-height: 120px; overflow-y: auto;">
+                                <div style="max-height: 200px; overflow-y: auto;">
                                     ${facilitiesList}
                                 </div>
                             </div>
@@ -3027,7 +3026,7 @@
                                 <h4 style="margin: 0 0 10px 0; color: #3498db; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
                                     <span>🚗</span> 交通
                                 </h4>
-                                <div style="max-height: 100px; overflow-y: auto;">
+                                <div style="max-height: 200px; overflow-y: auto;">
                                     ${transportList}
                                 </div>
                             </div>
@@ -3039,7 +3038,7 @@
                                 <h4 style="margin: 0 0 10px 0; color: #9b59b6; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
                                     <span>🎓</span> 學校
                                 </h4>
-                                <div style="max-height: 80px; overflow-y: auto;">
+                                <div style="max-height: 200px; overflow-y: auto;">
                                     ${schoolsList}
                                 </div>
                             </div>
@@ -3048,7 +3047,7 @@
                                 <h4 style="margin: 0 0 10px 0; color: #e67e22; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
                                     <span>🛒</span> 市場 & <span>🌳</span> 公園
                                 </h4>
-                                <div style="max-height: 100px; overflow-y: auto;">
+                                <div style="max-height: 200px; overflow-y: auto;">
                                     ${marketPark}
                                 </div>
                             </div>
@@ -3115,7 +3114,6 @@
                 z-index: 10001;
                 max-width: 320px;
                 font-size: 0.9rem;
-                animation: tooltipSlideIn 0.3s ease-out;
                 overflow: hidden;
             `;
 
@@ -3570,6 +3568,16 @@
                 if (photoInfo) {
                     photoInfo.textContent = `照片 ${newImageIndex + 1} / ${property.images.length}`;
                 }
+                
+                // 更新縮圖邊框樣式
+                const thumbnails = currentLightbox.querySelectorAll('.thumbnails img');
+                thumbnails.forEach((thumb, idx) => {
+                    if (idx === newImageIndex) {
+                        thumb.style.border = '2px solid #667eea';
+                    } else {
+                        thumb.style.border = '1px solid #ddd';
+                    }
+                });
             }
         }
 
@@ -3673,7 +3681,7 @@
                         
                         <!-- 簡化的縮圖導航 -->
                         ${property.images.length > 1 ? `
-                        <div class="thumbnails" style="display: flex; gap: 8px; margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.9); border-radius: 10px; max-width: 80vw; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                        <div class="thumbnails" style="display: flex; gap: 8px; margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.9); border-radius: 10px; width: 100%; max-width: 90vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
                             ${property.images.map((img, idx) => `
                                 <img src="${img}" 
                                      alt="縮圖 ${idx + 1}" 

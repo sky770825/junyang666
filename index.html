@@ -540,12 +540,18 @@
         
         /* 地圖彈窗手機優化 */
         @media (max-width: 768px) {
-            .modal .map-container {
-                height: 60vh !important;
-                min-height: 100px !important;
-                max-height: 115vh !important;
-                margin-top: 100px !important;
-            }
+        .modal .map-container {
+            height: 60vh !important;
+            min-height: 400px !important;
+            max-height: 65vh !important;
+            margin-top: 50px !important;
+            max-width: 600px !important;
+        }
+        
+        .modal .map-container iframe {
+            width: 100% !important;
+            height: 250px !important;
+        }
             
             .modal .map-buttons {
                 flex-direction: column !important;

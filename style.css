@@ -204,7 +204,7 @@ body {
         }
         
         .features-list li::before {
-            content: '??;
+            content: '✓';
             position: absolute;
             left: 0;
             color: #27ae60;
@@ -1587,7 +1587,7 @@ body {
                 gap: 0.4rem !important;
             }
             
-            /\/\*\*/  */
+            /* 貸款輸入行響應式調整 */
             .loan-input-row {
                 grid-template-columns: 1fr !important;
                 gap: 0.6rem !important;
@@ -1743,4 +1743,3 @@ body {
             .loan-modal-content { width: 98%; max-height: 98vh; }
             .modal-header h2 { font-size: 1rem; }
         }
-    </style>

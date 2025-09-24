@@ -4,32 +4,28 @@
     box-sizing: border-box;
 }
 
-        html {
-            overflow: hidden;
-            touch-action: manipulation;
+html, body {
             height: 100%;
-        }
-
-body {
+            width: 100%;
+            margin: 0;
+            padding: 0;
             font-family: 'Microsoft JhengHei', Arial, sans-serif;
-    line-height: 1.6;
+            line-height: 1.6;
             color: #333;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow: hidden;
-            touch-action: manipulation;
-            height: 100%;
-            position: fixed;
-            width: 100%;
-}
+            overflow-x: hidden;       /* 僅隱藏橫向 */
+            overflow-y: auto;         /* 允許直向滾動 */
+            position: relative;       /* 移除固定定位 */
+        }
 
 .container {
             max-width: 1200px;
     margin: 0 auto;
     background: white;
             box-shadow: 0 0 30px rgba(0,0,0,0.1);
-            height: 100vh;
-            overflow-y: auto;
+            min-height: 100vh;
             overflow-x: hidden;
+            overflow-y: auto;
 }
 
 .header {

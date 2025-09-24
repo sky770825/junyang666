@@ -517,6 +517,7 @@
             .modal div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb:hover {
                 background: #5a6fd8 !important;
             }
+            
         }
         
         /* 地圖彈窗手機優化 */
@@ -3584,6 +3585,57 @@
             }
         }
 
+        // 觸控手勢變數
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        // 處理觸控開始
+        function handleTouchStart(event, propertyId) {
+            if (event.touches.length === 1) {
+                touchStartX = event.touches[0].clientX;
+                touchStartY = event.touches[0].clientY;
+            }
+        }
+
+        // 處理觸控結束
+        function handleTouchEnd(event, propertyId) {
+            if (event.changedTouches.length === 1) {
+                const touchEndX = event.changedTouches[0].clientX;
+                const touchEndY = event.changedTouches[0].clientY;
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                
+                // 確保是水平滑動（水平距離大於垂直距離）
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                    const property = embeddedPropertiesData.properties.find(p => p.id === propertyId);
+                    if (!property || !property.images || !currentLightbox) return;
+                    
+                    const currentIndexElement = currentLightbox.querySelector('.current-image-index');
+                    if (!currentIndexElement) return;
+                    
+                    let currentIndex = parseInt(currentIndexElement.textContent.split('/')[0]) - 1;
+                    let newIndex;
+                    
+                    if (deltaX > 0) {
+                        // 向右滑動，顯示上一張
+                        newIndex = currentIndex - 1;
+                        if (newIndex < 0) {
+                            newIndex = property.images.length - 1;
+                        }
+                    } else {
+                        // 向左滑動，顯示下一張
+                        newIndex = currentIndex + 1;
+                        if (newIndex >= property.images.length) {
+                            newIndex = 0;
+                        }
+                    }
+                    
+                    updateLightboxImage(newIndex, propertyId);
+                }
+            }
+        }
+
+
         // 更新燈箱照片內容
         function updateLightboxImage(newImageIndex, propertyId) {
             const property = embeddedPropertiesData.properties.find(p => p.id === propertyId);
@@ -3595,7 +3647,7 @@
                 }
                 
                 // 更新照片資訊
-                const photoInfo = currentLightbox.querySelector('p');
+                const photoInfo = currentLightbox.querySelector('.current-image-index');
                 if (photoInfo) {
                     photoInfo.textContent = `照片 ${newImageIndex + 1} / ${property.images.length}`;
                 }
@@ -3686,9 +3738,14 @@
                                      touch-action: manipulation;
                                      -webkit-user-select: none;
                                      user-select: none;
+                                     pointer-events: auto;
+                                     z-index: 1;
                                  "
                                  onerror="this.style.border='2px solid #e74c3c'; this.alt='❌ 照片載入失敗'"
-                                 ondragstart="return false;">
+                                 ondragstart="return false;"
+                                 ontouchstart="handleTouchStart(event, '${propertyId}')"
+                                 ontouchend="handleTouchEnd(event, '${propertyId}')"
+                                 onclick="event.stopPropagation();">
                         </div>
                         
                         <!-- 照片資訊 -->
@@ -3705,64 +3762,24 @@
                             <h3 style="margin: 0 0 5px 0; font-size: 1.2rem; font-weight: 700;">
                                 ${property.title}
                             </h3>
-                            <p style="margin: 0; opacity: 0.8; font-size: 0.9rem;">
+                            <p class="current-image-index" style="margin: 0; opacity: 0.8; font-size: 0.9rem;">
                                 照片 ${imageIndex + 1} / ${property.images.length}
                             </p>
                         </div>
                         
                         
-                        <!-- 簡化的縮圖導航 -->
+                        <!-- 縮圖導航 -->
                         ${property.images.length > 1 ? `
-                        <div style="position: relative; margin-top: 15px;">
-                            <!-- 左箭頭 -->
-                            <button onclick="scrollThumbnails('left')" style="
-                                position: absolute;
-                                left: 5px;
-                                top: 50%;
-                                transform: translateY(-50%);
-                                background: rgba(102, 126, 234, 0.8);
-                                color: white;
-                                border: none;
-                                width: 30px;
-                                height: 30px;
-                                border-radius: 50%;
-                                cursor: pointer;
-                                z-index: 10;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 14px;
-                                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                            ">‹</button>
-                            
-                            <!-- 右箭頭 -->
-                            <button onclick="scrollThumbnails('right')" style="
-                                position: absolute;
-                                right: 5px;
-                                top: 50%;
-                                transform: translateY(-50%);
-                                background: rgba(102, 126, 234, 0.8);
-                                color: white;
-                                border: none;
-                                width: 30px;
-                                height: 30px;
-                                border-radius: 50%;
-                                cursor: pointer;
-                                z-index: 10;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 14px;
-                                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                            ">›</button>
-                            
-                            <div class="thumbnails" style="display: flex; gap: 8px; padding: 10px 40px; background: rgba(255,255,255,0.9); border-radius: 10px; width: 100%; max-width: 90vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
+                        <div style="margin-top: 15px; z-index: 10; position: relative;">
+                            <div class="thumbnails" style="display: flex; gap: 8px; padding: 10px; background: rgba(255,255,255,0.9); border-radius: 10px; width: 100%; max-width: 90vw; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; justify-content: center; pointer-events: auto;">
                                 ${property.images.map((img, idx) => `
                                     <img src="${img}" 
                                          alt="縮圖 ${idx + 1}" 
                                          loading="lazy"
-                                         onclick="updateLightboxImage(${idx}, '${propertyId}')"
-                                         style="width: 50px; height: 38px; object-fit: cover; border-radius: 6px; cursor: pointer; border: ${idx === imageIndex ? '2px solid #667eea' : '1px solid #ddd'}; flex-shrink: 0;">
+                                         onclick="updateLightboxImage(${idx}, '${propertyId}'); event.stopPropagation();"
+                                         style="width: 50px; height: 38px; object-fit: cover; border-radius: 6px; cursor: pointer; border: ${idx === imageIndex ? '2px solid #667eea' : '1px solid #ddd'}; flex-shrink: 0; pointer-events: auto;"
+                                         onmouseover="this.style.transform='scale(1.05)'" 
+                                         onmouseout="this.style.transform='scale(1)'">
                                 `).join('')}
                             </div>
                         </div>
@@ -3775,6 +3792,7 @@
                 
                 // 儲存到全域變數
                 currentLightbox = modal;
+                
                 
                 // 點擊背景關閉
                 modal.addEventListener('click', (e) => {

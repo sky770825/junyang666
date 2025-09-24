@@ -2636,139 +2636,11 @@
             }
         }
 
-        // 物件詳細資訊函數 - 添加滑動解鎖機制
+        // 物件詳細資訊函數
         function showPropertyDetails(propertyId) {
             const property = embeddedPropertiesData.properties.find(p => p.id === propertyId);
             if (property) {
-                // 顯示滑動解鎖界面
-                showSliderUnlock(property);
-            }
-        }
-
-        // 滑動解鎖界面
-        function showSliderUnlock(property) {
-            const unlockContainer = document.createElement('div');
-            unlockContainer.className = 'slider-unlock-container';
-            unlockContainer.id = 'sliderUnlockContainer';
-            
-            unlockContainer.innerHTML = `
-                <div class="slider-unlock-modal">
-                    <div class="slider-unlock-title">🔒 查看詳細資訊</div>
-                    <div class="slider-unlock-subtitle">請滑動解鎖以查看完整資料</div>
-                    
-                    <div class="slider-track" id="sliderTrack">
-                        <div class="slider-fill" id="sliderFill"></div>
-                        <div class="slider-thumb" id="sliderThumb">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                        <div class="slider-text">滑動解鎖</div>
-                        <div class="slider-progress" id="sliderProgress">0%</div>
-                    </div>
-                    
-                    <button class="close-unlock-btn" onclick="closeSliderUnlock()">
-                        <i class="fas fa-times"></i> 取消
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(unlockContainer);
-            
-            // 添加滑動邏輯
-            initSliderUnlock(property);
-        }
-
-        // 初始化滑動解鎖邏輯
-        function initSliderUnlock(property) {
-            const sliderTrack = document.getElementById('sliderTrack');
-            const sliderFill = document.getElementById('sliderFill');
-            const sliderThumb = document.getElementById('sliderThumb');
-            const sliderProgress = document.getElementById('sliderProgress');
-            
-            let isDragging = false;
-            let startX = 0;
-            let currentX = 0;
-            let progress = 0;
-            
-            // 滑鼠事件
-            sliderThumb.addEventListener('mousedown', startDrag);
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('mouseup', stopDrag);
-            
-            // 觸控事件
-            sliderThumb.addEventListener('touchstart', startDrag);
-            document.addEventListener('touchmove', drag);
-            document.addEventListener('touchend', stopDrag);
-            
-            function startDrag(e) {
-                isDragging = true;
-                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-                startX = clientX - sliderThumb.offsetLeft;
-                sliderThumb.style.cursor = 'grabbing';
-            }
-            
-            function drag(e) {
-                if (!isDragging) return;
-                
-                e.preventDefault();
-                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-                currentX = clientX - startX;
-                
-                const trackWidth = sliderTrack.offsetWidth;
-                const thumbWidth = sliderThumb.offsetWidth;
-                const maxDistance = trackWidth - thumbWidth - 10;
-                
-                // 限制滑動範圍
-                currentX = Math.max(5, Math.min(currentX, maxDistance));
-                
-                // 計算進度
-                progress = ((currentX - 5) / (maxDistance - 5)) * 100;
-                
-                // 更新UI
-                sliderThumb.style.left = currentX + 'px';
-                sliderFill.style.width = progress + '%';
-                sliderProgress.textContent = Math.round(progress) + '%';
-                
-                // 檢查是否解鎖成功
-                if (progress >= 85) {
-                    unlockSuccess(property);
-                }
-            }
-            
-            function stopDrag() {
-                if (!isDragging) return;
-                isDragging = false;
-                sliderThumb.style.cursor = 'grab';
-                
-                // 如果沒有達到解鎖條件，回彈
-                if (progress < 85) {
-                    resetSlider();
-                }
-            }
-            
-            function resetSlider() {
-                sliderThumb.style.left = '5px';
-                sliderFill.style.width = '0%';
-                sliderProgress.textContent = '0%';
-                progress = 0;
-            }
-            
-            function unlockSuccess(property) {
-                sliderThumb.classList.add('unlocked');
-                sliderThumb.innerHTML = '<i class="fas fa-check"></i>';
-                sliderFill.classList.add('unlock-success');
-                
-                setTimeout(() => {
-                    closeSliderUnlock();
-                    showPropertyModal(property);
-                }, 800);
-            }
-        }
-
-        // 關閉滑動解鎖界面
-        function closeSliderUnlock() {
-            const container = document.getElementById('sliderUnlockContainer');
-            if (container) {
-                container.remove();
+                showPropertyModal(property);
             }
         }
 
@@ -2814,8 +2686,10 @@
                         cursor: pointer;
                         font-size: 18px;
                         font-weight: bold;
-                        z-index: 10001;
-                    ">×</button>
+                        z-index: 10002;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'">×</button>
                     
                     <!-- 標題區域 -->
                     <div style="
@@ -3034,6 +2908,7 @@
             // 移除動畫樣式以提升性能
             
             modal.className = 'modal';
+            modal.id = 'propertyModal';
             currentPropertyModal = modal;
             document.body.appendChild(modal);
             

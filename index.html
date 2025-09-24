@@ -463,6 +463,25 @@
                 grid-template-columns: 1fr 1fr !important;
                 gap: 12px !important;
             }
+            
+            /* 物件詳細資訊彈窗手機版緊縮優化 */
+            .modal .property-detail-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.3rem !important;
+                font-size: 0.8rem !important;
+            }
+            
+            .modal .property-detail-grid > div {
+                padding: 0.4rem 0 !important;
+                border-bottom: 1px solid #f0f0f0 !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+            
+            .modal .property-detail-grid > div:last-child {
+                border-bottom: none !important;
+            }
         }
         
         /* 地圖彈窗手機優化 */
@@ -2270,11 +2289,11 @@
                         </div>
                         
                         ${property.layout ? `
-                        <div style="margin-bottom: 0.6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                            <div style="padding: 0.3rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 0.85rem;">
+                        <div style="margin-bottom: 0.6rem; display: flex; gap: 0.3rem;">
+                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 0.8rem;">
                                 <strong>格局：</strong>${property.layout}
                             </div>
-                            <div style="padding: 0.3rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 0.85rem;">
+                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 0.8rem;">
                                 <strong>屋齡：</strong>${property.age || '未設定'}
                             </div>
                         </div>
@@ -2491,7 +2510,7 @@
                     </div>
                     
                     <!-- 內容區域 -->
-                    <div style="padding: 25px 30px; max-height: 70vh; overflow-y: auto;">
+                    <div style="padding: 15px 20px; max-height: 75vh; overflow-y: auto;">
                         <!-- 主要資訊卡片 -->
                         <div class="main-info-grid" style="
                             display: flex;
@@ -2538,15 +2557,15 @@
                         <!-- 詳細資訊 -->
                         <div style="
                             background: #f8f9fa;
-                            border-radius: 15px;
-                            padding: 20px;
-                            margin-bottom: 20px;
+                            border-radius: 12px;
+                            padding: 15px;
+                            margin-bottom: 15px;
                             border-left: 4px solid #667eea;
                         ">
-                            <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 1.1rem; display: flex; align-items: center;">
-                                <i class="fas fa-info-circle" style="margin-right: 8px; color: #667eea;"></i>物件詳細資訊
+                            <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 1rem; display: flex; align-items: center;">
+                                <i class="fas fa-info-circle" style="margin-right: 6px; color: #667eea; font-size: 0.9rem;"></i>物件詳細資訊
                             </h3>
-                            <div class="detail-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; font-size: 0.95rem;">
+                            <div class="property-detail-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; font-size: 0.95rem;">
                                 <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef;">
                                     <span style="color: #666; font-weight: 500;">屋齡：</span>
                                     <span style="color: #2c3e50; font-weight: 600;">${property.age || '未設定'}</span>

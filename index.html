@@ -552,6 +552,56 @@
             width: 100% !important;
             height: 250px !important;
         }
+        
+        /* 手機版詳細資訊彈窗內容區域優化 */
+        .modal-content {
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding: 16px !important;
+            border-radius: 12px !important;
+            background: #fff !important;
+        }
+        
+        /* 貸款試算彈窗手機版優化 */
+        .loan-modal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(0,0,0,0.5) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 10000 !important;
+        }
+        
+        .loan-modal-content {
+            max-height: 85vh !important;
+            width: 95% !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding: 16px !important;
+            border-radius: 12px !important;
+            background: #fff !important;
+        }
+        
+        .loan-modal-body {
+            max-height: calc(85vh - 120px) !important;
+            min-height: auto !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        
+        /* 地圖按鈕絕對定位 */
+        .map-buttons {
+            position: absolute !important;
+            bottom: 20px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 1000 !important;
+        }
             
             .modal .map-buttons {
                 flex-direction: column !important;
@@ -2634,7 +2684,7 @@
                     </div>
                     
                     <!-- 內容區域 -->
-                    <div style="padding: 10px 15px; max-height: 80vh; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #667eea #f1f1f1;">
+                    <div class="modal-content" style="padding: 10px 15px; max-height: 80vh; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #667eea #f1f1f1;">
                         <!-- 主要資訊卡片 -->
                         <div class="main-info-grid" style="
                             display: flex;

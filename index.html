@@ -1467,7 +1467,7 @@
                     price: "998萬",
                     total_area: "36.43坪",
                     main_area: "15.999坪",
-                    layout: "2房1廳1衛2陽台",
+                    layout: "2房1廳1衛",
                     age: "8年",
                     floor: "14F/15F",
                     orientation: "坐西南朝東北",
@@ -1853,7 +1853,7 @@
                     price: "1,398萬",
                     total_area: "56.06坪",
                     main_area: "22.559坪",
-                    layout: "3房1廳2衛2陽台",
+                    layout: "3房1廳2衛",
                     age: "9年",
                     floor: "12F/15F",
                     orientation: "坐東北朝西南",
@@ -2922,7 +2922,6 @@
                 width: 90vw;
                 max-height: 80vh;
                 font-size: 0.9rem;
-                animation: tooltipSlideIn 0.3s ease-out;
                 overflow: hidden;
             `;
 
@@ -2937,6 +2936,7 @@
                 tooltip.style.transform = 'translate(-50%, -50%)';
                 tooltip.style.maxWidth = '95vw';
                 tooltip.style.maxHeight = '85vh';
+                tooltip.style.width = '95vw';
             } else {
                 // 桌面版在點擊元素附近
                 const tooltipX = rect.left + rect.width / 2 - 350;
@@ -3005,13 +3005,13 @@
                         <span style="font-weight: 600;">學區交通環境</span>
                     </div>
                 </div>
-                <div style="padding: 15px; line-height: 1.4; cursor: pointer;" onclick="closeTransportationTooltip()">
+                <div style="padding: 15px; line-height: 1.4; cursor: pointer; max-height: calc(80vh - 60px); overflow-y: auto;" onclick="closeTransportationTooltip()">
                     <div style="margin-bottom: 15px; color: #2c3e50; font-weight: 600; font-size: 0.95rem; text-align: center; padding-bottom: 10px; border-bottom: 2px solid #667eea;">
                         ${property.title}
                     </div>
                     
                     <!-- 多欄佈局 -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-height: 400px;">
+                    <div style="display: grid; grid-template-columns: ${window.innerWidth <= 768 ? '1fr' : '1fr 1fr'}; gap: 20px;">
                         <!-- 左欄 -->
                         <div>
                             <div style="margin-bottom: 15px;">

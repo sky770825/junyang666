@@ -2254,14 +2254,14 @@
 
                     <!-- 物件資訊 -->
                     <div class="property-info" style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px; margin: 0.5rem 0;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.8rem;">
-                            <div style="text-align: center; padding: 0.5rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 6px; font-weight: 600;">
-                                <div style="font-size: 0.9rem; opacity: 0.9;">售價</div>
-                                <div style="font-size: 1.3rem;">${property.price}</div>
+                        <div style="display: flex; gap: 0.3rem; margin-bottom: 0.6rem;">
+                            <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 4px; font-weight: 600;">
+                                <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">售價</div>
+                                <div style="font-size: 1rem;">${property.price}</div>
                             </div>
-                            <div style="text-align: center; padding: 0.5rem; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-radius: 6px; font-weight: 600;">
-                                <div style="font-size: 0.9rem; opacity: 0.9;">坪數</div>
-                                <div style="font-size: 1.3rem;">${property.total_area || property.area || '未設定'}</div>
+                            <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-radius: 4px; font-weight: 600;">
+                                <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">坪數</div>
+                                <div style="font-size: 1rem;">${property.total_area || property.area || '未設定'}</div>
                             </div>
                         </div>
                         
@@ -2494,42 +2494,44 @@
                     <div style="padding: 25px 30px; max-height: 70vh; overflow-y: auto;">
                         <!-- 主要資訊卡片 -->
                         <div class="main-info-grid" style="
-                            display: grid;
-                            grid-template-columns: 1fr 1fr 1fr;
-                            gap: 15px;
-                            margin-bottom: 25px;
+                            display: flex;
+                            gap: 0.3rem;
+                            margin-bottom: 20px;
                         ">
                             <div style="
+                                flex: 1;
                                 background: #667eea;
                                 color: white;
-                                padding: 15px;
-                                border-radius: 10px;
+                                padding: 0.4rem 0.2rem;
+                                border-radius: 6px;
                                 text-align: center;
                             ">
-                                <div style="font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px;">💰 售價</div>
-                                <div style="font-size: 1.3rem; font-weight: 600;">${property.price}</div>
+                                <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">💰 售價</div>
+                                <div style="font-size: 1rem; font-weight: 600;">${property.price}</div>
                             </div>
                             
                             <div style="
+                                flex: 1;
                                 background: #f093fb;
                                 color: white;
-                                padding: 15px;
-                                border-radius: 10px;
+                                padding: 0.4rem 0.2rem;
+                                border-radius: 6px;
                                 text-align: center;
                             ">
-                                <div style="font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px;">📐 坪數</div>
-                                <div style="font-size: 1.3rem; font-weight: 600;">${property.total_area || '未設定'}</div>
+                                <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">📐 坪數</div>
+                                <div style="font-size: 1rem; font-weight: 600;">${property.total_area || '未設定'}</div>
                             </div>
                             
                             <div style="
+                                flex: 1;
                                 background: #4ecdc4;
                                 color: white;
-                                padding: 15px;
-                                border-radius: 10px;
+                                padding: 0.4rem 0.2rem;
+                                border-radius: 6px;
                                 text-align: center;
                             ">
-                                <div style="font-size: 0.8rem; opacity: 0.9; margin-bottom: 5px;">🏠 格局</div>
-                                <div style="font-size: 1.3rem; font-weight: 600;">${property.layout || '未設定'}</div>
+                                <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">🏠 格局</div>
+                                <div style="font-size: 1rem; font-weight: 600;">${property.layout || '未設定'}</div>
                             </div>
                         </div>
                         

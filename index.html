@@ -538,171 +538,80 @@
             }
         }
         
+        /* 地圖容器樣式優化 */
+        .map-container {
+            width: 100%;       /* 讓地圖跟隨容器寬度 */
+            max-width: 600px;  /* 限制最大寬度，避免太大 */
+            margin: 0 auto;    /* 水平置中 */
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 350px;     /* 調整高度，手機可用250px */
+            border-radius: 8px;/* 加上圓角，看起來更現代 */
+        }
+
         /* 地圖彈窗手機優化 */
         @media (max-width: 768px) {
-        .modal .map-container {
-            height: 60vh !important;
-            min-height: 400px !important;
-            max-height: 65vh !important;
-            margin-top: 50px !important;
-            max-width: 600px !important;
-        }
-        
-        .modal .map-container iframe {
-            width: 100% !important;
-            height: 250px !important;
-        }
-        
-        /* 手機版詳細資訊彈窗內容區域優化 */
-        .modal-content {
-            max-height: 90vh !important;
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-            padding: 16px !important;
-            border-radius: 12px !important;
-            background: #fff !important;
-        }
-        
-        /* 貸款試算彈窗手機版優化 */
-        .loan-modal {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: rgba(0,0,0,0.5) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            z-index: 10000 !important;
-        }
-        
-        .loan-modal-content {
-            max-height: 85vh !important;
-            width: 95% !important;
-            max-width: 500px !important;
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-            padding: 20px !important;
-            border-radius: 12px !important;
-            background: #fff !important;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
-            font-family: "Microsoft JhengHei", sans-serif !important;
-        }
-        
-        .loan-modal-body {
-            max-height: calc(85vh - 120px) !important;
-            min-height: auto !important;
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-        }
-        
-        /* 手機版貸款試算彈窗優化樣式 */
-        .modal-header {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            margin-bottom: 15px !important;
-        }
-        
-        .modal-header h2 {
-            margin: 0 !important;
-            font-size: 1.2rem !important;
-        }
-        
-        .close-btn {
-            background: none !important;
-            border: none !important;
-            font-size: 1.2rem !important;
-            cursor: pointer !important;
-        }
-        
-        .modal-body .row {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            padding: 6px 0 !important;
-            border-bottom: 1px solid #eee !important;
-            white-space: nowrap !important;
-        }
-        
-        .modal-body .row:last-child {
-            border-bottom: none !important;
-        }
-        
-        .value {
-            font-weight: 600 !important;
-            color: #333 !important;
-        }
-        
-        .highlight {
-            background: #f0faff !important;
-            font-weight: 700 !important;
-            color: #007aff !important;
-            padding: 8px !important;
-            border-radius: 8px !important;
-            margin-top: 10px !important;
-        }
-        
-        /* 地圖按鈕絕對定位 */
-        .map-buttons {
-            position: absolute !important;
-            bottom: 20px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            z-index: 1000 !important;
-        }
-        
-        .modal .map-buttons {
-            flex-direction: column !important;
-            gap: 12px !important;
-            padding: 15px 20px !important;
-            background: #f8f9fa !important;
-            border-top: 1px solid #e9ecef !important;
-            flex-shrink: 0 !important;
-        }
-        
-        .modal .map-buttons a {
-            padding: 12px 24px !important;
-            font-size: 1rem !important;
-            border-radius: 8px !important;
-            min-height: 45px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            text-align: center !important;
-        }
-        
-        /* 地圖標題區域優化 */
-        .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] {
-            padding: 15px 20px 15px 20px !important;
-            margin-bottom: 10px !important;
-        }
-        
-        .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] h2 {
-            font-size: 1.1rem !important;
-            margin: 0 !important;
-        }
-        
-        .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] p {
-            font-size: 0.85rem !important;
-            margin: 3px 0 0 0 !important;
-        }
-        
-        /* 地圖彈窗整體優化 */
-        .modal {
-            padding: 8px !important;
-            margin: 0 !important;
-        }
-        
-        .modal > div {
-            width: 98vw !important;
-            max-width: none !important;
-            height: 90vh !important;
-            max-height: 90vh !important;
-            display: flex !important;
-            flex-direction: column !important;
-        }
+            .map-container iframe {
+                height: 250px; /* 手機版使用較小高度 */
+            }
+            
+            .modal .map-container {
+                height: 60vh !important;
+                min-height: 400px !important;
+                max-height: 65vh !important;
+            }
+            
+            .modal .map-buttons {
+                flex-direction: column !important;
+                gap: 12px !important;
+                padding: 15px 20px !important;
+                background: #f8f9fa !important;
+                border-top: 1px solid #e9ecef !important;
+                flex-shrink: 0 !important;
+            }
+            
+            .modal .map-buttons a {
+                padding: 12px 24px !important;
+                font-size: 1rem !important;
+                border-radius: 8px !important;
+                min-height: 45px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            
+            /* 地圖標題區域優化 */
+            .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] {
+                padding: 15px 20px 10px 20px !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] h2 {
+                font-size: 1.1rem !important;
+                margin: 0 !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] p {
+                font-size: 0.85rem !important;
+                margin: 3px 0 0 0 !important;
+            }
+            
+            /* 地圖彈窗整體優化 */
+            .modal {
+                padding: 8px !important;
+                margin: 0 !important;
+            }
+            
+            .modal > div {
+                width: 98vw !important;
+                max-width: none !important;
+                height: 90vh !important;
+                max-height: 90vh !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
         }
         
         /* 客戶見證動畫 */
@@ -764,7 +673,6 @@
             }
         }
         
-        
         .loan-modal-header {
             background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
             color: white;
@@ -811,7 +719,7 @@
         
         .loan-modal-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 1.2rem;
         }
         
@@ -925,14 +833,6 @@
             font-size: 0.8rem;
         }
         
-        /* 手機版貸款試算欄位寬度調整 */
-        @media (max-width: 480px) {
-            .loan-result-grid {
-                grid-template-columns: 0.7fr 1.3fr !important;
-                gap: 0.4rem !important;
-            }
-        }
-        
         .loan-result-highlight {
             background: linear-gradient(135deg, #10b981, #3b82f6);
             color: white;
@@ -967,6 +867,75 @@
             
             .filter-button:active {
                 transform: scale(0.98) !important;
+            }
+        }
+        
+        /* 貸款試算手機版優化 */
+        @media (max-width: 768px) {
+            .loan-modal-content {
+                margin: 3% auto;
+                width: 95%;
+                max-width: 750px;
+                max-height: 90vh;
+            }
+            
+            .loan-modal-header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .loan-modal-title {
+                font-size: 1.1rem;
+            }
+            
+            /* 貸款試算輸入行響應式設計 */
+            .loan-input-row {
+                grid-template-columns: 1fr !important;
+                gap: 0.8rem !important;
+            }
+            
+            /* 貸款試算結果行響應式設計 */
+            .loan-result-row {
+                grid-template-columns: 1fr !important;
+                gap: 0.6rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .loan-modal-content {
+                margin: 1% auto;
+                width: 98%;
+                max-height: 98vh;
+                border-radius: 8px;
+            }
+            
+            .loan-modal-header {
+                padding: 0.5rem 0.8rem;
+            }
+            
+            .loan-modal-title {
+                font-size: 0.9rem;
+            }
+            
+            /* 超小螢幕優化 */
+            .loan-input-group {
+                margin-bottom: 0.4rem;
+            }
+            
+            .loan-input-label {
+                font-size: 0.8rem;
+            }
+            
+            .loan-input {
+                padding: 0.4rem;
+                font-size: 0.8rem;
+            }
+            
+            .loan-slider {
+                margin: 0.3rem 0;
+            }
+            
+            .loan-slider-value {
+                font-size: 0.7rem;
             }
         }
         
@@ -1240,7 +1209,7 @@
         <div class="loan-modal-content">
             <div class="loan-modal-header">
                 <div class="loan-modal-title">
-                    <span class="text-2xl mr-3">🧮</span>
+                    <span style="margin-right: 8px;">🧮</span>
                     買方費用估算
                 </div>
                 <span class="loan-modal-close" onclick="closeLoanModal()">&times;</span>
@@ -1332,13 +1301,6 @@
                                 <label class="loan-input-label">其他月支出 (萬元)</label>
                                 <input type="number" id="modalOtherExpenses" class="loan-input" placeholder="例如：2" value="2">
                             </div>
-                        </div>
-                        
-                        <!-- 新青安貸款一般利率設定 -->
-                        <div id="youthRateSetting" class="loan-input-group" style="display: none;">
-                            <label class="loan-input-label">一般貸款利率 (%)</label>
-                            <input type="range" id="normalLoanRate" min="2.0" max="4.0" step="0.1" value="2.8" class="loan-slider">
-                            <div class="loan-slider-value" id="normalLoanRateValue">2.8%</div>
                         </div>
                         
                         <div class="loan-input-group">
@@ -2522,10 +2484,10 @@
                         
                         ${property.layout ? `
                         <div style="margin-bottom: 0.6rem; display: flex; gap: 0.3rem;">
-                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1.2rem;">
+                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1rem;">
                                 <strong>格局：</strong>${property.layout}
                             </div>
-                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1.2rem;">
+                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1rem;">
                                 <strong>屋齡：</strong>${property.age || '未設定'}
                             </div>
                         </div>
@@ -2742,7 +2704,7 @@
                     </div>
                     
                     <!-- 內容區域 -->
-                    <div class="modal-content" style="padding: 10px 15px; max-height: 80vh; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #667eea #f1f1f1;">
+                    <div style="padding: 10px 15px; max-height: 80vh; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #667eea #f1f1f1;">
                         <!-- 主要資訊卡片 -->
                         <div class="main-info-grid" style="
                             display: flex;
@@ -3447,28 +3409,22 @@
         function showLoanCalculator(propertyId) {
             const property = embeddedPropertiesData.properties.find(p => p.id === propertyId);
             if (property) {
-                try {
-                    console.log('開啟貸款試算彈窗');
-                    // 提取價格數字（移除"萬"字）
-                    const priceMatch = property.price.match(/(\d+(?:,\d+)*)/);
-                    const propertyPrice = priceMatch ? parseInt(priceMatch[1].replace(/,/g, '')) : 896;
-                    
-                    // 設定房屋總價
-                    document.getElementById('modalHousePrice').value = propertyPrice;
-                    
-                    // 顯示彈窗
-                    document.getElementById('loanModal').style.display = 'block';
-                    
-                    // 重新綁定滑桿事件
-                    setTimeout(() => {
-                        bindSliderEvents();
-                        bindInputEvents();
-                        calculateModalLoan(); // 立即計算一次顯示結果
-                    }, 100);
-                } catch (error) {
-                    console.error('彈窗開啟錯誤:', error);
-                    alert('彈窗開啟失敗，請檢查控制台錯誤訊息');
-                }
+                // 提取價格數字（移除"萬"字）
+                const priceMatch = property.price.match(/(\d+(?:,\d+)*)/);
+                const propertyPrice = priceMatch ? parseInt(priceMatch[1].replace(/,/g, '')) : 896;
+                
+                // 設定房屋總價
+                document.getElementById('modalHousePrice').value = propertyPrice;
+                
+                // 顯示彈窗
+                document.getElementById('loanModal').style.display = 'block';
+                
+                // 重新綁定滑桿事件
+                setTimeout(() => {
+                    bindSliderEvents();
+                    bindInputEvents();
+                    calculateModalLoan();
+                }, 100);
             }
         }
 
@@ -3477,125 +3433,59 @@
             document.getElementById('loanModal').style.display = 'none';
         }
 
-        // 滑桿值更新 - 確保在DOM載入後綁定
+        // 滑桿值更新
         function bindSliderEvents() {
             const loanRatioSlider = document.getElementById('modalLoanRatio');
             const loanYearsSlider = document.getElementById('modalLoanYears');
             const interestRateSlider = document.getElementById('modalInterestRate');
+            const agentFeeSlider = document.getElementById('modalAgentFee');
             
             if (loanRatioSlider) {
                 loanRatioSlider.addEventListener('input', function() {
                     document.getElementById('modalLoanRatioValue').textContent = this.value + '%';
-                    calculateModalLoan(); // 即時計算
-                });
-                loanRatioSlider.addEventListener('change', function() {
-                    document.getElementById('modalLoanRatioValue').textContent = this.value + '%';
-                    calculateModalLoan(); // 即時計算
-                    // 只有在變更時才檢查新青安貸款設定
-                    if (document.getElementById('modalExistingLoan').value === 'youth') {
-                        showYouthLoanNotice();
-                    }
+                    calculateModalLoan();
                 });
             }
             
             if (loanYearsSlider) {
                 loanYearsSlider.addEventListener('input', function() {
                     document.getElementById('modalLoanYearsValue').textContent = this.value + '年';
-                    calculateModalLoan(); // 即時計算
-                });
-                loanYearsSlider.addEventListener('change', function() {
-                    document.getElementById('modalLoanYearsValue').textContent = this.value + '年';
-                    calculateModalLoan(); // 即時計算
+                    calculateModalLoan();
                 });
             }
             
             if (interestRateSlider) {
                 interestRateSlider.addEventListener('input', function() {
                     document.getElementById('modalInterestRateValue').textContent = this.value + '%';
-                    calculateModalLoan(); // 即時計算
+                    calculateModalLoan();
                 });
-                interestRateSlider.addEventListener('change', function() {
-                    document.getElementById('modalInterestRateValue').textContent = this.value + '%';
-                    calculateModalLoan(); // 即時計算
+            }
+            
+            if (agentFeeSlider) {
+                agentFeeSlider.addEventListener('input', function() {
+                    document.getElementById('modalAgentFeeValue').textContent = this.value + '%';
+                    calculateModalLoan();
                 });
             }
         }
 
         // 綁定輸入框事件
         function bindInputEvents() {
-            // 房屋總價
-            const housePriceInput = document.getElementById('modalHousePrice');
-            if (housePriceInput) {
-                housePriceInput.addEventListener('input', function() {
-                    calculateModalLoan();
-                });
-                housePriceInput.addEventListener('change', function() {
-                    calculateModalLoan();
-                    // 只有在變更時才檢查新青安貸款設定
-                    if (document.getElementById('modalExistingLoan').value === 'youth') {
-                        showYouthLoanNotice();
-                    }
-                });
-            }
+            const inputs = ['modalHousePrice', 'modalServiceFee', 'modalNotaryFee', 'modalMonthlyIncome', 'modalOtherExpenses'];
+            inputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', calculateModalLoan);
+                }
+            });
             
-            // 寬限期下拉選單
-            const gracePeriodSelect = document.getElementById('modalGracePeriod');
-            if (gracePeriodSelect) {
-                gracePeriodSelect.addEventListener('change', calculateModalLoan);
-            }
-            
-            // 代書費+契稅
-            const serviceFeeInput = document.getElementById('modalServiceFee');
-            if (serviceFeeInput) {
-                serviceFeeInput.addEventListener('input', calculateModalLoan);
-                serviceFeeInput.addEventListener('change', calculateModalLoan);
-            }
-            
-            // 代書潤筆費
-            const notaryFeeInput = document.getElementById('modalNotaryFee');
-            if (notaryFeeInput) {
-                notaryFeeInput.addEventListener('input', calculateModalLoan);
-                notaryFeeInput.addEventListener('change', calculateModalLoan);
-            }
-            
-            // 仲介費滑桿
-            const agentFeeSlider = document.getElementById('modalAgentFee');
-            if (agentFeeSlider) {
-                agentFeeSlider.addEventListener('input', function() {
-                    document.getElementById('modalAgentFeeValue').textContent = this.value + '%';
-                    calculateModalLoan(); // 即時計算
-                });
-                agentFeeSlider.addEventListener('change', function() {
-                    document.getElementById('modalAgentFeeValue').textContent = this.value + '%';
-                    calculateModalLoan(); // 即時計算
-                });
-            }
-            
-            // 還款方式
-            const repaymentTypeSelect = document.getElementById('modalRepaymentType');
-            if (repaymentTypeSelect) {
-                repaymentTypeSelect.addEventListener('change', calculateModalLoan);
-            }
-            
-            // 名下有無其他房貸
-            const existingLoanSelect = document.getElementById('modalExistingLoan');
-            if (existingLoanSelect) {
-                existingLoanSelect.addEventListener('change', adjustLoanConditions);
-            }
-            
-            // 月收入
-            const monthlyIncomeInput = document.getElementById('modalMonthlyIncome');
-            if (monthlyIncomeInput) {
-                monthlyIncomeInput.addEventListener('input', calculateModalLoan);
-                monthlyIncomeInput.addEventListener('change', calculateModalLoan);
-            }
-            
-            // 其他月支出
-            const otherExpensesInput = document.getElementById('modalOtherExpenses');
-            if (otherExpensesInput) {
-                otherExpensesInput.addEventListener('input', calculateModalLoan);
-                otherExpensesInput.addEventListener('change', calculateModalLoan);
-            }
+            const selects = ['modalExistingLoan', 'modalGracePeriod', 'modalRepaymentType'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.addEventListener('change', calculateModalLoan);
+                }
+            });
         }
 
         // 調整貸款條件
@@ -3805,129 +3695,6 @@
             document.getElementById('modalLoanResults').innerHTML = resultsHTML;
         }
 
-        // 根據貸款狀況調整貸款條件
-        function adjustLoanConditions() {
-            const existingLoan = document.getElementById('modalExistingLoan').value;
-            const loanRatioSlider = document.getElementById('modalLoanRatio');
-            const gracePeriodSelect = document.getElementById('modalGracePeriod');
-            const interestRateSlider = document.getElementById('modalInterestRate');
-            
-            if (existingLoan === 'existing') {
-                // 第二戶貸款：限制貸款成數50%，取消寬限期
-                loanRatioSlider.max = 50;
-                loanRatioSlider.value = Math.min(loanRatioSlider.value, 50);
-                document.getElementById('modalLoanRatioValue').textContent = loanRatioSlider.value + '%';
-                
-                gracePeriodSelect.value = '0'; // 強制設為無寬限期
-                
-                // 顯示政策提醒
-                showPolicyNotice('第二戶貸款限制：貸款成數最高50%，無寬限期');
-            } else if (existingLoan === 'youth') {
-                // 新青安貸款：恢復貸款成數上限85%，允許寬限期
-                loanRatioSlider.max = 85;
-                gracePeriodSelect.value = '5'; // 預設新青安5年寬限期
-                
-                // 顯示新青安利率設定
-                showYouthLoanNotice();
-                
-                // 隱藏政策提醒
-                hidePolicyNotice();
-            } else {
-                // 首購：恢復正常設定
-                loanRatioSlider.max = 85;
-                gracePeriodSelect.value = '0'; // 預設無寬限期
-                
-                // 隱藏政策提醒
-                hidePolicyNotice();
-            }
-            
-            // 重新計算
-            calculateModalLoan();
-        }
-        
-        // 顯示政策提醒
-        function showPolicyNotice(message) {
-            let notice = document.getElementById('policyNotice');
-            if (!notice) {
-                notice = document.createElement('div');
-                notice.id = 'policyNotice';
-                notice.style.cssText = `
-                    background: linear-gradient(135deg, #fef3c7, #fde68a);
-                    border: 1px solid #f59e0b;
-                    border-radius: 6px;
-                    padding: 0.6rem;
-                    margin: 0.6rem 0;
-                    font-size: 0.8rem;
-                    color: #92400e;
-                    text-align: center;
-                    animation: fadeIn 0.3s ease-in;
-                `;
-                
-                const inputSection = document.querySelector('.loan-input-section');
-                inputSection.appendChild(notice);
-            }
-            notice.textContent = message;
-            notice.style.display = 'block';
-        }
-        
-        // 隱藏政策提醒
-        function hidePolicyNotice() {
-            const notice = document.getElementById('policyNotice');
-            if (notice) {
-                notice.style.display = 'none';
-            }
-        }
-        
-        // 顯示新青安貸款提醒
-        function showYouthLoanNotice() {
-            let notice = document.getElementById('youthLoanNotice');
-            if (!notice) {
-                notice = document.createElement('div');
-                notice.id = 'youthLoanNotice';
-                notice.style.cssText = `
-                    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-                    border: 1px solid #3b82f6;
-                    border-radius: 6px;
-                    padding: 0.6rem;
-                    margin: 0.6rem 0;
-                    font-size: 0.8rem;
-                    color: #1e40af;
-                    text-align: center;
-                    animation: fadeIn 0.3s ease-in;
-                `;
-                
-                const inputSection = document.querySelector('.loan-input-section');
-                inputSection.appendChild(notice);
-            }
-            notice.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 0.2rem;">🏠 新青安貸款優惠</div>
-                <div>前1000萬享1.8%優惠利率，超過部分適用一般利率</div>
-                <div style="font-size: 0.7rem; margin-top: 0.2rem; opacity: 0.8;">寬限期最長5年，貸款年限最長40年</div>
-            `;
-            notice.style.display = 'block';
-            
-            // 添加一般貸款利率設定
-            setTimeout(() => {
-                const youthRateSetting = document.getElementById('youthRateSetting');
-                if (youthRateSetting) {
-                    youthRateSetting.style.display = 'block';
-                    
-                    const normalRateSlider = document.getElementById('normalLoanRate');
-                    const normalRateValue = document.getElementById('normalLoanRateValue');
-                    
-                    if (normalRateSlider && normalRateValue && !normalRateSlider.hasAttribute('data-bound')) {
-                        normalRateSlider.setAttribute('data-bound', 'true');
-                        normalRateSlider.addEventListener('input', function() {
-                            normalRateValue.textContent = this.value + '%';
-                            calculateModalLoan(); // 重新計算
-                        });
-                    }
-                }, 100);
-            } else {
-                youthRateSetting.style.display = 'none';
-            }
-        }
-        
         // 點擊背景關閉彈窗
         window.onclick = function(event) {
             const loanModal = document.getElementById('loanModal');

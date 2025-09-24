@@ -1645,6 +1645,11 @@ body {
             padding: 1rem;
         }
 
+        .modal-body, .loan-modal-body, .lightbox-content {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
         .modal-body::-webkit-scrollbar {
             width: 6px;
         }

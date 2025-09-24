@@ -1743,3 +1743,158 @@ body {
             .loan-modal-content { width: 98%; max-height: 98vh; }
             .modal-header h2 { font-size: 1rem; }
         }
+
+        /* 手機版：地圖彈窗響應式樣式 */
+        @media (max-width: 768px) {
+            .map-modal-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 0; /* 手機可考慮去掉圓角，讓畫面更貼合 */
+                height: 500vh;    /* 如果要全螢幕高度可以加這行 */
+            }
+
+            .map-modal iframe {
+                height: 70vh;     /* 保持 70% 高度 */
+                min-height: auto; /* 避免小螢幕時被強制 500px 撐開 */
+            }
+        }
+
+        /* ===== 滑動解鎖密碼樣式 ===== */
+        .slider-unlock-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .slider-unlock-modal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            color: white;
+        }
+
+        .slider-unlock-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .slider-unlock-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .slider-track {
+            background: rgba(255, 255, 255, 0.2);
+            height: 50px;
+            border-radius: 25px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .slider-fill {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            height: 100%;
+            border-radius: 25px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .slider-thumb.unlocked {
+            background: #4CAF50;
+            color: white;
+            transform: scale(1.2);
+        }
+
+        .slider-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .slider-progress {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .unlock-success {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            animation: successPulse 0.6s ease;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .close-unlock-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .close-unlock-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }

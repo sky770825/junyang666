@@ -557,10 +557,18 @@
                 height: 250px; /* 手機版使用較小高度 */
             }
             
+            /* 地圖彈窗滿版樣式 */
+            .modal div[style*="max-height: 390vh"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 0 !important;
+                height: 500vh !important;
+            }
+            
             .modal .map-container {
-                height: 60vh !important;
-                min-height: 400px !important;
-                max-height: 65vh !important;
+                width: 100% !important;
+                height: 70vh !important;
+                min-height: auto !important;
             }
             
             .modal .map-buttons {
@@ -602,6 +610,29 @@
             .modal {
                 padding: 8px !important;
                 margin: 0 !important;
+            }
+            
+            /* 強制覆蓋地圖彈窗樣式 */
+            .modal div[style*="max-height: 390vh"] {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                height: 500vh !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .modal div[style*="max-height: 390vh"] .map-container {
+                width: 100% !important;
+                height: 70vh !important;
+                min-height: auto !important;
+                max-height: none !important;
+            }
+            
+            .modal div[style*="max-height: 390vh"] .map-container iframe {
+                width: 100% !important;
+                height: 100% !important;
+                min-height: auto !important;
             }
             
             .modal > div {

@@ -968,7 +968,7 @@ body {
             position: absolute;
             top: 20px;
             right: 30px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.95); /* 提高背景透明度 */
             border: none;
             border-radius: 50%;
             width: 40px;
@@ -979,7 +979,7 @@ body {
         display: flex;
         align-items: center;
             justify-content: center;
-            color: #333;
+            color: #e74c3c; /* 改為紅色，更明顯 */
             z-index: 10;
         }
         
@@ -999,6 +999,7 @@ body {
             overflow-x: auto;
             scrollbar-width: thin;
             scrollbar-color: rgba(255,255,255,0.3) transparent;
+            margin-top: 2rem; /* 增加上邊距，讓縮圖往下移 */
         }
         
         .lightbox-thumbnails::-webkit-scrollbar {

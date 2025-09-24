@@ -519,12 +519,19 @@
             }
             
             /* 手機版箭頭按鈕優化 */
-            .modal .main-image-arrow-left,
-            .modal .main-image-arrow-right {
+            .modal .main-image-arrow-left {
                 width: 50px !important;
                 height: 50px !important;
                 font-size: 20px !important;
                 left: 20px !important;
+                background: rgba(0, 0, 0, 0.8) !important;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.5) !important;
+            }
+            
+            .modal .main-image-arrow-right {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 20px !important;
                 right: 20px !important;
                 background: rgba(0, 0, 0, 0.8) !important;
                 box-shadow: 0 3px 10px rgba(0,0,0,0.5) !important;
@@ -534,21 +541,44 @@
         /* 地圖彈窗手機優化 */
         @media (max-width: 768px) {
             .modal .map-container {
-                height: 75vh !important;
-                min-height: 500px !important;
-                max-height: 80vh !important;
+                height: 60vh !important;
+                min-height: 400px !important;
+                max-height: 65vh !important;
             }
             
             .modal .map-buttons {
                 flex-direction: column !important;
                 gap: 12px !important;
-                padding: 20px !important;
+                padding: 15px 20px !important;
+                background: #f8f9fa !important;
+                border-top: 1px solid #e9ecef !important;
+                flex-shrink: 0 !important;
             }
             
             .modal .map-buttons a {
                 padding: 12px 24px !important;
                 font-size: 1rem !important;
                 border-radius: 8px !important;
+                min-height: 45px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            
+            /* 地圖標題區域優化 */
+            .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] {
+                padding: 15px 20px 10px 20px !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] h2 {
+                font-size: 1.1rem !important;
+                margin: 0 !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] p {
+                font-size: 0.85rem !important;
+                margin: 3px 0 0 0 !important;
             }
             
             /* 地圖彈窗整體優化 */
@@ -560,8 +590,10 @@
             .modal > div {
                 width: 98vw !important;
                 max-width: none !important;
-                height: 92vh !important;
-                max-height: none !important;
+                height: 90vh !important;
+                max-height: 90vh !important;
+                display: flex !important;
+                flex-direction: column !important;
             }
         }
         

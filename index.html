@@ -129,23 +129,27 @@
                 border-radius: 15px !important;
             }
             
-            /* 物件卡片優化 */
+            /* 物件卡片優化 - 5欄水平排列 */
             .properties-grid {
-                grid-template-columns: 1fr !important;
-                gap: 1rem !important;
-                padding: 0 1rem !important;
+                grid-template-columns: repeat(5, 1fr) !important;
+                gap: 0.5rem !important;
+                padding: 0 0.5rem !important;
+                overflow-x: auto !important;
             }
             
             .property-card {
                 margin: 0 !important;
-                padding: 1rem !important;
-                border-radius: 12px !important;
+                padding: 0.5rem !important;
+                border-radius: 8px !important;
+                min-width: 120px !important;
+                min-height: 280px !important;
+                flex-shrink: 0 !important;
             }
             
             .property-title {
-                font-size: 0.9rem !important;
-                margin-bottom: 0.8rem !important;
-                line-height: 1.3 !important;
+                font-size: 0.7rem !important;
+                margin-bottom: 0.4rem !important;
+                line-height: 1.2 !important;
                 word-wrap: break-word !important;
                 word-break: break-all !important;
                 white-space: nowrap !important;
@@ -153,7 +157,7 @@
                 text-overflow: ellipsis !important;
                 transform-origin: left !important;
                 transition: font-size 0.3s ease !important;
-                min-height: 2.6rem !important;
+                min-height: 1.8rem !important;
                 display: flex !important;
                 align-items: center !important;
             }
@@ -165,32 +169,33 @@
             }
             
             .photo-item {
-                width: 85px !important;
-                height: 64px !important;
-                border-radius: 8px !important;
+                width: 60px !important;
+                height: 45px !important;
+                border-radius: 6px !important;
             }
             
             /* 物件資訊區域 */
             .property-info {
-                padding: 0.6rem !important;
-                margin: 0.4rem 0 !important;
+                padding: 0.3rem !important;
+                margin: 0.2rem 0 !important;
             }
             
             .info-grid {
-                grid-template-columns: 1fr !important;
-                gap: 0.4rem !important;
-                margin-bottom: 0.6rem !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.2rem !important;
+                margin-bottom: 0.3rem !important;
             }
             
             .info-item {
-                padding: 0.3rem !important;
-                font-size: 0.9rem !important;
+                padding: 0.15rem !important;
+                font-size: 0.65rem !important;
+                text-align: center !important;
             }
             
             /* 地圖區域 */
             iframe {
-                height: 100px !important;
-                border-radius: 6px !important;
+                height: 60px !important;
+                border-radius: 4px !important;
             }
             
             /* 聯絡方式區域 */
@@ -366,20 +371,20 @@
             
             /* 主要資訊卡片手機優化 */
             .modal .main-info-grid {
-                grid-template-columns: 1fr !important;
-                gap: 12px !important;
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 8px !important;
             }
             
             .modal .main-info-grid > div {
-                padding: 15px !important;
+                padding: 10px !important;
             }
             
             .modal .main-info-grid .info-title {
-                font-size: 0.8rem !important;
+                font-size: 0.7rem !important;
             }
             
             .modal .main-info-grid .info-value {
-                font-size: 1.3rem !important;
+                font-size: 1.1rem !important;
             }
             
             /* 詳細資訊表格手機優化 */
@@ -392,8 +397,8 @@
         /* 地圖彈窗手機優化 */
         @media (max-width: 768px) {
             .modal .map-container {
-                height: 50vh !important;
-                min-height: 300px !important;
+                height: 60vh !important;
+                min-height: 400px !important;
             }
             
             .modal .map-buttons {
@@ -405,6 +410,19 @@
             .modal .map-buttons a {
                 padding: 10px 20px !important;
                 font-size: 0.9rem !important;
+            }
+            
+            /* 地圖彈窗整體優化 */
+            .modal {
+                padding: 5px !important;
+                margin: 5px !important;
+            }
+            
+            .modal > div {
+                width: 95vw !important;
+                max-width: none !important;
+                height: 90vh !important;
+                max-height: none !important;
             }
         }
         
@@ -3586,7 +3604,7 @@
                         </div>
                         
                         <!-- 地圖容器 -->
-                        <div style="width: 100%; height: 70vh; min-height: 500px;">
+                        <div class="map-container" style="width: 100%; height: 70vh; min-height: 500px;">
                             <iframe src="${property.google_maps || 'https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469'}" 
                                     width="100%" 
                                     height="100%" 
@@ -3598,7 +3616,7 @@
                         </div>
                         
                         <!-- 地圖操作按鈕 -->
-                        <div style="padding: 20px 30px; background: #f8f9fa; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <div class="map-buttons" style="padding: 20px 30px; background: #f8f9fa; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                             <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.address)}" 
                                target="_blank" 
                                style="

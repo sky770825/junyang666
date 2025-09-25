@@ -1242,6 +1242,225 @@
                 height: 49px !important;
             }
         }
+
+        /* 物件狀態標籤樣式 */
+        .property-status-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            animation: pulse-glow 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .status-urgent {
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+            animation: urgent-pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-selling {
+            background: linear-gradient(45deg, #ffa502, #ff6348);
+            animation: selling-pulse 2s ease-in-out infinite;
+        }
+
+        .status-negotiating {
+            background: linear-gradient(45deg, #3742fa, #2f3542);
+            animation: negotiating-pulse 2.5s ease-in-out infinite;
+        }
+
+        .status-below-appraisal {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            animation: below-appraisal-pulse 2.2s ease-in-out infinite;
+        }
+
+        .status-about-to-sell {
+            background: linear-gradient(45deg, #f87171, #dc2626);
+            animation: about-to-sell-pulse 1.8s ease-in-out infinite;
+        }
+
+        /* 動畫效果 */
+        @keyframes urgent-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 4px 16px rgba(255, 71, 87, 0.6);
+            }
+        }
+
+        @keyframes selling-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(255, 165, 2, 0.4);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 3px 12px rgba(255, 165, 2, 0.6);
+            }
+        }
+
+        @keyframes negotiating-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(55, 66, 250, 0.4);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 3px 10px rgba(55, 66, 250, 0.5);
+            }
+        }
+
+        @keyframes below-appraisal-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 3px 12px rgba(59, 130, 246, 0.6);
+            }
+        }
+
+        @keyframes about-to-sell-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(248, 113, 113, 0.4);
+            }
+            50% {
+                transform: scale(1.04);
+                box-shadow: 0 3px 12px rgba(248, 113, 113, 0.6);
+            }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* 確保物件卡片有相對定位 */
+        .property-card {
+            position: relative;
+        }
+
+        /* 彈窗中的狀態標籤樣式 */
+        .modal-status-tag {
+            position: absolute;
+            top: 15px;
+            right: 60px;
+            z-index: 10001;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            animation: modal-pulse-glow 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .modal-status-urgent {
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+            animation: modal-urgent-pulse 1.5s ease-in-out infinite;
+        }
+
+        .modal-status-selling {
+            background: linear-gradient(45deg, #ffa502, #ff6348);
+            animation: modal-selling-pulse 2s ease-in-out infinite;
+        }
+
+        .modal-status-negotiating {
+            background: linear-gradient(45deg, #3742fa, #2f3542);
+            animation: modal-negotiating-pulse 2.5s ease-in-out infinite;
+        }
+
+        .modal-status-below-appraisal {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            animation: modal-below-appraisal-pulse 2.2s ease-in-out infinite;
+        }
+
+        .modal-status-about-to-sell {
+            background: linear-gradient(45deg, #f87171, #dc2626);
+            animation: modal-about-to-sell-pulse 1.8s ease-in-out infinite;
+        }
+
+        /* 彈窗動畫效果 */
+        @keyframes modal-urgent-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(255, 71, 87, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 5px 20px rgba(255, 71, 87, 0.7);
+            }
+        }
+
+        @keyframes modal-selling-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(255, 165, 2, 0.5);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 4px 15px rgba(255, 165, 2, 0.7);
+            }
+        }
+
+        @keyframes modal-negotiating-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(55, 66, 250, 0.5);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 4px 12px rgba(55, 66, 250, 0.6);
+            }
+        }
+
+        @keyframes modal-below-appraisal-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(59, 130, 246, 0.5);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.7);
+            }
+        }
+
+        @keyframes modal-about-to-sell-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(248, 113, 113, 0.5);
+            }
+            50% {
+                transform: scale(1.04);
+                box-shadow: 0 4px 15px rgba(248, 113, 113, 0.7);
+            }
+        }
+
+        @keyframes modal-pulse-glow {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.9;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1634,6 +1853,8 @@
                     price: "896萬",
                     total_area: "40.08坪",
                     main_area: "18.17坪",
+                    status: "below-appraisal",
+                    statusText: "低於鑑價",
                     layout: "2房2廳1衛",
                     age: "11年",
                     floor: "10/14樓",
@@ -2009,6 +2230,8 @@
                     address: "楊梅區金山街368巷***號14樓",
                     price: "1,298萬",
                     total_area: "47.51坪",
+                    status: "about-to-sell",
+                    statusText: "即將售出",
                     main_area: "22.97坪",
                     layout: "3房2廳2衛",
                     age: "7年",
@@ -2619,6 +2842,19 @@
                     );
                 }
                 
+                // 自動排序：有標籤的物件排在前面
+                filtered.sort((a, b) => {
+                    const aHasTag = a.status && a.statusText;
+                    const bHasTag = b.status && b.statusText;
+                    
+                    // 有標籤的排在前面
+                    if (aHasTag && !bHasTag) return -1;
+                    if (!aHasTag && bHasTag) return 1;
+                    
+                    // 如果都有標籤或都沒有標籤，保持原有順序
+                    return 0;
+                });
+                
                 return filtered;
             }
 
@@ -2666,6 +2902,11 @@
                 const card = document.createElement('div');
                 card.className = 'property-card';
                 card.innerHTML = `
+                    ${property.status && property.statusText ? `
+                        <div class="property-status-tag status-${property.status}">
+                            ${property.statusText}
+                        </div>
+                    ` : ''}
                     <h3 class="property-title">${property.title}</h3>
                     
                     <!-- 照片滾動區 -->
@@ -2913,7 +3154,13 @@
                         background: #667eea;
                         color: white;
                         padding: 15px 20px;
+                        position: relative;
                     ">
+                        ${property.status && property.statusText ? `
+                            <div class="modal-status-tag modal-status-${property.status}">
+                                ${property.statusText}
+                            </div>
+                        ` : ''}
                         <h2 style="margin: 0; font-size: 1.3rem; font-weight: 600;">
                             🏠 ${property.title}
                         </h2>

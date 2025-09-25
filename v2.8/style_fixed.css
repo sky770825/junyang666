@@ -1,0 +1,121 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== 全域修正 ===== */
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Microsoft JhengHei', Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  overflow-x: hidden;       /* 只鎖水平 */
+  overflow-y: auto;         /* 允許直向滾動 */
+  position: relative;       /* 移除固定定位 */
+}
+
+/* Container 框架 */
+.container {
+  width: 100%;
+  margin: 0;
+  background: white;
+  box-shadow: none; /* 如果不要外框陰影 */
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(45deg, #2c3e50, #3498db);
+  color: white;
+  padding: 1.2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 區塊 */
+section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+/* 卡片 */
+.property-card {
+  width: 100%;
+  margin: 0 auto;
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  transition: all 0.3s;
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 手機優化 */
+@media (max-width: 768px) {
+  section {
+    max-width: 100%;
+    padding: 0 !important;   /* 完全移除左右間距，達到100%寬度 */
+  }
+  .property-card {
+    width: 100% !important;
+    margin: 0 auto !important;
+    border-radius: 8px !important;
+  }
+}
+
+/* ===== 貸款試算彈窗 ===== */
+.loan-modal-content {
+  background: #fff;
+  margin: 2% auto;
+  padding: 0;
+  border-radius: 12px;
+  width: 95%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+.loan-modal-body {
+  flex: 1 1 auto;
+  padding: 1rem;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===== 地圖彈窗 ===== */
+.map-modal {
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  overflow: hidden;
+}
+
+.map-modal .modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}

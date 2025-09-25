@@ -165,7 +165,7 @@
             
             /* 標題區域優化 */
             .header h1 {
-                font-size: 1.5rem !important;
+                font-size: 1.8rem !important;
                 padding: 0.5rem !important;
             }
             
@@ -334,7 +334,7 @@
         /* 超小螢幕優化 */
         @media (max-width: 480px) {
             .header h1 {
-                font-size: 1.3rem !important;
+                font-size: 1.6rem !important;
                 padding: 0.4rem !important;
             }
             
@@ -2637,10 +2637,10 @@
                         
                         ${property.layout ? `
                         <div style="margin-bottom: 0.6rem; display: flex; gap: 0.3rem;">
-                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1rem;">
+                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1.3rem;">
                                 <strong>格局：</strong>${property.layout}
                             </div>
-                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1rem;">
+                            <div style="flex: 1; padding: 0.3rem 0.2rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 1.3rem;">
                                 <strong>屋齡：</strong>${property.age || '未設定'}
                             </div>
                         </div>
@@ -2732,7 +2732,7 @@
                 
                 container.innerHTML = `
                     <div style="text-align: center; margin: 1rem 0; padding: 1rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 10px;">
-                        <div style="font-size: 1.1rem; font-weight: 600;">
+                        <div style="font-size: 0.8rem; font-weight: 600;">
                             顯示 ${showing} 個物件，共 ${total} 個物件
                             ${this.currentFilter !== 'all' ? `（篩選：${this.currentFilter}）` : ''}
                             ${this.searchTerm ? `（搜尋：${this.searchTerm}）` : ''}

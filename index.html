@@ -354,6 +354,25 @@
                 padding: 0 0.8rem !important;
             }
             
+            /* 強制覆蓋所有手機版容器padding */
+            .container {
+                padding: 0 0.8rem !important;
+            }
+            
+            /* 覆蓋HTML中的inline style */
+            section[style*="padding: 1.2rem"] {
+                padding: 1.2rem 0.8rem !important;
+            }
+            
+            section[style*="padding: 1.5rem 1.2rem"] {
+                padding: 1.5rem 0.8rem !important;
+            }
+            
+            /* 強制覆蓋搜尋框padding */
+            #property-search {
+                padding: 0.6rem 0.8rem !important;
+            }
+            
             #stats-container > div {
                 padding: 0.8rem !important;
                 font-size: 0.9rem !important;
@@ -753,7 +772,7 @@
                 touch-action: pan-y !important;
             }
             
-            /* 學區交通浮框專用樣式 */
+            /* 學區交通浮框專用樣式 - 手機版置中 */
             #transportation-details-tooltip {
                 position: fixed !important;
                 top: 50% !important;
@@ -769,6 +788,41 @@
                 z-index: 10001 !important;
                 overflow: hidden !important;
                 font-size: 0.9rem !important;
+            }
+            
+            /* 電腦版學區交通浮框置中樣式 */
+            @media (min-width: 769px) {
+                #transportation-details-tooltip {
+                    position: fixed !important;
+                    top: 50% !important;
+                    left: 50% !important;
+                    transform: translate(-50%, -50%) !important;
+                    width: auto !important;
+                    max-width: 600px !important;
+                    min-width: 400px !important;
+                    max-height: 70vh !important;
+                    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+                    border: 2px solid #667eea !important;
+                    border-radius: 15px !important;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.25) !important;
+                    z-index: 10001 !important;
+                    overflow: hidden !important;
+                    font-size: 0.95rem !important;
+                }
+                
+                /* 電腦版地圖容器優化 - 只影響電腦版 */
+                .modal .map-container {
+                    height: 30vh !important;
+                    min-height: 300px !important;
+                }
+                
+                /* 確保手機版地圖容器不受影響 */
+                @media (max-width: 768px) {
+                    .modal .map-container {
+                        height: 50vh !important;
+                        min-height: auto !important;
+                    }
+                }
             }
             
             #transportation-details-tooltip > div:last-child {
@@ -1247,7 +1301,7 @@
         
         
         <!-- 相關資料連結 -->
-        <section style="background: #f8f9fa; padding: 1.2rem; margin: 1rem 0; text-align: center;">
+        <section style="background: #f8f9fa; padding: 1.2rem 0.8rem; margin: 1rem 0; text-align: center;">
             <h2 style="color: #2c3e50; margin-bottom: 0.8rem;">📎 相關資料連結</h2>
             <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: 1000px; margin: 0 auto;">
                 <a href="https://realtor.houseprice.tw/agent/buy/0925666597/" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(46, 204, 113, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🏠 更多物件資料</a>
@@ -1274,7 +1328,7 @@
         </section>
         
         <!-- 客戶見證 -->
-        <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.2rem 1rem; margin: 0.8rem 0; position: relative; overflow: hidden;">
+        <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.2rem 0.8rem; margin: 0.8rem 0; position: relative; overflow: hidden;">
             <!-- 背景裝飾 -->
             <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: url('data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 100 100&quot;><circle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;2&quot; fill=&quot;rgba(255,255,255,0.1)&quot;/><circle cx=&quot;80&quot; cy=&quot;80&quot; r=&quot;1&quot; fill=&quot;rgba(255,255,255,0.1)&quot;/><circle cx=&quot;60&quot; cy=&quot;30&quot; r=&quot;1.5&quot; fill=&quot;rgba(255,255,255,0.1)&quot;/></svg>') repeat; animation: float 20s infinite linear;"></div>
             
@@ -1331,7 +1385,7 @@
         </section>
         
         <!-- 聯絡方式 -->
-        <section style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1.5rem 1.2rem; margin: 1rem 0; position: relative;">
+        <section style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1.5rem 0.8rem; margin: 1rem 0; position: relative;">
             <h2 style="text-align: center; margin-bottom: 1.5rem; color: #2c3e50; font-size: 1.6rem; font-weight: 800; position: relative;">
                 <span style="background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📞 聯絡方式</span>
             </h2>
@@ -1611,26 +1665,22 @@
                             "龍潭科學園區",
                             "全聯福利中心",
                             "7-ELEVEN",
-                            "萊爾富",
-                            "楊梅市場"
+                            "萊爾富"
                         ],
                         transport: [
                             "台1線",
                             "縣道115號",
                             "楊梅交流道",
-                            "龍潭交流道",
-                            "楊梅火車站",
+                            "埔心火車站",
                             "公車站牌"
                         ],
                         schools: [
-                            "楊明國中",
-                            "楊明國小",
-                            "楊梅國中",
-                            "楊梅國小",
-                            "瑞塘國小"
+                            "陽光國小",
+                            "瑞塘國小",
+                            "瑞坪國中"
                         ],
-                        market: "楊梅市場",
-                        park: "楊明公園"
+                        market: "萬大市場",
+                        park: "四維公園"
                     },
                     google_maps: "https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469"
                 },
@@ -1709,9 +1759,7 @@
                     features: [
                         "金山重劃區、生活機能優異",
                         "全室輕裝潢、拎包即可入住",
-                        "屋主用心維護、屋況好",
-                        "近楊明國中小、公園",
-                        "近楊梅交流道、南下北上交通便利"
+                        "屋主用心維護、屋況好"
                     ],
                     transportation: {
                         facilities: [
@@ -1792,7 +1840,6 @@
                     features: [
                         "社區規劃健身房,圖書室、咖啡廳、羽球室、媽媽教室、瑜珈教室、撞球室及桌球室等",
                         "制震工法,戴雲發安全結構,採用ALFA SAFE柱中柱,耐震系統工法",
-                        "生活機能完善便利,距離楊梅火車站約750米、楊明商圈約270米、全聯約750米",
                         "邊間雙面採光,格局方正,獨立玄關,鞋櫃空間",
                         "衛浴有對外開窗,獨立洗手槽"
                     ],
@@ -1860,11 +1907,7 @@
                     features: [
                         "室內2+1房格局.溫馨裝潢,一卡皮箱可入住",
                         "雙陽台.房間皆開窗,通風好採光佳.屋況優",
-                        "高樓層.使用天然瓦斯,附有大平面車位",
-                        "學區:楊明國小.國中,車程約2-3分鐘可達",
-                        "近楊明公園.新農商圈商家林立.天成醫院",
-                        "車程約3分鐘即上交流道國道一號、火車站",
-                        "位於金山街商圈,近楊梅觀光夜市約500M"
+                        "高樓層.使用天然瓦斯,附有大平面車位"
                     ],
                     images: [
                         "images/2-5/客廳.jpg",
@@ -1881,16 +1924,7 @@
                     ],
                     features: [
                         "新成屋",
-                        "楊梅景觀大樓兩房車",
-                        "台1線、楊梅交流道",
-                        "楊梅火車站",
-                        "楊明國中",
-                        "楊明國小",
-                        "楊梅國小",
-                        "五楊交流道",
-                        "楊梅區免費公車",
-                        "楊梅市場",
-                        "楊明公園"
+                        "楊梅景觀大樓兩房車"
                     ],
                     description: "X計畫世紀城兩房車，全新裝潢，採光佳，交通便利。景觀兩房車，座西南朝東北，有電梯，平面車位。",
                     google_maps: "https://www.google.com/maps/embed?pb=!4v1758707580230!6m8!1m7!1s7LZSjlMNTSAfghbzIa7ejw!2m2!1d24.91239663360834!2d121.1626274308514!3f152.5463588641371!4f29.4261813964752!5f0.7820865974627469"
@@ -1947,14 +1981,7 @@
                         "二房大空間間間可放雙人床",
                         "衛浴開窗通風不怕潮濕",
                         "獨立大車位近電梯口旁",
-                        "24H警衛管理安全可靠",
-                        "楊明雙學區景觀2房車",
-                        "環東路商圈新農街商圈",
-                        "全聯福利中心天成醫院怡仁綜合醫院",
-                        "台1線台31線縣道115號",
-                        "楊梅交流道楊梅火車站",
-                        "楊明國中楊明國小",
-                        "楊梅市場楊明公園"
+                        "24H警衛管理安全可靠"
                     ],
                     images: [
                         "images/2-6/客廳.jpg",
@@ -2024,10 +2051,7 @@
                         "高樓層景觀戶、全室美裝潢",
                         "稀有衛浴開窗設計",
                         "前後雙陽台",
-                        "天然瓦斯",
-                        "環東路商圈、新農街商圈、星巴克、全聯福利中心",
-                        "近楊明國中、楊明國小、大同國小",
-                        "近楊梅交流道、楊梅火車站交通便利"
+                        "天然瓦斯"
                     ],
                     images: [
                         "images/3-1/客廳.jpg",
@@ -2097,7 +2121,6 @@
                         "雙衛浴皆有開窗、通風佳",
                         "屋況佳、稀有釋出",
                         "優質社區、環境清幽",
-                        "近楊梅車站、交流道",
                         "採光佳、座西朝東向",
                         "私有坡道平面車位"
                     ],
@@ -2165,9 +2188,7 @@
                     },
                     features: [
                         "明星社區管理良好有24小時警衛免追垃圾車",
-                        "鄰近學區附近有幼稚園、小學、中學",
                         "格局優美採光明亮暖色系裝潢真溫馨",
-                        "近楊梅交流道、台1線交通好方便",
                         "屋齡新屋況好屋主誠心出售歡迎洽詢"
                     ],
                     images: [
@@ -2237,18 +2258,13 @@
                         "近醫療機構"
                     ],
                     transportation: {
-                        facilities: ["超商", "郵局", "幼兒園", "連鎖餐飲", "大型五金量販", "全聯"],
-                        transport: ["國道", "瑞塘國小學區"],
-                        schools: ["瑞塘國小"],
+                        facilities: ["超商", "郵局", "連鎖餐飲", "職人五金", "全聯"],
+                        transport: ["楊梅交流道", "埔心火車站"],
+                        schools: ["瑞梅國小", "瑞塘國小", "瑞坪國中", "幼兒園"],
                         market: "全聯",
                         park: "鄰近公園"
                     },
                     features: [
-                        "明星學區瑞塘國小(總量管制)",
-                        "成熟商圈下樓就是兩間超商、郵局、幼兒園、連鎖餐飲、大型五金量販",
-                        "一小段路到全聯",
-                        "google導航車程三分鐘內到所屬學區",
-                        "五分鐘車程上國道",
                         "屋況毋須整理",
                         "溫馨裝潢收納不馬虎",
                         "三面採光間間開窗"
@@ -2318,18 +2334,16 @@
                         "屋齡新屋況好溫馨舒適",
                         "室內大空間採光明亮",
                         "前後陽台",
-                        "近龍科溫馨景觀三房車",
-                        "梅獅路商圈",
-                        "UNIQLO、星巴克、全聯福利中心",
-                        "楊梅交流道、埔心火車站",
-                        "瑞坪國中、楊光國中小、瑞塘國小",
-                        "萬大黃昏市場、柚子公園"
+                        "近龍科溫馨景觀三房車"
                     ],
                     nearby_facilities: "梅獅路商圈、UNIQLO、星巴克、全聯福利中心、職人的店、貴族世家、愛買大賣場",
-                    transportation: "楊梅交流道、埔心火車站",
-                    schools: "瑞坪國中、楊光國中小、瑞塘國小",
-                    market: "萬大黃昏市場",
-                    park: "柚子公園",
+                    transportation: {
+                        facilities: ["梅獅路商圈", "UNIQLO", "星巴克", "全聯福利中心"],
+                        transport: ["楊梅交流道", "埔心火車站"],
+                        schools: ["瑞坪國中", "楊光國中小", "瑞塘國小"],
+                        market: "萬大黃昏市場",
+                        park: "柚子公園"
+                    },
                     images: [
                         "images/3-5/客廳.jpg",
                         "images/3-5/LINE_ALBUM_閱森活三房車7樓$1432萬、自住好約_241008_1.jpg",
@@ -2469,9 +2483,7 @@
                     features: [
                         "全新落成正四房+車位",
                         "格局方正,空間寬敞,好規劃",
-                        "環繞新農&環東雙商圈,機能一應俱全",
                         "含平面車位,進出無憂",
-                        "近楊明中小學,綠地公園相伴,生活品質提升",
                         "屋主誠意出售,以甜價實現您的夢想藍圖"
                     ],
                     images: [
@@ -2543,9 +2555,7 @@
                     features: [
                         "和耀新加州四房雙車位",
                         "室內空間大、好規劃利用",
-                        "新農商圈、環東路商圈,生活機能完善",
                         "平面車位,汽車停放方便,出行更加便捷",
-                        "近楊明國中小、楊明公園,提升生活質量",
                         "屋主割愛,現因個人原因割愛出售"
                     ],
                     images: [
@@ -3297,13 +3307,14 @@
                 tooltip.style.maxHeight = '85vh';
                 tooltip.style.width = '95vw';
             } else {
-                // 桌面版在點擊元素附近
-                const tooltipX = rect.left + rect.width / 2 - 350;
-                const tooltipY = rect.top - 20;
-                const maxLeft = Math.max(10, Math.min(tooltipX, window.innerWidth - 710));
-                const maxTop = Math.max(10, Math.min(tooltipY, window.innerHeight - 400));
-                tooltip.style.left = maxLeft + 'px';
-                tooltip.style.top = maxTop + 'px';
+                // 電腦版也居中顯示
+                tooltip.style.left = '50%';
+                tooltip.style.top = '50%';
+                tooltip.style.transform = 'translate(-50%, -50%)';
+                tooltip.style.width = 'auto';
+                tooltip.style.maxWidth = '600px';
+                tooltip.style.minWidth = '400px';
+                tooltip.style.maxHeight = '70vh';
             }
 
             // 顯示學區交通內容
@@ -4303,7 +4314,7 @@
                         </div>
                         
                         <!-- 地圖容器 -->
-                        <div class="map-container" style="width: 100%; height: 60vh; min-height: 400px;">
+                        <div class="map-container" style="width: 100%; height: 30vh; min-height: 300px;">
                             <iframe src="${property.google_maps || 'https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469'}" 
                                     width="100%" 
                                     height="100%" 

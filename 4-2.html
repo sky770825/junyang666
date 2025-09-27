@@ -705,11 +705,11 @@
         
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 2.1rem;
+                font-size: 1.8rem;
             }
             
             .price {
-                font-size: 2.6rem;
+                font-size: 2.2rem;
             }
             
             .main-content {
@@ -765,12 +765,6 @@
                 grid-template-columns: 1fr 1fr !important;
             }
             
-            @media (max-width: 480px) {
-                .contact-section div[style*="grid-template-columns: 1fr 1fr"] {
-                    grid-template-columns: 1fr !important;
-                }
-            }
-            
             .contact-section h4 {
                 font-size: 1.2rem !important;
             }
@@ -782,6 +776,21 @@
             .contact-section h2 {
                 position: relative;
                 z-index: 1;
+            }
+            
+            /* 地址換行修正 */
+            .map-section p {
+                word-break: keep-all;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            @media (max-width: 480px) {
+                .map-section p {
+                    white-space: normal;
+                    word-break: break-all;
+                }
             }
         }
     </style>

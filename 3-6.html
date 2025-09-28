@@ -1394,8 +1394,21 @@
                 <p style="margin: 5px 0;">📍 桃園市楊梅區梅獅路二段190號4樓</p>
                 <p style="margin: 5px 0; font-size: 0.9rem;">👨‍💼 不動產經紀人：汪嘉芳</p>
                 <p style="margin: 5px 0; font-size: 0.9rem;">證號：(96)北縣字第001504號</p>
-                <a href="https://www.ilovepdf.com/zh-tw/html-to-pdf" target="_blank" class="contact-button" style="margin: 15px 0; padding: 12px 25px; font-size: 1rem; background: linear-gradient(45deg, #9b59b6, #8e44ad);">
-                    🌐 進階 PDF 工具
+                <!-- PDF 生成說明 -->
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #f39c12;">
+                    <h5 style="margin: 0 0 10px 0; color: #f39c12; font-size: 1rem;">📄 如何下載 PDF 版本？</h5>
+                    <p style="margin: 5px 0; font-size: 0.9rem; line-height: 1.4;">
+                        1️⃣ 點擊下方「複製網頁連結」<br>
+                        2️⃣ 點擊「進階 PDF 工具」開啟網站<br>
+                        3️⃣ 貼上連結並點擊「轉換 HTML」
+                    </p>
+                </div>
+                
+                <button onclick="copyPageUrl()" class="contact-button" style="margin: 10px 0; padding: 12px 25px; font-size: 1rem; background: linear-gradient(45deg, #e67e22, #d35400); border: none; cursor: pointer; width: 100%;">
+                    📋 步驟1：複製網頁連結
+                </button>
+                <a href="https://www.ilovepdf.com/zh-tw/html-to-pdf" target="_blank" class="contact-button" style="margin: 10px 0; padding: 12px 25px; font-size: 1rem; background: linear-gradient(45deg, #9b59b6, #8e44ad); display: block; text-align: center; text-decoration: none;">
+                    🌐 步驟2：進階 PDF 工具
                 </a>
                 <a href="https://lin.ee/rkb8MIe" class="contact-button" style="margin: 15px 0; padding: 12px 25px; font-size: 1rem; background: linear-gradient(45deg, #00C300, #00A000);">
                     💬 LINE 官方帳號
@@ -1641,6 +1654,134 @@
             features.style.transform = 'translateY(20px)';
             features.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(features);
+        }
+        
+        // 複製網頁連結功能
+        function copyPageUrl() {
+            const pageUrl = 'https://sky770825.github.io/junyang666/3-6.html';
+            const button = event.target;
+            const originalText = button.innerHTML;
+            
+            // 嘗試複製到剪貼簿
+            if (navigator.clipboard && window.isSecureContext) {
+                // 使用現代 Clipboard API
+                navigator.clipboard.writeText(pageUrl).then(() => {
+                    showCopySuccess(button, originalText);
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(pageUrl, button, originalText);
+                });
+            } else {
+                // 使用傳統方法
+                fallbackCopyTextToClipboard(pageUrl, button, originalText);
+            }
+        }
+        
+        function fallbackCopyTextToClipboard(text, button, originalText) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopySuccess(button, originalText);
+                } else {
+                    showCopyError(button, originalText);
+                }
+            } catch (err) {
+                showCopyError(button, originalText);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        function showCopySuccess(button, originalText) {
+            button.innerHTML = '✅ 已複製！';
+            button.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
+            
+            // 顯示詳細提示訊息
+            showNotification(`
+                ✅ 網頁連結已複製！<br><br>
+                📋 下一步：<br>
+                1. 點擊下方「步驟2：進階 PDF 工具」<br>
+                2. 在網站中貼上連結 (Ctrl+V)<br>
+                3. 點擊「轉換 HTML」下載 PDF
+            `, 'success');
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = 'linear-gradient(45deg, #e67e22, #d35400)';
+            }, 4000);
+        }
+        
+        function showCopyError(button, originalText) {
+            button.innerHTML = '❌ 複製失敗';
+            button.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)';
+            
+            showNotification('❌ 複製失敗，請手動複製連結：<br>' + 'https://sky770825.github.io/junyang666/3-6.html', 'error');
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = 'linear-gradient(45deg, #e67e22, #d35400)';
+            }, 3000);
+        }
+        
+        function showNotification(message, type) {
+            // 移除現有的通知
+            const existingNotification = document.getElementById('copy-notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // 創建新通知
+            const notification = document.createElement('div');
+            notification.id = 'copy-notification';
+            notification.innerHTML = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                max-width: 350px;
+                font-size: 13px;
+                line-height: 1.5;
+                animation: slideIn 0.3s ease;
+                text-align: left;
+            `;
+            
+            // 添加動畫樣式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // 5秒後自動移除
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideIn 0.3s ease reverse';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
         }
         
     </script>

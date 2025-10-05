@@ -1456,10 +1456,22 @@
             setupImagePaths();
         });
         
+        // DOM載入完成後也執行一次
+        document.addEventListener('DOMContentLoaded', () => {
+            setupImagePaths();
+        });
+        
+        // 延遲執行確保所有資源載入完成
+        setTimeout(() => {
+            setupImagePaths();
+        }, 2000);
+        
         // 智能路徑檢測和設定
         function setupImagePaths() {
-            // 檢測環境
-            const isGitHubPages = window.location.hostname === 'sky770825.github.io';
+            // 檢測環境 - 改進的檢測邏輯
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io' || 
+                                  window.location.pathname.includes('junyang666') ||
+                                  (window.location.protocol === 'https:' && window.location.hostname !== 'localhost');
             const basePath = isGitHubPages ? 'images/' : '../images/';
             
             console.log(`🔍 環境檢測結果:`);
@@ -1527,7 +1539,9 @@
         
         // 燈箱功能 - 動態路徑
         function getLightboxImages() {
-            const isGitHubPages = window.location.hostname === 'sky770825.github.io';
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io' || 
+                                  window.location.pathname.includes('junyang666') ||
+                                  (window.location.protocol === 'https:' && window.location.hostname !== 'localhost');
             const basePath = isGitHubPages ? 'images/' : '../images/';
             
             return [
@@ -1836,6 +1850,31 @@
                     }, 300);
                 }
             }, 5000);
+        }
+        
+        // 測試圖片路徑函數
+        function testImagePaths() {
+            console.log('🧪 開始測試圖片路徑...');
+            console.log(`📍 當前位置: ${window.location.href}`);
+            console.log(`🌐 Protocol: ${window.location.protocol}`);
+            console.log(`🏠 Hostname: ${window.location.hostname}`);
+            console.log(`📁 Pathname: ${window.location.pathname}`);
+            
+            // 重新執行路徑設定
+            setupImagePaths();
+            
+            // 檢查所有圖片元素
+            const images = document.querySelectorAll('.photo-thumbnail img');
+            console.log(`🖼️ 找到 ${images.length} 個圖片元素`);
+            
+            images.forEach((img, index) => {
+                console.log(`圖片 ${index + 1}: ${img.src}`);
+                if (img.src.includes('undefined') || img.src === '') {
+                    console.error(`❌ 圖片 ${index + 1} 路徑異常`);
+                } else {
+                    console.log(`✅ 圖片 ${index + 1} 路徑正常`);
+                }
+            });
         }
         
     </script>

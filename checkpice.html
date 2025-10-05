@@ -137,6 +137,110 @@ footer .dock{display:flex;gap:8px;background:var(--card);border:1px solid var(--
     font-size:11px;padding:5px 8px
   }
 }
+
+/* 貸款試算按鈕樣式 */
+.loan-btn{
+  background:linear-gradient(135deg,#10b98155,#05966944);border:none;
+  color:white;padding:4px 8px;border-radius:6px;font-size:12px;cursor:pointer;
+  transition:all 0.2s ease
+}
+.loan-btn:hover{
+  background:linear-gradient(135deg,#10b98177,#05966966);transform:translateY(-1px)
+}
+
+/* 卡片中的貸款試算按鈕 */
+.loan-btn-card{
+  background:linear-gradient(135deg,#10b98155,#05966944);border:none;
+  color:white;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;
+  transition:all 0.2s ease;width:100%;margin-top:4px
+}
+.loan-btn-card:hover{
+  background:linear-gradient(135deg,#10b98177,#05966966);transform:translateY(-1px)
+}
+
+/* 貸款試算彈窗樣式 */
+.loan-modal{
+  display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;
+  background-color:rgba(0,0,0,0.7);backdrop-filter:blur(8px)
+}
+.loan-modal-content{
+  background:var(--bg);margin:3% auto;padding:0;border:2px solid var(--accent);
+  border-radius:16px;width:95%;max-width:900px;max-height:94vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);backdrop-filter:blur(20px)
+}
+.loan-modal-header{
+  display:flex;justify-content:space-between;align-items:center;padding:20px 24px;
+  border-bottom:2px solid var(--accent);background:linear-gradient(135deg,var(--accent),#0ea5e9);
+  color:white;border-radius:14px 14px 0 0
+}
+.loan-modal-title{font-weight:700;font-size:20px;text-shadow:0 1px 2px rgba(0,0,0,0.3)}
+.loan-modal-close{
+  color:white;font-size:32px;font-weight:bold;cursor:pointer;line-height:1;
+  background:rgba(255,255,255,0.2);border-radius:50%;width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s ease
+}
+.loan-modal-close:hover{background:rgba(255,255,255,0.3);transform:scale(1.1)}
+.loan-modal-body{padding:24px;background:var(--bg)}
+.loan-modal-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px
+}
+.loan-input-section h3{margin:0 0 16px 0;color:var(--good)}
+.loan-input-group{margin-bottom:16px}
+.loan-input-label{
+  display:block;margin-bottom:6px;font-size:14px;color:var(--text);font-weight:500
+}
+.loan-input{
+  width:100%;padding:10px 14px;border:2px solid var(--stroke);border-radius:8px;
+  background:var(--card);color:var(--text);font-size:14px;transition:all 0.2s ease
+}
+.loan-input:focus{
+  border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(34,211,238,0.1)
+}
+.loan-slider{
+  width:100%;height:6px;border-radius:3px;background:var(--stroke);outline:none;
+  -webkit-appearance:none
+}
+.loan-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--accent);cursor:pointer
+}
+.loan-slider-value{
+  text-align:center;margin-top:4px;font-size:14px;color:var(--accent);font-weight:600
+}
+.loan-input-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px
+}
+.loan-result-section h3{margin:0 0 16px 0;color:var(--accent)}
+.loan-result-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:12px
+}
+.loan-result-card{
+  background:var(--card);border:2px solid var(--stroke);border-radius:10px;padding:16px;
+  text-align:center;transition:all 0.2s ease;box-shadow:0 2px 8px rgba(0,0,0,0.1)
+}
+.loan-result-card:hover{
+  border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)
+}
+.loan-result-value{
+  font-size:18px;font-weight:bold;color:var(--accent);margin-bottom:4px
+}
+.loan-result-label{
+  font-size:12px;color:var(--muted)
+}
+.loan-warning{
+  background:rgba(245,158,11,0.1);border:1px solid var(--warn);border-radius:8px;
+  padding:12px;margin-top:16px;color:var(--warn)
+}
+
+/* 手機版貸款試算優化 */
+@media (max-width: 768px) {
+  .loan-modal-content{width:95%;margin:2% auto;max-height:95vh}
+  .loan-modal-grid{grid-template-columns:1fr;gap:16px}
+  .loan-input-row{grid-template-columns:1fr;gap:8px}
+  .loan-result-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .loan-modal-header{padding:12px 16px}
+  .loan-modal-body{padding:16px}
+}
 </style>
 </head>
 <body>
@@ -165,7 +269,7 @@ footer .dock{display:flex;gap:8px;background:var(--card);border:1px solid var(--
           <tr>
             <th>物件</th><th>成交價(萬)</th><th>額外裝潢(萬)</th><th>LTV%</th><th>自備款(萬)</th><th>總支出(萬)</th>
             <th>主＋附坪</th><th>車位坪</th><th>合計坪(含車位)</th>
-            <th>房屋單價(扣車位)</th><th>主＋附單價</th><th>總單價(含車位)</th><th>排名</th>
+            <th>房屋單價(扣車位)</th><th>主＋附單價</th><th>總單價(含車位)</th><th>排名</th><th>貸款試算</th>
           </tr>
         </thead>
         <tbody id="summary"></tbody>
@@ -181,6 +285,122 @@ footer .dock{display:flex;gap:8px;background:var(--card);border:1px solid var(--
     <button class="warn" id="resetBtn">清空</button>
   </div>
 </footer>
+
+<!-- 貸款試算彈窗 -->
+<div id="loanModal" class="loan-modal">
+  <div class="loan-modal-content">
+    <div class="loan-modal-header">
+      <div class="loan-modal-title">
+        <span style="margin-right: 8px;">🧮</span>
+        買方費用估算
+      </div>
+      <span class="loan-modal-close" onclick="closeLoanModal()">&times;</span>
+    </div>
+    <div class="loan-modal-body">
+      <div class="loan-modal-grid">
+        <!-- 輸入區域 -->
+        <div class="loan-input-section">
+          <h3>📝 輸入參數</h3>
+          
+          <div class="loan-input-group">
+            <label class="loan-input-label">房屋總價 (萬元)</label>
+            <input type="number" id="modalHousePrice" class="loan-input" placeholder="例如：896" value="896">
+          </div>
+          
+          <div class="loan-input-row">
+            <div class="loan-input-group">
+              <label class="loan-input-label">貸款成數 (%)</label>
+              <input type="range" id="modalLoanRatio" min="40" max="85" value="80" class="loan-slider">
+              <div class="loan-slider-value" id="modalLoanRatioValue">80%</div>
+            </div>
+            
+            <div class="loan-input-group">
+              <label class="loan-input-label">貸款年限 (年)</label>
+              <input type="range" id="modalLoanYears" min="0" max="40" value="40" class="loan-slider">
+              <div class="loan-slider-value" id="modalLoanYearsValue">40年</div>
+            </div>
+          </div>
+          
+          <div class="loan-input-row">
+            <div class="loan-input-group">
+              <label class="loan-input-label">貸款利率 (%)</label>
+              <input type="range" id="modalInterestRate" min="0.5" max="5" step="0.1" value="2.1" class="loan-slider">
+              <div class="loan-slider-value" id="modalInterestRateValue">2.1%</div>
+            </div>
+            
+            <div class="loan-input-group">
+              <label class="loan-input-label">名下有無其他房貸</label>
+              <select id="modalExistingLoan" class="loan-input" onchange="adjustLoanConditions()">
+                <option value="none">無其他房貸 (首購)</option>
+                <option value="existing">有其他房貸 (第二戶)</option>
+                <option value="youth">新青安貸款 (限1000萬)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="loan-input-row">
+            <div class="loan-input-group">
+              <label class="loan-input-label">寬限期 (年)</label>
+              <select id="modalGracePeriod" class="loan-input">
+                <option value="0">無寬限期</option>
+                <option value="1">1年</option>
+                <option value="2">2年</option>
+                <option value="3">3年</option>
+                <option value="5" selected>新青安 5年</option>
+              </select>
+            </div>
+            
+            <div class="loan-input-group">
+              <label class="loan-input-label">還款方式</label>
+              <select id="modalRepaymentType" class="loan-input">
+                <option value="equal_payment">等額本息</option>
+                <option value="equal_principal">等額本金</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="loan-input-row">
+            <div class="loan-input-group">
+              <label class="loan-input-label">代書費+契稅 (元)</label>
+              <input type="number" id="modalServiceFee" class="loan-input" placeholder="100000" value="100000">
+            </div>
+            
+            <div class="loan-input-group">
+              <label class="loan-input-label">代書潤筆費 (元)</label>
+              <input type="number" id="modalNotaryFee" class="loan-input" placeholder="2000" value="2000">
+            </div>
+          </div>
+          
+          <div class="loan-input-group">
+            <label class="loan-input-label">仲介費 (%)</label>
+            <input type="range" id="modalAgentFee" min="0" max="2" step="0.1" value="2" class="loan-slider">
+            <div class="loan-slider-value" id="modalAgentFeeValue">2%</div>
+          </div>
+          
+          <div class="loan-input-row">
+            <div class="loan-input-group">
+              <label class="loan-input-label">月收入 (萬元)</label>
+              <input type="number" id="modalMonthlyIncome" class="loan-input" placeholder="例如：8" value="8">
+            </div>
+            
+            <div class="loan-input-group">
+              <label class="loan-input-label">其他月支出 (萬元)</label>
+              <input type="number" id="modalOtherExpenses" class="loan-input" placeholder="例如：2" value="2">
+            </div>
+          </div>
+        </div>
+        
+        <!-- 結果區域 -->
+        <div class="loan-result-section">
+          <h3>💰 試算結果</h3>
+          <div class="loan-result-grid" id="loanResults">
+            <!-- 結果將動態生成 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 const app=document.getElementById('items');
@@ -202,6 +422,7 @@ function newRow(d={}){
       <div><label>車位價格(萬)</label><input type="number" class="parkPrice" value="${d.parkPrice||0}"></div>
       <div><label>額外裝潢(萬)</label><input type="number" class="extraDecor" value="${d.extraDecor||0}"></div>
       <div><label>貸款成數(%)</label><input type="number" class="ltv" value="${d.ltv||80}"></div>
+      <div><label>貸款試算</label><button class="loan-btn-card" onclick="showLoanCalculator('${d.name||'新物件'}', ${d.price||0})">🧮 試算</button></div>
     </div>
     <div class="kpi">
       <span class="houseP">房屋單價 —</span>
@@ -263,7 +484,8 @@ function calcAll(){
       <td>${d.houseUnit?d.houseUnit.toFixed(2):'—'}</td>
       <td>${d.usableUnit?d.usableUnit.toFixed(2):'—'}</td>
       <td>${d.totalUnit?d.totalUnit.toFixed(2):'—'}</td>
-      <td>${rank}</td>`;
+      <td>${rank}</td>
+      <td><button class="loan-btn" onclick="showLoanCalculator('${d.name}', ${d.price})">🧮 試算</button></td>`;
     summary.appendChild(tr);
 
     d.row.el.classList.remove('rank1','rank2','rank3');
@@ -336,6 +558,213 @@ document.getElementById('csvBtn').onclick=()=>{
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='compare.csv';a.click();URL.revokeObjectURL(url);
 };
+
+/* 貸款試算功能 */
+function showLoanCalculator(propertyName, propertyPrice) {
+  // 設定房屋總價
+  document.getElementById('modalHousePrice').value = propertyPrice;
+  
+  // 顯示彈窗
+  document.getElementById('loanModal').style.display = 'block';
+  
+  // 重新綁定滑桿事件
+  setTimeout(() => {
+    bindSliderEvents();
+    bindInputEvents();
+    calculateModalLoan();
+  }, 100);
+}
+
+// 關閉貸款試算彈窗
+function closeLoanModal() {
+  document.getElementById('loanModal').style.display = 'none';
+}
+
+// 滑桿值更新
+function bindSliderEvents() {
+  const loanRatioSlider = document.getElementById('modalLoanRatio');
+  const loanYearsSlider = document.getElementById('modalLoanYears');
+  const interestRateSlider = document.getElementById('modalInterestRate');
+  const agentFeeSlider = document.getElementById('modalAgentFee');
+  
+  if (loanRatioSlider) {
+    loanRatioSlider.addEventListener('input', function() {
+      document.getElementById('modalLoanRatioValue').textContent = this.value + '%';
+      calculateModalLoan();
+    });
+  }
+  
+  if (loanYearsSlider) {
+    loanYearsSlider.addEventListener('input', function() {
+      document.getElementById('modalLoanYearsValue').textContent = this.value + '年';
+      calculateModalLoan();
+    });
+  }
+  
+  if (interestRateSlider) {
+    interestRateSlider.addEventListener('input', function() {
+      document.getElementById('modalInterestRateValue').textContent = this.value + '%';
+      calculateModalLoan();
+    });
+  }
+  
+  if (agentFeeSlider) {
+    agentFeeSlider.addEventListener('input', function() {
+      document.getElementById('modalAgentFeeValue').textContent = this.value + '%';
+      calculateModalLoan();
+    });
+  }
+}
+
+// 綁定輸入框事件
+function bindInputEvents() {
+  const inputs = ['modalHousePrice', 'modalServiceFee', 'modalNotaryFee', 'modalMonthlyIncome', 'modalOtherExpenses'];
+  inputs.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.addEventListener('input', calculateModalLoan);
+    }
+  });
+  
+  const selects = ['modalExistingLoan', 'modalGracePeriod', 'modalRepaymentType'];
+  selects.forEach(id => {
+    const select = document.getElementById(id);
+    if (select) {
+      select.addEventListener('change', calculateModalLoan);
+    }
+  });
+}
+
+// 調整貸款條件
+function adjustLoanConditions() {
+  const existingLoan = document.getElementById('modalExistingLoan').value;
+  const loanRatioSlider = document.getElementById('modalLoanRatio');
+  const gracePeriodSelect = document.getElementById('modalGracePeriod');
+  const interestRateSlider = document.getElementById('modalInterestRate');
+  
+  if (existingLoan === 'existing') {
+    // 第二戶貸款：限制貸款成數50%，取消寬限期
+    loanRatioSlider.max = 50;
+    loanRatioSlider.value = Math.min(loanRatioSlider.value, 50);
+    document.getElementById('modalLoanRatioValue').textContent = loanRatioSlider.value + '%';
+    
+    gracePeriodSelect.value = '0';
+    
+    interestRateSlider.min = 1.5;
+    interestRateSlider.max = 5;
+    interestRateSlider.value = Math.max(interestRateSlider.value, 1.5);
+    document.getElementById('modalInterestRateValue').textContent = interestRateSlider.value + '%';
+    
+  } else if (existingLoan === 'youth') {
+    // 新青安貸款：限制1000萬額度，優惠利率，5年寬限期
+    loanRatioSlider.max = 80;
+    loanRatioSlider.value = Math.min(loanRatioSlider.value, 80);
+    document.getElementById('modalLoanRatioValue').textContent = loanRatioSlider.value + '%';
+    
+    gracePeriodSelect.value = '5';
+    
+    interestRateSlider.min = 1.2;
+    interestRateSlider.max = 2.0;
+    interestRateSlider.value = 1.8;
+    document.getElementById('modalInterestRateValue').textContent = interestRateSlider.value + '%';
+    
+  } else {
+    // 首購：恢復正常條件
+    loanRatioSlider.max = 85;
+    loanRatioSlider.value = Math.min(loanRatioSlider.value, 85);
+    document.getElementById('modalLoanRatioValue').textContent = loanRatioSlider.value + '%';
+    
+    gracePeriodSelect.value = '5';
+    
+    interestRateSlider.min = 1.5;
+    interestRateSlider.max = 5;
+    interestRateSlider.value = Math.max(interestRateSlider.value, 1.5);
+    document.getElementById('modalInterestRateValue').textContent = interestRateSlider.value + '%';
+  }
+  
+  calculateModalLoan();
+}
+
+// 貸款試算計算功能
+function calculateModalLoan() {
+  const housePrice = parseFloat(document.getElementById('modalHousePrice').value) * 10000;
+  const loanRatio = parseFloat(document.getElementById('modalLoanRatio').value) / 100;
+  const loanYears = parseInt(document.getElementById('modalLoanYears').value);
+  const interestRate = parseFloat(document.getElementById('modalInterestRate').value) / 100;
+  const gracePeriod = parseInt(document.getElementById('modalGracePeriod').value) || 0;
+  const serviceFee = parseFloat(document.getElementById('modalServiceFee').value) || 0;
+  const notaryFee = parseFloat(document.getElementById('modalNotaryFee').value) || 0;
+  const agentFeeRate = parseFloat(document.getElementById('modalAgentFee').value) || 0;
+  const agentFee = housePrice * (agentFeeRate / 100);
+  const repaymentType = document.getElementById('modalRepaymentType').value;
+  const monthlyIncome = parseFloat(document.getElementById('modalMonthlyIncome').value) * 10000 || 0;
+  const otherExpenses = parseFloat(document.getElementById('modalOtherExpenses').value) * 10000 || 0;
+  const existingLoan = document.getElementById('modalExistingLoan').value;
+  
+  if (!housePrice || housePrice <= 0) {
+    return;
+  }
+  
+  // 基本計算
+  const loanAmount = housePrice * loanRatio;
+  const downPayment = housePrice - loanAmount;
+  
+  // 貸款計算
+  const totalMonths = loanYears * 12;
+  const graceMonths = gracePeriod * 12;
+  const remainingMonths = totalMonths - graceMonths;
+  
+  // 計算月付金額
+  const monthlyRate = interestRate / 12;
+  const gracePayment = loanAmount * monthlyRate;
+  
+  let normalPayment = 0;
+  if (remainingMonths > 0) {
+    if (repaymentType === 'equal_payment') {
+      normalPayment = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths) / 
+                     (Math.pow(1 + monthlyRate, remainingMonths) - 1);
+    } else {
+      normalPayment = loanAmount / remainingMonths + loanAmount * monthlyRate;
+    }
+  }
+  
+  // 總費用計算
+  const totalCost = downPayment + serviceFee + notaryFee + agentFee;
+  
+  // 負擔能力檢查
+  const availableIncome = monthlyIncome - otherExpenses;
+  const canAfford = availableIncome >= normalPayment;
+  
+  // 顯示結果
+  const resultsContainer = document.getElementById('loanResults');
+  resultsContainer.innerHTML = `
+    <div class="loan-result-card">
+      <div class="loan-result-value">${(loanAmount/10000).toFixed(0)}萬</div>
+      <div class="loan-result-label">貸款金額</div>
+    </div>
+    <div class="loan-result-card">
+      <div class="loan-result-value">${(downPayment/10000).toFixed(0)}萬</div>
+      <div class="loan-result-label">自備款</div>
+    </div>
+    <div class="loan-result-card">
+      <div class="loan-result-value">${(totalCost/10000).toFixed(0)}萬</div>
+      <div class="loan-result-label">總支出</div>
+    </div>
+    <div class="loan-result-card">
+      <div class="loan-result-value">${gracePayment.toFixed(0)}元</div>
+      <div class="loan-result-label">寬限期月付</div>
+    </div>
+    <div class="loan-result-card">
+      <div class="loan-result-value">${normalPayment.toFixed(0)}元</div>
+      <div class="loan-result-label">正常月付</div>
+    </div>
+    <div class="loan-result-card">
+      <div class="loan-result-value">${(availableIncome/10000).toFixed(1)}萬</div>
+      <div class="loan-result-label">可支配收入</div>
+    </div>
+    ${!canAfford ? '<div class="loan-warning">⚠️ 月付金額超過可支配收入，建議調整貸款條件</div>' : ''}
+  `;
+}
 
 /* 初始化 */
 if(localStorage.getItem('theme')==='light')document.body.classList.add('light');

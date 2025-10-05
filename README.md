@@ -456,8 +456,8 @@ const basePath = isGitHubPages ? 'images/' : '../images/';
 - ✅ **2-2.html**：替換外部圖片連結為本地 `images/2-2/封面照.jpeg`
 - ✅ **2-4.html**：替換外部圖片連結為本地 `images/2-4/封面照.jpg`
 - ✅ **2-5.html**：替換外部圖片連結為本地 `images/2-5/封面照.jpeg`
-- ✅ **2-6.html**：替換外部圖片連結為本地 `images/2-6/封面照.jpeg`
-- ✅ **2-9.html**：替換外部圖片連結為本地 `images/2-9/封面照.jpg`
+- ✅ **2-6.html**：替換外部圖片連結為本地 `images/2-6/封面照.jpg`
+- ✅ **2-9.html**：替換外部圖片連結為本地 `images/2-9/封面照.jpeg`
 - ✅ **3-6.html**：替換外部圖片連結為本地 `images/3-6/封面照.jpg`
 - ✅ **4-2.html**：替換外部圖片連結為本地 `images/4-2/封面照.png`
 - ✅ 所有文件都添加了封面照的動態路徑檢測功能

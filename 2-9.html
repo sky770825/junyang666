@@ -1658,7 +1658,7 @@
         
         // 複製網頁連結功能
         function copyPageUrl() {
-            const pageUrl = 'https://sky770825.github.io/junyang666/給客戶的物件專頁/2-9.html';
+            const pageUrl = 'https://sky770825.github.io/junyang666/2-9';
             const button = event.target;
             const originalText = button.innerHTML;
             
@@ -1723,7 +1723,7 @@
             button.innerHTML = '❌ 複製失敗';
             button.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)';
             
-            showNotification('❌ 複製失敗，請手動複製連結：<br>' + 'https://sky770825.github.io/junyang666/給客戶的物件專頁/2-9.html', 'error');
+            showNotification('❌ 複製失敗，請手動複製連結：<br>' + 'https://sky770825.github.io/junyang666/2-9', 'error');
             
             setTimeout(() => {
                 button.innerHTML = originalText;

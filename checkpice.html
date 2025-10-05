@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>房產比價｜車位拆算＋額外裝潢＋自備款</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 <style>
 :root{
   --bg:#0b0f14; --card:rgba(255,255,255,.06); --stroke:rgba(255,255,255,.12);
@@ -31,7 +32,7 @@ button{cursor:pointer}
 button.primary{background:linear-gradient(135deg,#22d3ee55,#0ea5e944);border:none}
 button.good{background:linear-gradient(135deg,#34d39955,#10b98144);border:none}
 button.warn{background:linear-gradient(135deg,#f59e0b55,#fbbf2444);border:none}
-main{max-width:1400px;margin:16px auto 80px;padding:0 16px;display:grid;gap:16px}
+main{max-width:1400px;margin:16px auto 20px;padding:0 16px;display:grid;gap:16px}
 .grid{
   display:grid;gap:16px;
   grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
@@ -53,7 +54,7 @@ main{max-width:1400px;margin:16px auto 80px;padding:0 16px;display:grid;gap:16px
 table{width:100%;border-collapse:collapse;min-width:1200px}
 th,td{padding:6px 10px;white-space:nowrap;border-bottom:1px dashed var(--stroke);text-align:right;min-width:80px}
 th:first-child,td:first-child{text-align:left;min-width:120px}
-footer{position:fixed;bottom:12px;left:0;right:0;display:flex;justify-content:center}
+footer{position:static;margin:20px 0;display:flex;justify-content:center}
 footer .dock{display:flex;gap:8px;background:var(--card);border:1px solid var(--stroke);padding:8px 10px;border-radius:999px;backdrop-filter:blur(10px);max-width:1400px;margin:0 auto}
 
 /* 手機版響應式設計 */
@@ -70,7 +71,7 @@ footer .dock{display:flex;gap:8px;background:var(--card);border:1px solid var(--
     font-size:14px;padding:8px 12px;min-width:auto
   }
   main{
-    max-width:100%;margin:12px auto 100px;padding:0 12px;gap:12px
+    max-width:100%;margin:12px auto 20px;padding:0 12px;gap:12px
   }
   .grid{
     grid-template-columns:1fr;gap:12px
@@ -241,6 +242,194 @@ footer .dock{display:flex;gap:8px;background:var(--card);border:1px solid var(--
   .loan-modal-header{padding:12px 16px}
   .loan-modal-body{padding:16px}
 }
+
+/* 底部資訊區塊樣式 */
+.info-section{
+  background:var(--bg);padding:40px 0;margin-top:40px;border-top:1px solid var(--stroke)
+}
+.info-container{
+  max-width:1400px;margin:0 auto;padding:0 16px
+}
+.info-title{
+  text-align:center;font-size:28px;font-weight:700;color:var(--text);margin-bottom:8px
+}
+.info-subtitle{
+  text-align:center;font-size:16px;color:var(--muted);margin-bottom:40px
+}
+.info-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:40px
+}
+.info-card{
+  background:var(--card);border:1px solid var(--stroke);border-radius:12px;padding:24px;
+  text-align:center;transition:all 0.3s ease
+}
+.info-card:hover{
+  transform:translateY(-4px);box-shadow:0 8px 25px rgba(0,0,0,0.15);border-color:var(--accent)
+}
+.info-icon{
+  font-size:48px;margin-bottom:16px
+}
+.info-card h3{
+  font-size:18px;font-weight:600;color:var(--text);margin-bottom:12px
+}
+.info-title-link{
+  font-size:18px;font-weight:600;color:var(--text);text-decoration:none;
+  transition:all 0.2s ease;display:block;margin-bottom:12px
+}
+.info-title-link:hover{
+  color:var(--accent);transform:translateY(-1px)
+}
+.info-card p{
+  font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.5
+}
+.info-links{
+  display:flex;flex-direction:column;gap:8px;margin-top:12px
+}
+.info-link{
+  background:var(--bg);color:var(--text);padding:8px 12px;border-radius:6px;
+  text-decoration:none;font-size:13px;border:1px solid var(--stroke);
+  transition:all 0.2s ease;text-align:center
+}
+.info-link:hover{
+  background:var(--accent);color:white;border-color:var(--accent);
+  transform:translateY(-1px)
+}
+.dropdown-container{
+  margin-top:16px
+}
+.info-dropdown{
+  width:100%;padding:10px 14px;border:2px solid var(--stroke);border-radius:8px;
+  background:var(--card);color:var(--text);font-size:14px;cursor:pointer;
+  transition:all 0.2s ease
+}
+.info-dropdown option{
+  background:var(--bg);color:var(--text);padding:8px
+}
+.info-dropdown:focus{
+  border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(34,211,238,0.1)
+}
+.info-dropdown:hover{
+  border-color:var(--accent)
+}
+/* 深色主題聯絡方式樣式 */
+.contact-section-dark{
+  background:var(--bg);padding:40px 0;margin-top:40px;border-top:1px solid var(--stroke)
+}
+.contact-title-dark{
+  text-align:center;font-size:28px;font-weight:700;color:var(--text);margin-bottom:40px
+}
+.contact-grid-dark{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1000px;margin:0 auto;padding:0 16px
+}
+.contact-card-dark{
+  background:var(--card);border:1px solid var(--stroke);border-radius:15px;padding:24px;
+  position:relative;overflow:hidden;transition:all 0.3s ease
+}
+.contact-card-dark:hover{
+  transform:translateY(-4px);box-shadow:0 8px 25px rgba(0,0,0,0.15);border-color:var(--accent)
+}
+.contact-card-header{
+  position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),#0ea5e9)
+}
+.contact-card-title{
+  color:var(--text);margin-bottom:20px;font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px
+}
+.contact-content{
+  flex:1;margin-bottom:20px
+}
+.contact-item{
+  display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:8px;
+  border-left:3px solid var(--accent);margin-bottom:12px;font-size:16px
+}
+.contact-item i{
+  color:var(--accent);font-size:18px
+}
+.contact-item span{
+  font-weight:600;color:var(--text);flex:1
+}
+.contact-phone-link{
+  color:var(--warn);text-decoration:none;font-weight:bold;display:flex;align-items:center;gap:4px;
+  transition:all 0.2s ease
+}
+.contact-phone-link:hover{
+  color:#fbbf24;transform:translateY(-1px)
+}
+.line-item{
+  border-left-color:var(--good)
+}
+.line-item i{
+  color:var(--good)
+}
+.copy-btn-dark{
+  background:linear-gradient(45deg,var(--good),#10b981);color:white;border:none;padding:6px 12px;
+  border-radius:12px;cursor:pointer;font-size:12px;transition:all 0.3s ease;margin-left:auto
+}
+.copy-btn-dark:hover{
+  background:linear-gradient(45deg,#10b981,var(--good));transform:translateY(-1px)
+}
+.contact-actions{
+  display:flex;gap:12px;flex-wrap:wrap;margin-top:auto;padding-top:16px
+}
+.contact-action-btn{
+  padding:12px 20px;border-radius:20px;text-decoration:none;font-weight:600;
+  display:inline-flex;align-items:center;gap:8px;transition:all 0.3s ease;flex:1;justify-content:center;font-size:14px
+}
+.call-btn{
+  background:linear-gradient(45deg,var(--accent),#0ea5e9);color:white;
+  box-shadow:0 3px 12px rgba(34,211,238,0.3)
+}
+.call-btn:hover{
+  transform:translateY(-2px);box-shadow:0 4px 16px rgba(34,211,238,0.4)
+}
+.line-btn{
+  background:linear-gradient(45deg,var(--good),#10b981);color:white;
+  box-shadow:0 3px 12px rgba(52,211,153,0.3)
+}
+.line-btn:hover{
+  transform:translateY(-2px);box-shadow:0 4px 16px rgba(52,211,153,0.4)
+}
+.company-info-list{
+  display:flex;flex-direction:column;gap:8px
+}
+.company-item{
+  display:flex;align-items:center;gap:12px;padding:8px;background:var(--bg);border-radius:6px;
+  font-size:14px
+}
+.company-item i{
+  color:var(--accent);font-size:16px
+}
+.company-item span{
+  font-weight:600;color:var(--text)
+}
+
+/* 手機版底部資訊優化 */
+@media (max-width: 768px) {
+  .info-section{padding:20px 0;margin-top:20px}
+  .info-container{padding:0 12px}
+  .info-title{font-size:22px}
+  .info-subtitle{font-size:13px;margin-bottom:20px}
+  .info-grid{grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+  .info-card{padding:16px;min-height:120px;display:flex;flex-direction:column;justify-content:center}
+  .info-icon{font-size:32px;margin-bottom:8px}
+  .info-card h3{font-size:14px;margin-bottom:8px}
+  .info-card p{font-size:12px;margin-bottom:12px}
+  .info-title-link{font-size:14px;margin-bottom:8px}
+  .contact-section-dark{padding:20px 0;margin-top:20px}
+  .contact-title-dark{font-size:22px;margin-bottom:20px}
+  .contact-grid-dark{grid-template-columns:1fr;gap:16px;padding:0 12px}
+  .contact-card-dark{padding:16px}
+  .contact-card-title{font-size:16px;margin-bottom:16px}
+  .contact-item{padding:8px;font-size:13px;margin-bottom:8px}
+  .contact-item i{font-size:14px}
+  .contact-phone-link{font-size:13px}
+  .copy-btn-dark{padding:6px 10px;font-size:10px}
+  .contact-actions{flex-direction:column;gap:8px}
+  .contact-action-btn{padding:8px 12px;font-size:12px}
+  .company-item{padding:6px;font-size:12px;margin-bottom:6px}
+  .company-item i{font-size:12px}
+  .dropdown-container{margin-top:8px}
+  .info-dropdown{padding:6px 10px;font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -285,6 +474,120 @@ footer .dock{display:flex;gap:8px;background:var(--card);border:1px solid var(--
     <button class="warn" id="resetBtn">清空</button>
   </div>
 </footer>
+
+<!-- 底部資訊區塊 -->
+<section class="info-section">
+  <div class="info-container">
+    <h2 class="info-title">🏠 住商不動產 楊梅大順店</h2>
+    <p class="info-subtitle">精選物件 | 低於銀行鑑價 | 預約從速</p>
+    
+    <div class="info-grid">
+      <!-- 更多物件資料 -->
+      <div class="info-card">
+        <div class="info-icon">🏠</div>
+        <a href="https://realtor.houseprice.tw/agent/buy/0925666597/" target="_blank" class="info-title-link">更多物件資料</a>
+      </div>
+      
+      <!-- TikTok短影音 -->
+      <div class="info-card">
+        <div class="info-icon">🎵</div>
+        <a href="https://www.tiktok.com/@aihouse168" target="_blank" class="info-title-link">TikTok短影音</a>
+      </div>
+      
+      <!-- 房產資訊參考 -->
+      <div class="info-card">
+        <div class="info-icon">📊</div>
+        <div class="info-title">房產資訊參考</div>
+        <div class="dropdown-container">
+          <select class="info-dropdown" onchange="openSelectedLink(this)">
+            <option value="">請選擇資訊類型</option>
+            <option value="https://drive.google.com/file/d/1NddGgXcysK-QRoozRA4XXww6c-NUv-OJ/view?usp=drive_link">📈 楊梅優勢簡報</option>
+            <option value="https://drive.google.com/file/d/1PeGDx2IruOjWkeIHgVVqpk0tceB0l7Vg/view?usp=drive_link">🏦 新青安政策</option>
+            <option value="https://drive.google.com/file/d/1vVluYlY81Ew76Dc4ZyWI_Y9CZ3cWbj0t/view?usp=drive_link">📊 2025年分析</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- 精選物件 -->
+      <div class="info-card">
+        <div class="info-icon">⭐</div>
+        <a href="https://sky770825.github.io/junyang666/" target="_blank" class="info-title-link">精選物件</a>
+      </div>
+    </div>
+    
+    <!-- 聯絡方式 -->
+    <section class="contact-section-dark">
+      <h2 class="contact-title-dark">📞 聯絡方式</h2>
+      <div class="contact-grid-dark">
+        <div class="contact-card-dark">
+          <div class="contact-card-header"></div>
+          <h3 class="contact-card-title">👥 聯絡方式</h3>
+          <div class="contact-content">
+            <div class="contact-item">
+              <i class="bi bi-person-fill"></i>
+              <span>劉子菲</span>
+              <a href="tel:0925666597" class="contact-phone-link">
+                <i class="bi bi-phone-fill"></i> 0925-666-597
+              </a>
+            </div>
+            <div class="contact-item">
+              <i class="bi bi-person-fill"></i>
+              <span>蔡濬瑒</span>
+              <a href="tel:0928776755" class="contact-phone-link">
+                <i class="bi bi-phone-fill"></i> 0928-776-755
+              </a>
+            </div>
+            <div class="contact-item line-item">
+              <i class="bi bi-chat-dots-fill"></i>
+              <span>LINE：@931aeinu</span>
+              <button id="copyLineId" class="copy-btn-dark" title="複製 LINE ID">
+                <i class="bi bi-copy"></i> 複製
+              </button>
+            </div>
+          </div>
+          <div class="contact-actions">
+            <a href="tel:0928776755" class="contact-action-btn call-btn">
+              <i class="bi bi-telephone-outbound-fill"></i> 立即來電
+            </a>
+            <a href="https://lin.ee/Lax7jMka" target="_blank" class="contact-action-btn line-btn">
+              <i class="fa-brands fa-line"></i> LINE聯絡
+            </a>
+          </div>
+        </div>
+        <div class="contact-card-dark">
+          <div class="contact-card-header"></div>
+          <h3 class="contact-card-title">🏢 經紀業資訊</h3>
+          <div class="company-info-list">
+            <div class="company-item">
+              <i class="bi bi-buildings"></i>
+              <span>公司：常鴻悦豐企業社</span>
+            </div>
+            <div class="company-item">
+              <i class="bi bi-person-badge-fill"></i>
+              <span>營業員：蔡文豪（112）桃市字第432900號</span>
+            </div>
+            <div class="company-item">
+              <i class="bi bi-person-badge-fill"></i>
+              <span>營業員：劉子菲（113）桃市字第467056號</span>
+            </div>
+            <div class="company-item">
+              <i class="bi bi-shield-check-fill"></i>
+              <span>經紀人：葉靜蓉（104）新北經證字第003119號</span>
+            </div>
+            <div class="company-item">
+              <i class="bi bi-geo-alt-fill"></i>
+              <span>服務據點：住商不動產楊梅大順店</span>
+            </div>
+            <div class="company-item">
+              <i class="bi bi-clock-fill"></i>
+              <span>營業時間：09:00–21:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
 
 <!-- 貸款試算彈窗 -->
 <div id="loanModal" class="loan-modal">
@@ -765,6 +1068,37 @@ function calculateModalLoan() {
     ${!canAfford ? '<div class="loan-warning">⚠️ 月付金額超過可支配收入，建議調整貸款條件</div>' : ''}
   `;
 }
+
+// 複製 LINE ID 功能
+function copyLineId() {
+  const lineId = '@931aeinu';
+  navigator.clipboard.writeText(lineId).then(() => {
+    // 顯示複製成功提示
+    const btn = document.getElementById('copyLineId');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check"></i> 已複製！';
+    btn.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+    
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.style.background = 'linear-gradient(45deg, #00c851, #00a085)';
+    }, 2000);
+  }).catch(() => {
+    // 如果複製失敗，顯示提示
+    alert('LINE ID: @931aeinu\n請手動複製');
+  });
+}
+
+// 下拉選單開啟連結功能
+function openSelectedLink(selectElement) {
+  const selectedValue = selectElement.value;
+  if (selectedValue) {
+    window.open(selectedValue, '_blank');
+    // 重置選單到預設選項
+    selectElement.selectedIndex = 0;
+  }
+}
+
 
 /* 初始化 */
 if(localStorage.getItem('theme')==='light')document.body.classList.add('light');

@@ -1448,7 +1448,76 @@
         // 頁面載入完成後執行價格動畫
         window.addEventListener('load', () => {
             setTimeout(animatePrice, 500);
+            setupImagePaths();
         });
+        
+        // 智能路徑檢測和設定
+        function setupImagePaths() {
+            // 檢測環境
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io';
+            const basePath = isGitHubPages ? 'images/' : '../images/';
+            
+            console.log(`🔍 環境檢測結果:`);
+            console.log(`- Protocol: ${window.location.protocol}`);
+            console.log(`- Hostname: ${window.location.hostname}`);
+            console.log(`- Pathname: ${window.location.pathname}`);
+            console.log(`- 判斷為: ${isGitHubPages ? 'GitHub Pages' : '本地'}`);
+            console.log(`- 使用路徑: ${basePath}`);
+            
+            // 更新所有圖片路徑
+            const imageSelectors = [
+                { src: basePath + '2-4/客廳.jpg', alt: '香梅一品客廳' },
+                { src: basePath + '2-4/175837820303047104.jpg!400x300.jpg', alt: '香梅一品格局圖' },
+                { src: basePath + '2-4/175837820329382908.jpg!400x300.jpg', alt: '香梅一品室內空間' },
+                { src: basePath + '2-4/175837820334991101.jpg!400x300.jpg', alt: '香梅一品房間配置' },
+                { src: basePath + '2-4/175837820335129506.jpg!400x300.jpg', alt: '香梅一品衛浴空間' },
+                { src: basePath + '2-4/175837820348461909.jpg!400x300.jpg', alt: '香梅一品景觀' },
+                { src: basePath + '2-4/175837820348814906.jpg!400x300.jpg', alt: '香梅一品室內空間' },
+                { src: basePath + '2-4/175837820362708209.jpg!400x300.jpg', alt: '香梅一品房間配置' },
+                { src: basePath + '2-4/175837820364224009.jpg!400x300.jpg', alt: '香梅一品衛浴空間' },
+                { src: basePath + '2-4/175837820375382503.jpg!400x300.jpg', alt: '香梅一品景觀' },
+                { src: basePath + '2-4/175837820377061705.jpg!400x300.jpg', alt: '香梅一品格局圖' }
+            ];
+            
+            // 更新HTML中的圖片
+            const photoThumbnails = document.querySelectorAll('.photo-thumbnail img');
+            console.log(`🖼️ 找到 ${photoThumbnails.length} 個圖片元素`);
+            
+            photoThumbnails.forEach((img, index) => {
+                if (imageSelectors[index]) {
+                    img.src = imageSelectors[index].src;
+                    img.alt = imageSelectors[index].alt;
+                    console.log(`✅ 設定圖片 ${index + 1}: ${img.src}`);
+                } else {
+                    console.log(`⚠️ 沒有找到圖片 ${index + 1} 的設定`);
+                }
+            });
+            
+            // 更新JavaScript中的圖片陣列
+            window.dynamicImages = imageSelectors.map(item => item.src);
+            
+            // 測試圖片載入
+            imageSelectors.forEach((item, index) => {
+                const testImg = new Image();
+                testImg.onload = () => console.log(`✅ 圖片 ${index + 1} 載入成功: ${item.src}`);
+                testImg.onerror = () => console.log(`❌ 圖片 ${index + 1} 載入失敗: ${item.src}`);
+                testImg.src = item.src;
+            });
+        }
+        
+        // 立即執行（防止事件監聽器沒有觸發）
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📄 DOM載入完成，立即設定圖片路徑...');
+            setTimeout(() => {
+                setupImagePaths();
+            }, 100);
+        });
+        
+        // 強制執行（最後保險）
+        setTimeout(() => {
+            console.log('⏰ 3秒後強制設定圖片路徑...');
+            setupImagePaths();
+        }, 3000);
         
         // 燈箱功能 - 動態路徑
         function getLightboxImages() {

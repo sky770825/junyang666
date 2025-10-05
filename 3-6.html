@@ -1263,47 +1263,47 @@
                 <h3>📸 房屋照片</h3>
                 <div class="photo-grid">
                     <div class="photo-thumbnail" onclick="openLightbox(0)">
-                        <img src="../images/3-6/客廳.jpg" alt="客廳">
+                        <img src=""客廳.jpg" alt="客廳">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(1)">
-                        <img src="../images/3-6/1753723093400.jpg" alt="房屋照片 2">
+                        <img src=""1753723093400.jpg" alt="房屋照片 2">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(2)">
-                        <img src="../images/3-6/1753723125486.jpg" alt="房屋照片 3">
+                        <img src=""1753723125486.jpg" alt="房屋照片 3">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(3)">
-                        <img src="../images/3-6/1753723134338.jpg" alt="房屋照片 4">
+                        <img src=""1753723134338.jpg" alt="房屋照片 4">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(4)">
-                        <img src="../images/3-6/1753723142286.jpg" alt="房屋照片 5">
+                        <img src=""1753723142286.jpg" alt="房屋照片 5">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(5)">
-                        <img src="../images/3-6/1753723151139.jpg" alt="房屋照片 6">
+                        <img src=""1753723151139.jpg" alt="房屋照片 6">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(6)">
-                        <img src="../images/3-6/1753723159050.jpg" alt="房屋照片 7">
+                        <img src=""1753723159050.jpg" alt="房屋照片 7">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(7)">
-                        <img src="../images/3-6/1753723170649.jpg" alt="房屋照片 8">
+                        <img src=""1753723170649.jpg" alt="房屋照片 8">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(8)">
-                        <img src="../images/3-6/1753723179212.jpg" alt="房屋照片 9">
+                        <img src=""1753723179212.jpg" alt="房屋照片 9">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(9)">
-                        <img src="../images/3-6/1753723189184.jpg" alt="房屋照片 10">
+                        <img src=""1753723189184.jpg" alt="房屋照片 10">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(10)">
-                        <img src="../images/3-6/格局圖.jpg" alt="格局圖" style="object-fit: contain; background: #f5f5f5;">
+                        <img src=""格局圖.jpg" alt="格局圖" style="object-fit: contain; background: #f5f5f5;">
                         <div class="photo-overlay"></div>
                     </div>
                 </div>
@@ -1497,7 +1497,76 @@
         // 頁面載入完成後執行價格動畫
         window.addEventListener('load', () => {
             setTimeout(animatePrice, 500);
+            setupImagePaths();
         });
+        
+        // 智能路徑檢測和設定
+        function setupImagePaths() {
+            // 檢測環境
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io';
+            const basePath = isGitHubPages ? 'images/' : '../images/';
+            
+            console.log(`🔍 環境檢測結果:`);
+            console.log(`- Protocol: ${window.location.protocol}`);
+            console.log(`- Hostname: ${window.location.hostname}`);
+            console.log(`- Pathname: ${window.location.pathname}`);
+            console.log(`- 判斷為: ${isGitHubPages ? 'GitHub Pages' : '本地'}`);
+            console.log(`- 使用路徑: ${basePath}`);
+            
+            // 更新所有圖片路徑
+            const imageSelectors = [
+                { src: basePath + '3-6/客廳.jpg', alt: '客廳' },
+                { src: basePath + '3-6/1753723093400.jpg', alt: '房屋照片 2' },
+                { src: basePath + '3-6/1753723093401.jpg', alt: '房屋照片 3' },
+                { src: basePath + '3-6/1753723093402.jpg', alt: '房屋照片 4' },
+                { src: basePath + '3-6/1753723093403.jpg', alt: '房屋照片 5' },
+                { src: basePath + '3-6/1753723093404.jpg', alt: '房屋照片 6' },
+                { src: basePath + '3-6/1753723093405.jpg', alt: '房屋照片 7' },
+                { src: basePath + '3-6/1753723093406.jpg', alt: '房屋照片 8' },
+                { src: basePath + '3-6/1753723093407.jpg', alt: '房屋照片 9' },
+                { src: basePath + '3-6/1753723093408.jpg', alt: '房屋照片 10' },
+                { src: basePath + '3-6/1753723093409.jpg', alt: '房屋照片 11' }
+            ];
+            
+            // 更新HTML中的圖片
+            const photoThumbnails = document.querySelectorAll('.photo-thumbnail img');
+            console.log(`🖼️ 找到 ${photoThumbnails.length} 個圖片元素`);
+            
+            photoThumbnails.forEach((img, index) => {
+                if (imageSelectors[index]) {
+                    img.src = imageSelectors[index].src;
+                    img.alt = imageSelectors[index].alt;
+                    console.log(`✅ 設定圖片 ${index + 1}: ${img.src}`);
+                } else {
+                    console.log(`⚠️ 沒有找到圖片 ${index + 1} 的設定`);
+                }
+            });
+            
+            // 更新JavaScript中的圖片陣列
+            window.dynamicImages = imageSelectors.map(item => item.src);
+            
+            // 測試圖片載入
+            imageSelectors.forEach((item, index) => {
+                const testImg = new Image();
+                testImg.onload = () => console.log(`✅ 圖片 ${index + 1} 載入成功: ${item.src}`);
+                testImg.onerror = () => console.log(`❌ 圖片 ${index + 1} 載入失敗: ${item.src}`);
+                testImg.src = item.src;
+            });
+        }
+        
+        // 立即執行（防止事件監聽器沒有觸發）
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📄 DOM載入完成，立即設定圖片路徑...');
+            setTimeout(() => {
+                setupImagePaths();
+            }, 100);
+        });
+        
+        // 強制執行（最後保險）
+        setTimeout(() => {
+            console.log('⏰ 3秒後強制設定圖片路徑...');
+            setupImagePaths();
+        }, 3000);
         
         // 燈箱功能 - 動態路徑
         function getLightboxImages() {

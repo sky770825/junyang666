@@ -836,7 +836,7 @@
     <div class="container">
         <div class="header">
             <div style="margin-bottom: 20px;">
-                <img src="https://cdn-ckfinder.leju.com.tw/files/blog_1686_1710126364.png" 
+                <img src="../images/4-2/封面照.png" 
                      alt="和耀新加州建案外觀" 
                      style="width: 100%; max-width: 600px; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
             </div>
@@ -1597,6 +1597,44 @@
             features.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(features);
         }
+        
+        // 動態路徑檢測和設定
+        function setupImagePaths() {
+            // 檢測環境
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io' || 
+                                  window.location.pathname.includes('junyang666') ||
+                                  (window.location.protocol === 'https:' && window.location.hostname !== 'localhost');
+            const basePath = isGitHubPages ? 'images/' : '../images/';
+            
+            console.log(`🔍 環境檢測結果:`);
+            console.log(`- Protocol: ${window.location.protocol}`);
+            console.log(`- Hostname: ${window.location.hostname}`);
+            console.log(`- Pathname: ${window.location.pathname}`);
+            console.log(`- 判斷為: ${isGitHubPages ? 'GitHub Pages' : '本地'}`);
+            console.log(`- 使用路徑: ${basePath}`);
+            
+            // 更新封面照路徑
+            const coverImage = document.querySelector('.header img');
+            if (coverImage) {
+                coverImage.src = basePath + '4-2/封面照.png';
+                console.log(`✅ 設定封面照: ${coverImage.src}`);
+            }
+        }
+        
+        // 頁面載入完成後執行
+        window.addEventListener('load', () => {
+            setupImagePaths();
+        });
+        
+        // DOM載入完成後也執行一次
+        document.addEventListener('DOMContentLoaded', () => {
+            setupImagePaths();
+        });
+        
+        // 延遲執行確保所有資源載入完成
+        setTimeout(() => {
+            setupImagePaths();
+        }, 2000);
     </script>
 </body>
 </html>

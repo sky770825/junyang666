@@ -838,7 +838,7 @@
         <div class="container">
             <div class="header no-page-break">
             <div style="margin-bottom: 20px;">
-                <img src="https://static.rakuya.com.tw/community_image/42782/646ec6f305de4.jpeg" 
+                <img src="../images/2-9/封面照.jpg" 
                      alt="X計畫世紀城建案外觀" 
                      style="width: 100%; max-width: 600px; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
             </div>
@@ -1480,6 +1480,13 @@
             console.log(`- Pathname: ${window.location.pathname}`);
             console.log(`- 判斷為: ${isGitHubPages ? 'GitHub Pages' : '本地'}`);
             console.log(`- 使用路徑: ${basePath}`);
+            
+            // 更新封面照路徑
+            const coverImage = document.querySelector('.header img');
+            if (coverImage) {
+                coverImage.src = basePath + '2-9/封面照.jpg';
+                console.log(`✅ 設定封面照: ${coverImage.src}`);
+            }
             
             // 更新所有圖片路徑
             const imageSelectors = [

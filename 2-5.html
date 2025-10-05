@@ -838,7 +838,7 @@
         <div class="container">
             <div class="header no-page-break">
             <div style="margin-bottom: 20px;">
-                <img src="https://static.rakuya.com.tw/community_image/42782/646ec6f305de4.jpeg" 
+                <img src="../images/2-5/封面照.jpeg" 
                      alt="X計畫世紀城建案外觀" 
                      style="width: 100%; max-width: 600px; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
             </div>
@@ -1221,47 +1221,47 @@
                 <h3>📸 房屋照片</h3>
                 <div class="photo-grid">
                     <div class="photo-thumbnail" onclick="openLightbox(0)">
-                        <img src=""客廳.jpg" alt="客廳全景">
+                        <img src="../images/2-5/客廳.jpg" alt="客廳全景">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(1)">
-                        <img src=""1.jpg" alt="格局圖">
+                        <img src="../images/2-5/1.jpg" alt="格局圖">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(2)">
-                        <img src=""175515145904060006.jpg!400x300.jpg" alt="室內空間">
+                        <img src="../images/2-5/175515145904060006.jpg!400x300.jpg" alt="室內空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(3)">
-                        <img src=""175515145908339404.jpg!400x300.jpg" alt="房間配置">
+                        <img src="../images/2-5/175515145908339404.jpg!400x300.jpg" alt="房間配置">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(4)">
-                        <img src=""175515145938402500.jpg!400x300.jpg" alt="衛浴空間">
+                        <img src="../images/2-5/175515145938402500.jpg!400x300.jpg" alt="衛浴空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(5)">
-                        <img src=""175515145955434102.jpg!400x300.jpg" alt="陽台空間">
+                        <img src="../images/2-5/175515145955434102.jpg!400x300.jpg" alt="陽台空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(6)">
-                        <img src=""175515145971678109.jpg!400x300.jpg" alt="房屋照片 7">
+                        <img src="../images/2-5/175515145971678109.jpg!400x300.jpg" alt="房屋照片 7">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(7)">
-                        <img src=""175515145978652905.jpg!400x300.jpg" alt="房屋照片 8">
+                        <img src="../images/2-5/175515145978652905.jpg!400x300.jpg" alt="房屋照片 8">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(8)">
-                        <img src=""175515145990574407.jpg!400x300.jpg" alt="房屋照片 9">
+                        <img src="../images/2-5/175515145990574407.jpg!400x300.jpg" alt="房屋照片 9">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(9)">
-                        <img src=""175515145993691403.jpg!400x300.jpg" alt="房屋照片 10">
+                        <img src="../images/2-5/175515145993691403.jpg!400x300.jpg" alt="房屋照片 10">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(10)">
-                        <img src=""格局圖.jpeg" alt="格局圖" style="object-fit: contain; background: #f5f5f5;">
+                        <img src="../images/2-5/格局圖.jpeg" alt="格局圖" style="object-fit: contain; background: #f5f5f5;">
                         <div class="photo-overlay"></div>
                     </div>
                 </div>
@@ -1463,6 +1463,13 @@
             console.log(`- Pathname: ${window.location.pathname}`);
             console.log(`- 判斷為: ${isGitHubPages ? 'GitHub Pages' : '本地'}`);
             console.log(`- 使用路徑: ${basePath}`);
+            
+            // 更新封面照路徑
+            const coverImage = document.querySelector('.header img');
+            if (coverImage) {
+                coverImage.src = basePath + '2-5/封面照.jpeg';
+                console.log(`✅ 設定封面照: ${coverImage.src}`);
+            }
             
             // 更新所有圖片路徑
             const imageSelectors = [

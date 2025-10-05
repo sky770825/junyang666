@@ -838,7 +838,7 @@
         <div class="container">
             <div class="header no-page-break">
             <div style="margin-bottom: 20px;">
-                <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4npkf_TP7KCr96UCmTNJaqE4bGEJiDG3Fm9-MQB_s6hEyKjcISXYSmCPKFNZm3QacQQq3ah_6T2CvqfnImV1NFSDKx6j5HFQZc2W4r5TdW1zhSTKIuN6b0eUx7hoL0imKU83Xz2P=s680-w680-h510-rw" 
+                <img src="../images/2-6/封面照.jpeg" 
                      alt="益欣學學建案外觀" 
                      style="width: 100%; max-width: 400px; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
             </div>
@@ -1451,6 +1451,13 @@
             console.log(`- Pathname: ${window.location.pathname}`);
             console.log(`- 判斷為: ${isGitHubPages ? 'GitHub Pages' : '本地'}`);
             console.log(`- 使用路徑: ${basePath}`);
+            
+            // 更新封面照路徑
+            const coverImage = document.querySelector('.header img');
+            if (coverImage) {
+                coverImage.src = basePath + '2-6/封面照.jpeg';
+                console.log(`✅ 設定封面照: ${coverImage.src}`);
+            }
             
             // 更新所有圖片路徑
             const imageSelectors = [

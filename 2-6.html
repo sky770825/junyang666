@@ -1492,21 +1492,28 @@
             setupImagePaths();
         });
         
-        // 燈箱功能
-        const images = [
-            'images/2-6/客廳.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_1.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_2.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_3.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_4.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_5.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_6.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_7.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_8.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_9.jpg',
-            'images/2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_10.jpg',
-            'images/2-6/格局圖.jpg'
-        ];
+        // 燈箱功能 - 動態路徑
+        function getLightboxImages() {
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io';
+            const basePath = isGitHubPages ? 'images/' : '../images/';
+            
+            return [
+                basePath + '2-6/客廳.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_1.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_2.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_3.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_4.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_5.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_6.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_7.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_8.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_9.jpg',
+                basePath + '2-6/LINE_ALBUM_益欣學學二房車$1188萬（自住提前好約）_250703_10.jpg',
+                basePath + '2-6/格局圖.jpg'
+            ];
+        }
+        
+        const images = getLightboxImages();
         
         let currentImageIndex = 0;
         

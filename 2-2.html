@@ -1550,19 +1550,26 @@
             setupImagePaths();
         }, 3000);
         
-        // 燈箱功能 - 使用本地路徑
-        const images = [
-            '../images/2-2/客廳.jpg',
-            '../images/2-2/客餐廳.jpg',
-            '../images/2-2/主臥房.jpg',
-            '../images/2-2/衛浴.jpg',
-            '../images/2-2/後陽台.jpg',
-            '../images/2-2/廚房.jpg',
-            '../images/2-2/次臥房.jpg',
-            '../images/2-2/玄關.jpg',
-            '../images/2-2/臥房.jpg',
-            '../images/2-2/格局圖.jpg'
-        ];
+        // 燈箱功能 - 動態路徑
+        function getLightboxImages() {
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io';
+            const basePath = isGitHubPages ? 'images/' : '../images/';
+            
+            return [
+                basePath + '2-2/客廳.jpg',
+                basePath + '2-2/客餐廳.jpg',
+                basePath + '2-2/主臥房.jpg',
+                basePath + '2-2/衛浴.jpg',
+                basePath + '2-2/後陽台.jpg',
+                basePath + '2-2/廚房.jpg',
+                basePath + '2-2/次臥房.jpg',
+                basePath + '2-2/玄關.jpg',
+                basePath + '2-2/臥房.jpg',
+                basePath + '2-2/格局圖.jpg'
+            ];
+        }
+        
+        const images = getLightboxImages();
         
         let currentImageIndex = 0;
         

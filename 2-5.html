@@ -1221,47 +1221,47 @@
                 <h3>📸 房屋照片</h3>
                 <div class="photo-grid">
                     <div class="photo-thumbnail" onclick="openLightbox(0)">
-                        <img src="images/2-5/客廳.jpg" alt="客廳全景">
+                        <img src="../images/2-5/客廳.jpg" alt="客廳全景">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(1)">
-                        <img src="images/2-5/1.jpg" alt="格局圖">
+                        <img src="../images/2-5/1.jpg" alt="格局圖">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(2)">
-                        <img src="images/2-5/175515145904060006.jpg!400x300.jpg" alt="室內空間">
+                        <img src="../images/2-5/175515145904060006.jpg!400x300.jpg" alt="室內空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(3)">
-                        <img src="images/2-5/175515145908339404.jpg!400x300.jpg" alt="房間配置">
+                        <img src="../images/2-5/175515145908339404.jpg!400x300.jpg" alt="房間配置">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(4)">
-                        <img src="images/2-5/175515145938402500.jpg!400x300.jpg" alt="衛浴空間">
+                        <img src="../images/2-5/175515145938402500.jpg!400x300.jpg" alt="衛浴空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(5)">
-                        <img src="images/2-5/175515145955434102.jpg!400x300.jpg" alt="陽台空間">
+                        <img src="../images/2-5/175515145955434102.jpg!400x300.jpg" alt="陽台空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(6)">
-                        <img src="images/2-5/175515145971678109.jpg!400x300.jpg" alt="房屋照片 7">
+                        <img src="../images/2-5/175515145971678109.jpg!400x300.jpg" alt="房屋照片 7">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(7)">
-                        <img src="images/2-5/175515145978652905.jpg!400x300.jpg" alt="房屋照片 8">
+                        <img src="../images/2-5/175515145978652905.jpg!400x300.jpg" alt="房屋照片 8">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(8)">
-                        <img src="images/2-5/175515145990574407.jpg!400x300.jpg" alt="房屋照片 9">
+                        <img src="../images/2-5/175515145990574407.jpg!400x300.jpg" alt="房屋照片 9">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(9)">
-                        <img src="images/2-5/175515145993691403.jpg!400x300.jpg" alt="房屋照片 10">
+                        <img src="../images/2-5/175515145993691403.jpg!400x300.jpg" alt="房屋照片 10">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(10)">
-                        <img src="images/2-5/格局圖.jpeg" alt="格局圖" style="object-fit: contain; background: #f5f5f5;">
+                        <img src="../images/2-5/格局圖.jpeg" alt="格局圖" style="object-fit: contain; background: #f5f5f5;">
                         <div class="photo-overlay"></div>
                     </div>
                 </div>
@@ -1450,20 +1450,27 @@
             setTimeout(animatePrice, 500);
         });
         
-        // 燈箱功能
-        const images = [
-            'images/2-5/客廳.jpg',
-            'images/2-5/1.jpg',
-            'images/2-5/175515145904060006.jpg!400x300.jpg',
-            'images/2-5/175515145908339404.jpg!400x300.jpg',
-            'images/2-5/175515145938402500.jpg!400x300.jpg',
-            'images/2-5/175515145955434102.jpg!400x300.jpg',
-            'images/2-5/175515145971678109.jpg!400x300.jpg',
-            'images/2-5/175515145978652905.jpg!400x300.jpg',
-            'images/2-5/175515145990574407.jpg!400x300.jpg',
-            'images/2-5/175515145993691403.jpg!400x300.jpg',
-            'images/2-5/格局圖.jpeg'
-        ];
+        // 燈箱功能 - 動態路徑
+        function getLightboxImages() {
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io';
+            const basePath = isGitHubPages ? 'images/' : '../images/';
+            
+            return [
+                basePath + '2-5/客廳.jpg',
+                basePath + '2-5/1.jpg',
+                basePath + '2-5/175515145904060006.jpg!400x300.jpg',
+                basePath + '2-5/175515145908339404.jpg!400x300.jpg',
+                basePath + '2-5/175515145938402500.jpg!400x300.jpg',
+                basePath + '2-5/175515145955434102.jpg!400x300.jpg',
+                basePath + '2-5/175515145971678109.jpg!400x300.jpg',
+                basePath + '2-5/175515145978652905.jpg!400x300.jpg',
+                basePath + '2-5/175515145990574407.jpg!400x300.jpg',
+                basePath + '2-5/175515145993691403.jpg!400x300.jpg',
+                basePath + '2-5/格局圖.jpeg'
+            ];
+        }
+        
+        const images = getLightboxImages();
         
         let currentImageIndex = 0;
         

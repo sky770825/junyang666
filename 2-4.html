@@ -1221,47 +1221,47 @@
                 <h3>📸 房屋照片</h3>
                 <div class="photo-grid">
                     <div class="photo-thumbnail" onclick="openLightbox(0)">
-                        <img src="images/2-4/客廳.jpg" alt="香梅一品客廳">
+                        <img src="../images/2-4/客廳.jpg" alt="香梅一品客廳">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(1)">
-                        <img src="images/2-4/175837820303047104.jpg!400x300.jpg" alt="香梅一品格局圖">
+                        <img src="../images/2-4/175837820303047104.jpg!400x300.jpg" alt="香梅一品格局圖">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(2)">
-                        <img src="images/2-4/175837820329382908.jpg!400x300.jpg" alt="香梅一品室內空間">
+                        <img src="../images/2-4/175837820329382908.jpg!400x300.jpg" alt="香梅一品室內空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(3)">
-                        <img src="images/2-4/175837820334991101.jpg!400x300.jpg" alt="香梅一品房間配置">
+                        <img src="../images/2-4/175837820334991101.jpg!400x300.jpg" alt="香梅一品房間配置">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(4)">
-                        <img src="images/2-4/175837820335129506.jpg!400x300.jpg" alt="香梅一品衛浴空間">
+                        <img src="../images/2-4/175837820335129506.jpg!400x300.jpg" alt="香梅一品衛浴空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(5)">
-                        <img src="images/2-4/175837820348461909.jpg!400x300.jpg" alt="香梅一品景觀">
+                        <img src="../images/2-4/175837820348461909.jpg!400x300.jpg" alt="香梅一品景觀">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(6)">
-                        <img src="images/2-4/175837820348814906.jpg!400x300.jpg" alt="香梅一品室內空間">
+                        <img src="../images/2-4/175837820348814906.jpg!400x300.jpg" alt="香梅一品室內空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(7)">
-                        <img src="images/2-4/175837820362708209.jpg!400x300.jpg" alt="香梅一品房間配置">
+                        <img src="../images/2-4/175837820362708209.jpg!400x300.jpg" alt="香梅一品房間配置">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(8)">
-                        <img src="images/2-4/175837820364224009.jpg!400x300.jpg" alt="香梅一品衛浴空間">
+                        <img src="../images/2-4/175837820364224009.jpg!400x300.jpg" alt="香梅一品衛浴空間">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(9)">
-                        <img src="images/2-4/175837820375382503.jpg!400x300.jpg" alt="香梅一品景觀">
+                        <img src="../images/2-4/175837820375382503.jpg!400x300.jpg" alt="香梅一品景觀">
                         <div class="photo-overlay"></div>
                     </div>
                     <div class="photo-thumbnail" onclick="openLightbox(10)">
-                        <img src="images/2-4/175837820377061705.jpg!400x300.jpg" alt="香梅一品格局圖" style="object-fit: contain; background: #f5f5f5;">
+                        <img src="../images/2-4/175837820377061705.jpg!400x300.jpg" alt="香梅一品格局圖" style="object-fit: contain; background: #f5f5f5;">
                         <div class="photo-overlay"></div>
                     </div>
                 </div>
@@ -1450,20 +1450,27 @@
             setTimeout(animatePrice, 500);
         });
         
-        // 燈箱功能
-        const images = [
-            'images/2-4/客廳.jpg',
-            'images/2-4/175837820303047104.jpg!400x300.jpg',
-            'images/2-4/175837820329382908.jpg!400x300.jpg',
-            'images/2-4/175837820334991101.jpg!400x300.jpg',
-            'images/2-4/175837820335129506.jpg!400x300.jpg',
-            'images/2-4/175837820348461909.jpg!400x300.jpg',
-            'images/2-4/175837820348814906.jpg!400x300.jpg',
-            'images/2-4/175837820362708209.jpg!400x300.jpg',
-            'images/2-4/175837820364224009.jpg!400x300.jpg',
-            'images/2-4/175837820375382503.jpg!400x300.jpg',
-            'images/2-4/175837820377061705.jpg!400x300.jpg'
-        ];
+        // 燈箱功能 - 動態路徑
+        function getLightboxImages() {
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io';
+            const basePath = isGitHubPages ? 'images/' : '../images/';
+            
+            return [
+                basePath + '2-4/客廳.jpg',
+                basePath + '2-4/175837820303047104.jpg!400x300.jpg',
+                basePath + '2-4/175837820329382908.jpg!400x300.jpg',
+                basePath + '2-4/175837820334991101.jpg!400x300.jpg',
+                basePath + '2-4/175837820335129506.jpg!400x300.jpg',
+                basePath + '2-4/175837820348461909.jpg!400x300.jpg',
+                basePath + '2-4/175837820348814906.jpg!400x300.jpg',
+                basePath + '2-4/175837820362708209.jpg!400x300.jpg',
+                basePath + '2-4/175837820364224009.jpg!400x300.jpg',
+                basePath + '2-4/175837820375382503.jpg!400x300.jpg',
+                basePath + '2-4/175837820377061705.jpg!400x300.jpg'
+            ];
+        }
+        
+        const images = getLightboxImages();
         
         let currentImageIndex = 0;
         

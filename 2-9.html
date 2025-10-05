@@ -1478,21 +1478,28 @@
             });
         });
         
-        // 燈箱功能
-        const images = [
-            'images/2-9/客廳.jpg',
-            'images/2-9/3.jpg',
-            'images/2-9/7.jpg',
-            'images/2-9/1.jpg',
-            'images/2-9/5.jpg',
-            'images/2-9/9.jpg',
-            'images/2-9/2.jpg',
-            'images/2-9/8.jpg',
-            'images/2-9/4.jpg',
-            'images/2-9/6.jpg',
-            'images/2-9/10.jpg',
-            'images/2-9/格局圖.png'
-        ];
+        // 燈箱功能 - 動態路徑
+        function getLightboxImages() {
+            const isGitHubPages = window.location.hostname === 'sky770825.github.io';
+            const basePath = isGitHubPages ? 'images/' : '../images/';
+            
+            return [
+                basePath + '2-9/客廳.jpg',
+                basePath + '2-9/3.jpg',
+                basePath + '2-9/7.jpg',
+                basePath + '2-9/1.jpg',
+                basePath + '2-9/5.jpg',
+                basePath + '2-9/9.jpg',
+                basePath + '2-9/2.jpg',
+                basePath + '2-9/8.jpg',
+                basePath + '2-9/4.jpg',
+                basePath + '2-9/6.jpg',
+                basePath + '2-9/10.jpg',
+                basePath + '2-9/格局圖.png'
+            ];
+        }
+        
+        const images = getLightboxImages();
         
         let currentImageIndex = 0;
         

@@ -1338,6 +1338,11 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
 
+        .status-new {
+            background: linear-gradient(45deg, #10b981, #059669);
+            animation: new-pulse 2s ease-in-out infinite;
+        }
+
         /* 動畫效果 */
         @keyframes urgent-pulse {
             0%, 100% {
@@ -1391,6 +1396,17 @@
             50% {
                 transform: scale(1.04);
                 box-shadow: 0 3px 12px rgba(248, 113, 113, 0.6);
+            }
+        }
+
+        @keyframes new-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 3px 12px rgba(16, 185, 129, 0.6);
             }
         }
 
@@ -1459,6 +1475,11 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.5);
         }
 
+        .modal-status-new {
+            background: linear-gradient(45deg, #10b981, #059669);
+            animation: modal-new-pulse 2s ease-in-out infinite;
+        }
+
         /* 彈窗動畫效果 */
         @keyframes modal-urgent-pulse {
             0%, 100% {
@@ -1512,6 +1533,17 @@
             50% {
                 transform: scale(1.04);
                 box-shadow: 0 4px 15px rgba(248, 113, 113, 0.7);
+            }
+        }
+
+        @keyframes modal-new-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(16, 185, 129, 0.5);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 4px 15px rgba(16, 185, 129, 0.7);
             }
         }
 
@@ -2357,6 +2389,74 @@
                     ],
                     description: "世紀城溫馨成家2房車，全室美裝潢拎包即可入住，廚房開窗衛浴開窗室內通風，國小在旁公園在旁，大型社區管理完善管理費便宜，超A物件趕快來看屋。",
                     google_maps: "https://www.google.com/maps/embed?pb=!4v1758707580230!6m8!1m7!1s7LZSjlMNTSAfghbzIa7ejw!2m2!1d24.91239663360834!2d121.1626274308514!3f152.5463588641371!4f29.4261813964752!5f0.7820865974627469"
+                },
+                {
+                    id: "prop_010",
+                    title: "星視界 梅獅商圈投資價2房",
+                    number: "2-10",
+                    type: "2房",
+                    community: "星視界",
+                    address: "楊梅區梅獅路二段***號6樓",
+                    price: "780萬",
+                    total_area: "24坪",
+                    main_area: "15.05坪",
+                    status: "new",
+                    statusText: "新進物件",
+                    balcony_area: "1.45坪",
+                    parking_area: "0坪",
+                    age: "6.4年",
+                    floor: "6/15",
+                    direction: "座西朝東",
+                    layout: "2房1廳1衛",
+                    building_type: "華廈",
+                    completion_date: "108.04.25",
+                    management_fee: "1521元/月",
+                    guard_management: "有",
+                    natural_gas: "有",
+                    basement_floors: "3樓",
+                    decoration: "無",
+                    road_width: "12米",
+                    parking_space: "無",
+                    motorcycle_space: "B1-118",
+                    current_status: "空屋",
+                    features: [
+                        "屋況乾淨明亮空間格局方正",
+                        "衛浴寬敞帶浴缸 乾濕分離 免治馬桶",
+                        "無裝潢可自行規劃設計",
+                        "社區24小時物業管理",
+                        "公設 健身房 兒童遊戲區 閱覽接待大廳",
+                        "緊鄰梅獅商圈、萬大市場、便利佳"
+                    ],
+                    transportation: {
+                        train_station: "埔心火車站 (車程約5分鐘)",
+                        highway: "楊梅交流道 (車程約3分鐘)",
+                        main_roads: ["梅獅路", "環東路"]
+                    },
+                    schools: {
+                        elementary: "瑞塘國小",
+                        junior_high: "瑞坪國中"
+                    },
+                    facilities: {
+                        shopping_district: "梅獅商圈",
+                        supermarket: "全聯福利中心",
+                        market: "萬大黃昏市場",
+                        restaurants: ["職人的店", "車麗屋", "拚什鍋", "錢都"]
+                    },
+                    parks: ["四維公園", "柚子公園"],
+                    images: [
+                        "images/2-10/客廳.jpg",
+                        "images/2-10/S__4964396_0.jpg",
+                        "images/2-10/S__4964397_0.jpg",
+                        "images/2-10/S__4964399_0.jpg",
+                        "images/2-10/S__4964400_0.jpg",
+                        "images/2-10/S__4964401_0.jpg",
+                        "images/2-10/S__4964402_0.jpg",
+                        "images/2-10/S__4964403_0.jpg",
+                        "images/2-10/S__4964404_0.jpg",
+                        "images/2-10/S__4964405_0.jpg"
+                    ],
+                    description: "星視界梅獅商圈兩房，屋況乾淨明亮空間格局方正，衛浴寬敞帶浴缸乾濕分離免治馬桶，無裝潢可自行規劃設計，社區24小時物業管理公設健身房兒童遊戲區閱覽接待大廳，緊鄰梅獅商圈萬大市場便利佳。",
+                    google_maps: "https://www.google.com/maps/embed?pb=!4v1759812818990!6m8!1m7!1slj_LTW10cQd16qIzdgayiA!2m2!1d24.90874422041527!2d121.1755533141979!3f79.29357334235497!4f23.932620325399583!5f0.7820865974627469"
                 },
                 {
                     id: "prop_011",
@@ -3945,9 +4045,30 @@
 
             // 顯示學區交通內容
             const transportation = property.transportation || {};
+            const schools = property.schools || {};
+            const facilities = property.facilities || {};
+            const parks = property.parks || [];
             
-            const facilitiesList = transportation.facilities && transportation.facilities.length > 0 
-                ? transportation.facilities.map(facility => `
+            // 處理設施資訊（支援新舊格式）
+            let facilitiesItems = [];
+            if (typeof facilities === 'object' && !Array.isArray(facilities)) {
+                // 新格式：facilities 是物件
+                if (facilities.shopping_district) facilitiesItems.push(facilities.shopping_district);
+                if (facilities.supermarket) facilitiesItems.push(facilities.supermarket);
+                if (facilities.market) facilitiesItems.push(facilities.market);
+                if (facilities.restaurants && Array.isArray(facilities.restaurants)) {
+                    facilitiesItems = facilitiesItems.concat(facilities.restaurants);
+                }
+            } else if (Array.isArray(facilities)) {
+                // 舊格式：facilities 是陣列
+                facilitiesItems = facilities;
+            } else if (transportation.facilities && Array.isArray(transportation.facilities)) {
+                // 更舊的格式
+                facilitiesItems = transportation.facilities;
+            }
+            
+            const facilitiesList = facilitiesItems.length > 0
+                ? facilitiesItems.map(facility => `
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 6px 10px; background: rgba(46, 204, 113, 0.05); border-radius: 6px; border-left: 3px solid #2ecc71;">
                         <span style="color: #2ecc71; font-size: 1rem;">🏢</span>
                         <span style="color: #2c3e50; font-weight: 500;">${facility}</span>
@@ -3955,8 +4076,21 @@
                 `).join('')
                 : '<div style="text-align: center; color: #666; padding: 10px;">暫無設施資訊</div>';
 
-            const transportList = transportation.transport && transportation.transport.length > 0 
-                ? transportation.transport.map(trans => `
+            // 處理交通資訊（支援新舊格式）
+            let transportItems = [];
+            if (typeof transportation === 'object') {
+                if (transportation.train_station) transportItems.push(transportation.train_station);
+                if (transportation.highway) transportItems.push(transportation.highway);
+                if (transportation.main_roads && Array.isArray(transportation.main_roads)) {
+                    transportItems = transportItems.concat(transportation.main_roads.map(road => road));
+                }
+                if (transportation.transport && Array.isArray(transportation.transport)) {
+                    transportItems = transportItems.concat(transportation.transport);
+                }
+            }
+            
+            const transportList = transportItems.length > 0
+                ? transportItems.map(trans => `
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 6px 10px; background: rgba(52, 152, 219, 0.05); border-radius: 6px; border-left: 3px solid #3498db;">
                         <span style="color: #3498db; font-size: 1rem;">🚗</span>
                         <span style="color: #2c3e50; font-weight: 500;">${trans}</span>
@@ -3964,8 +4098,22 @@
                 `).join('')
                 : '<div style="text-align: center; color: #666; padding: 10px;">暫無交通資訊</div>';
 
-            const schoolsList = transportation.schools && transportation.schools.length > 0 
-                ? transportation.schools.map(school => `
+            // 處理學校資訊（支援新舊格式）
+            let schoolsItems = [];
+            if (typeof schools === 'object' && !Array.isArray(schools)) {
+                // 新格式：schools 是物件
+                if (schools.elementary) schoolsItems.push(`國小：${schools.elementary}`);
+                if (schools.junior_high) schoolsItems.push(`國中：${schools.junior_high}`);
+            } else if (Array.isArray(schools)) {
+                // 舊格式：schools 是陣列
+                schoolsItems = schools;
+            } else if (transportation.schools && Array.isArray(transportation.schools)) {
+                // 更舊的格式
+                schoolsItems = transportation.schools;
+            }
+            
+            const schoolsList = schoolsItems.length > 0
+                ? schoolsItems.map(school => `
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 6px 10px; background: rgba(155, 89, 182, 0.05); border-radius: 6px; border-left: 3px solid #9b59b6;">
                         <span style="color: #9b59b6; font-size: 1rem;">🎓</span>
                         <span style="color: #2c3e50; font-weight: 500;">${school}</span>
@@ -3973,19 +4121,24 @@
                 `).join('')
                 : '<div style="text-align: center; color: #666; padding: 10px;">暫無學校資訊</div>';
 
+            // 處理市場和公園資訊
+            const marketInfo = typeof facilities === 'object' ? facilities.market : (transportation.market || '');
+            const parkInfo = Array.isArray(parks) && parks.length > 0 ? parks.join('、') : (transportation.park || '');
+            
             const marketPark = `
-                ${transportation.market ? `
+                ${marketInfo ? `
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 6px 10px; background: rgba(230, 126, 34, 0.05); border-radius: 6px; border-left: 3px solid #e67e22;">
                         <span style="color: #e67e22; font-size: 1rem;">🛒</span>
-                        <span style="color: #2c3e50; font-weight: 500;">${transportation.market}</span>
+                        <span style="color: #2c3e50; font-weight: 500;">${marketInfo}</span>
                     </div>
                 ` : ''}
-                ${transportation.park ? `
+                ${parkInfo ? `
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 6px 10px; background: rgba(39, 174, 96, 0.05); border-radius: 6px; border-left: 3px solid #27ae60;">
                         <span style="color: #27ae60; font-size: 1rem;">🌳</span>
-                        <span style="color: #2c3e50; font-weight: 500;">${transportation.park}</span>
+                        <span style="color: #2c3e50; font-weight: 500;">${parkInfo}</span>
                     </div>
                 ` : ''}
+                ${!marketInfo && !parkInfo ? '<div style="text-align: center; color: #666; padding: 10px;">暫無市場/公園資訊</div>' : ''}
             `;
 
             tooltip.innerHTML = `

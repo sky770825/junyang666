@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>租售需求登記｜楊梅住商 濬瑒、子菲</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #dfe9f3 0%, #ffffff 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: 2.2rem;
+      color: #1a237e;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      color: #555;
+      font-size: 1.1rem;
+    }
+
+    .form-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      padding: 40px 30px;
+      max-width: 650px;
+      width: 100%;
+      animation: floatUp 0.8s ease-in-out;
+    }
+
+    @keyframes floatUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .form-group {
+      position: relative;
+      width: 100%;
+    }
+
+    label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+      display: block;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .label-required::after {
+      content: " *";
+      color: #e53935;
+    }
+
+    .field-hint {
+      font-size: 13px;
+      color: #666;
+      margin-top: 6px;
+      display: block;
+      line-height: 1.5;
+    }
+
+    input, select, textarea {
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 13px 15px;
+      font-size: 16px;
+      width: 100%;
+      font-family: 'Noto Sans TC', sans-serif;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+    }
+
+    input.valid {
+      border-color: #4caf50;
+    }
+
+    input.invalid {
+      border-color: #e53935;
+    }
+
+    .error-message {
+      color: #e53935;
+      font-size: 13px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    input.invalid + .error-message {
+      display: block;
+    }
+
+    textarea { 
+      resize: vertical; 
+      min-height: 80px;
+    }
+
+    .quick-options {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      align-items: stretch;
+    }
+
+    .quick-btn {
+      padding: 10px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 20px;
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      color: #555;
+      white-space: nowrap;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      line-height: 1.2;
+    }
+
+    .quick-btn:hover {
+      border-color: #1a73e8;
+      color: #1a73e8;
+      background: #e3f2fd;
+      transform: translateY(-1px);
+    }
+
+    .quick-btn.active {
+      background: #1a73e8;
+      color: white;
+      border-color: #1a73e8;
+      font-weight: 600;
+    }
+
+    .needs-category {
+      margin-bottom: 24px;
+    }
+
+    .needs-category:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .category-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a73e8;
+      margin-bottom: 12px;
+      padding-left: 10px;
+      border-left: 4px solid #1a73e8;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 10px;
+      width: 100%;
+    }
+
+    .checkbox-item {
+      position: relative;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 11px 13px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      color: #555;
+      user-select: none;
+      white-space: nowrap;
+      min-height: 46px;
+      height: 100%;
+      line-height: 1.3;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .checkbox-label::before {
+      content: '';
+      display: inline-block;
+      width: 17px;
+      height: 17px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      margin-right: 10px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .checkbox-item input[type="checkbox"]:checked + .checkbox-label {
+      background: #e3f2fd;
+      border-color: #1a73e8;
+      color: #1a73e8;
+      font-weight: 600;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(26, 115, 232, 0.15);
+    }
+
+    .checkbox-item input[type="checkbox"]:checked + .checkbox-label::before {
+      background: #1a73e8;
+      border-color: #1a73e8;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+      background-size: 13px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .checkbox-label:hover {
+      border-color: #1a73e8;
+      background: #f8fbff;
+      transform: translateY(-1px);
+    }
+
+    .budget-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    .budget-group > * {
+      min-height: 48px;
+    }
+
+    button[type="submit"] {
+      background: linear-gradient(135deg, #1a73e8, #004ba0);
+      color: #fff;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button[type="submit"]:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .loading {
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 50%;
+      left: 50%;
+      margin-left: -10px;
+      margin-top: -10px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: #666;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .cta {
+      text-align: center;
+      margin-top: 25px;
+      padding: 20px;
+      background: linear-gradient(135deg, #e3f2fd, #fff);
+      border-radius: 12px;
+      color: #1a237e;
+      font-weight: 600;
+      font-size: 1.05rem;
+      border: 2px dashed #1a73e8;
+    }
+
+    .line-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 14px 30px;
+      background: linear-gradient(135deg, #06C755, #05b048);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);
+    }
+
+    .line-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 199, 85, 0.4);
+      background: linear-gradient(135deg, #05b048, #049639);
+    }
+
+    .line-btn::before {
+      content: "💬 ";
+      font-size: 18px;
+    }
+
+    .success-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .success-modal.show {
+      display: flex;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .success-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 400px;
+      animation: scaleIn 0.3s;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .success-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+
+    .close-btn {
+      margin-top: 20px;
+      padding: 12px 30px;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* 平板設備 (768px ~ 1024px) */
+    @media (max-width: 1024px) {
+      .form-card {
+        max-width: 700px;
+        padding: 35px 28px;
+      }
+      .checkbox-group {
+        grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+        gap: 10px;
+      }
+      form {
+        gap: 20px;
+      }
+    }
+
+    /* 手機橫向 (600px ~ 768px) */
+    @media (max-width: 768px) {
+      .hero h1 { 
+        font-size: 2rem;
+        line-height: 1.3;
+      }
+      .hero p {
+        font-size: 1rem;
+      }
+      .form-card { 
+        padding: 28px 22px;
+        max-width: 100%;
+      }
+      form {
+        gap: 20px;
+      }
+      .checkbox-group {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .quick-options {
+        gap: 8px;
+      }
+      .quick-btn {
+        font-size: 13px;
+        padding: 9px 14px;
+        min-height: 38px;
+      }
+      .checkbox-label {
+        font-size: 13px;
+        padding: 10px 11px;
+      }
+    }
+
+    /* 手機直向 (< 600px) */
+    @media (max-width: 600px) {
+      .hero h1 { 
+        font-size: 1.7rem;
+        line-height: 1.3;
+        padding: 0 15px;
+        margin-bottom: 8px;
+      }
+      .hero p {
+        font-size: 0.95rem;
+        padding: 0 15px;
+        line-height: 1.5;
+      }
+      .form-card { 
+        padding: 24px 18px;
+        border-radius: 18px;
+      }
+      form {
+        gap: 20px;
+      }
+      .budget-group { 
+        grid-template-columns: 1fr; 
+        gap: 12px;
+      }
+      .budget-group > * {
+        min-height: 50px;
+      }
+      .checkbox-group { 
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .checkbox-label {
+        font-size: 14px;
+        padding: 13px 13px;
+        min-height: 50px;
+        justify-content: flex-start;
+      }
+      .checkbox-label::before {
+        width: 18px;
+        height: 18px;
+        margin-right: 11px;
+      }
+      body { 
+        padding: 12px;
+      }
+      .quick-btn { 
+        font-size: 13px; 
+        padding: 11px 14px;
+        min-height: 42px;
+      }
+      .quick-options {
+        gap: 8px;
+        margin-top: 10px;
+      }
+      label {
+        font-size: 15px;
+        margin-bottom: 10px;
+      }
+      .category-title {
+        font-size: 14px;
+        margin-bottom: 12px;
+        padding-left: 10px;
+      }
+      .needs-category {
+        margin-bottom: 22px;
+      }
+      .success-content {
+        margin: 0 20px;
+        padding: 32px 26px;
+      }
+      .line-btn {
+        padding: 15px 30px;
+        font-size: 16px;
+        width: 100%;
+        max-width: 320px;
+      }
+      input, select, textarea {
+        font-size: 16px;
+        padding: 14px 13px;
+        min-height: 50px;
+      }
+      select {
+        background-position: right 13px center;
+      }
+      .field-hint {
+        font-size: 12px;
+        margin-top: 6px;
+        line-height: 1.5;
+      }
+      button[type="submit"] {
+        padding: 18px;
+        font-size: 17px;
+        border-radius: 14px;
+        min-height: 56px;
+      }
+    }
+
+    /* 小型手機 (< 375px) */
+    @media (max-width: 375px) {
+      .hero h1 { 
+        font-size: 1.5rem;
+      }
+      .hero p {
+        font-size: 0.9rem;
+      }
+      .form-card {
+        padding: 20px 16px;
+      }
+      form {
+        gap: 18px;
+      }
+      .checkbox-label {
+        font-size: 13px;
+        padding: 11px 11px;
+        min-height: 48px;
+      }
+      .checkbox-label::before {
+        width: 17px;
+        height: 17px;
+        margin-right: 10px;
+      }
+      .quick-btn {
+        font-size: 12px;
+        padding: 9px 11px;
+        min-height: 40px;
+      }
+      label {
+        font-size: 14px;
+      }
+      .category-title {
+        font-size: 13px;
+      }
+      input, select, textarea {
+        padding: 13px 12px;
+        min-height: 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>🏠 房屋租售需求登記</h1>
+    <p>填寫您的需求，我們將為您匹配最合適的物件與顧問</p>
+  </div>
+
+  <div class="form-card">
+    <form id="needForm">
+      <!-- 需求類型 -->
+      <div class="form-group">
+        <label class="label-required">📋 需求類型</label>
+        <select name="需求類型" id="demandType" required>
+          <option value="">請選擇需求類型</option>
+          <option value="租屋需求">🏘️ 租屋需求</option>
+          <option value="店面出租">🏪 店面出租</option>
+          <option value="辦公室出租">🏢 辦公室出租</option>
+          <option value="買房需求">🏡 買房需求</option>
+          <option value="其他">💭 其他</option>
+        </select>
+      </div>
+
+      <!-- 期望地點 -->
+      <div class="form-group">
+        <label class="label-required">📍 期望地點</label>
+        <input type="text" name="期望地點" id="location" placeholder="請輸入地點，例如：桃園市楊梅區" required>
+        <div class="quick-options">
+          <button type="button" class="quick-btn" data-location="桃園市楊梅區">楊梅區</button>
+          <button type="button" class="quick-btn" data-location="桃園市中壢區">中壢區</button>
+          <button type="button" class="quick-btn" data-location="桃園市平鎮區">平鎮區</button>
+          <button type="button" class="quick-btn" data-location="桃園市龜山區">龜山區</button>
+          <button type="button" class="quick-btn" data-location="桃園市桃園區">桃園區</button>
+        </div>
+        <small class="field-hint">💡 可點選常用地點快速填入</small>
+      </div>
+
+      <!-- 預算範圍 -->
+      <div class="form-group">
+        <label class="label-required">💰 預算範圍</label>
+        <div class="budget-group">
+          <select name="預算類型" id="budgetType">
+            <option value="租金/月">租金/月</option>
+            <option value="總價">購屋總價</option>
+          </select>
+          <input type="text" name="預算金額" id="budget" placeholder="請輸入金額" required>
+        </div>
+        <div class="quick-options">
+          <button type="button" class="quick-btn" data-budget="1萬以下">1萬↓</button>
+          <button type="button" class="quick-btn" data-budget="1-2萬">1-2萬</button>
+          <button type="button" class="quick-btn" data-budget="2-3萬">2-3萬</button>
+          <button type="button" class="quick-btn" data-budget="800-1200萬">800-1200萬</button>
+          <button type="button" class="quick-btn" data-budget="1200-1800萬">1200-1800萬</button>
+        </div>
+        <small class="field-hint">💡 點選快速範圍或自行輸入</small>
+      </div>
+
+      <!-- 坪數需求 -->
+      <div class="form-group">
+        <label>📐 坪數需求</label>
+        <input type="text" name="坪數" id="area" placeholder="例如：20坪、20-30坪">
+        <div class="quick-options">
+          <button type="button" class="quick-btn" data-area="10坪以下">10坪↓</button>
+          <button type="button" class="quick-btn" data-area="10-20坪">10-20坪</button>
+          <button type="button" class="quick-btn" data-area="20-30坪">20-30坪</button>
+          <button type="button" class="quick-btn" data-area="30-40坪">30-40坪</button>
+          <button type="button" class="quick-btn" data-area="40坪以上">40坪↑</button>
+        </div>
+      </div>
+
+      <!-- 房型格局 -->
+      <div class="form-group">
+        <label>🛏️ 房型格局（可複選）</label>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="room1" name="房型[]" value="套房">
+            <label class="checkbox-label" for="room1">🏠 套房</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room2" name="房型[]" value="雅房">
+            <label class="checkbox-label" for="room2">🚪 雅房</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room3" name="房型[]" value="1房1廳1衛">
+            <label class="checkbox-label" for="room3">🏘️ 1房1廳1衛</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room4" name="房型[]" value="2房1廳1衛">
+            <label class="checkbox-label" for="room4">🏘️ 2房1廳1衛</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room5" name="房型[]" value="2房2廳1衛">
+            <label class="checkbox-label" for="room5">🏘️ 2房2廳1衛</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room6" name="房型[]" value="3房2廳2衛">
+            <label class="checkbox-label" for="room6">🏘️ 3房2廳2衛</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room7" name="房型[]" value="4房2廳2衛">
+            <label class="checkbox-label" for="room7">🏘️ 4房2廳2衛</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room8" name="房型[]" value="5房以上">
+            <label class="checkbox-label" for="room8">🏘️ 5房以上</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room9" name="房型[]" value="透天厝">
+            <label class="checkbox-label" for="room9">🏡 透天厝</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room10" name="房型[]" value="店面">
+            <label class="checkbox-label" for="room10">🏪 店面</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room11" name="房型[]" value="辦公室">
+            <label class="checkbox-label" for="room11">🏢 辦公室</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="room12" name="房型[]" value="開放空間">
+            <label class="checkbox-label" for="room12">🎨 開放空間</label>
+          </div>
+        </div>
+        <small class="field-hint">💡 可選擇多種房型，增加配對機會</small>
+      </div>
+
+      <!-- 特殊需求 -->
+      <div class="form-group">
+        <label>✨ 特殊需求（可複選）</label>
+        
+        <!-- 基本設施 -->
+        <div class="needs-category">
+          <div class="category-title">🏠 基本設施</div>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="need1" name="特殊需求[]" value="需要車位">
+              <label class="checkbox-label" for="need1">🚗 需要車位</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need2" name="特殊需求[]" value="有電梯">
+              <label class="checkbox-label" for="need2">🛗 有電梯</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need3" name="特殊需求[]" value="獨立陽台">
+              <label class="checkbox-label" for="need3">🪴 獨立陽台</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need4" name="特殊需求[]" value="有廚房">
+              <label class="checkbox-label" for="need4">🍳 有廚房</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need5" name="特殊需求[]" value="可開伙">
+              <label class="checkbox-label" for="need5">🔥 可開伙</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 家具家電 -->
+        <div class="needs-category">
+          <div class="category-title">🛋️ 家具家電</div>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="need6" name="特殊需求[]" value="有家具">
+              <label class="checkbox-label" for="need6">🛋️ 有家具</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need7" name="特殊需求[]" value="有家電">
+              <label class="checkbox-label" for="need7">📺 有家電</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 交通位置 -->
+        <div class="needs-category">
+          <div class="category-title">🚇 交通位置</div>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="need8" name="特殊需求[]" value="近捷運站">
+              <label class="checkbox-label" for="need8">🚇 近捷運站</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need9" name="特殊需求[]" value="近火車站">
+              <label class="checkbox-label" for="need9">🚄 近火車站</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need10" name="特殊需求[]" value="近公車站">
+              <label class="checkbox-label" for="need10">🚌 近公車站</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need11" name="特殊需求[]" value="臨大馬路">
+              <label class="checkbox-label" for="need11">🛣️ 臨大馬路</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 生活機能 -->
+        <div class="needs-category">
+          <div class="category-title">🛒 生活機能</div>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="need12" name="特殊需求[]" value="近學校">
+              <label class="checkbox-label" for="need12">🏫 近學校</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need13" name="特殊需求[]" value="近商圈">
+              <label class="checkbox-label" for="need13">🛒 近商圈</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need14" name="特殊需求[]" value="近市場">
+              <label class="checkbox-label" for="need14">🥬 近市場</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 環境條件 -->
+        <div class="needs-category">
+          <div class="category-title">☀️ 環境條件</div>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="need15" name="特殊需求[]" value="採光佳">
+              <label class="checkbox-label" for="need15">☀️ 採光佳</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need16" name="特殊需求[]" value="安靜環境">
+              <label class="checkbox-label" for="need16">🤫 安靜環境</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need17" name="特殊需求[]" value="可養寵物">
+              <label class="checkbox-label" for="need17">🐕 可養寵物</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 商用需求 -->
+        <div class="needs-category">
+          <div class="category-title">🏪 商用需求</div>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="need18" name="特殊需求[]" value="一樓店面">
+              <label class="checkbox-label" for="need18">🏪 一樓店面</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="need19" name="特殊需求[]" value="角間位置">
+              <label class="checkbox-label" for="need19">📐 角間位置</label>
+            </div>
+          </div>
+        </div>
+
+        <small class="field-hint">💡 點選所有符合的需求，我們會幫您篩選</small>
+      </div>
+
+      <!-- 其他補充說明 -->
+      <div class="form-group">
+        <label>📝 其他補充說明（選填）</label>
+        <textarea name="其他說明" id="otherNotes" rows="2" placeholder="如有其他特殊需求，請在此說明..."></textarea>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 10px 0;">
+
+      <!-- 聯絡資訊 -->
+      <div class="form-group">
+        <label class="label-required">👤 聯絡人姓名</label>
+        <input type="text" name="姓名" id="name" placeholder="請輸入您的姓名" required>
+      </div>
+
+      <div class="form-group">
+        <label class="label-required">📱 聯絡電話</label>
+        <input type="tel" name="電話" id="phone" placeholder="0912-345-678" required>
+        <small class="error-message" id="phoneError">請輸入正確的手機號碼格式</small>
+        <small class="field-hint">💡 請輸入09開頭的手機號碼</small>
+      </div>
+
+      <div class="form-group">
+        <label>💬 LINE ID（選填）</label>
+        <input type="text" name="LINE_ID" id="lineId" placeholder="請輸入您的 LINE ID">
+        <small class="field-hint">💡 方便我們透過 LINE 快速聯繫您</small>
+      </div>
+
+      <div class="form-group">
+        <label>📞 偏好聯絡方式</label>
+        <select name="聯絡方式">
+          <option value="LINE">LINE 優先</option>
+          <option value="電話">電話優先</option>
+          <option value="不限">都可以</option>
+        </select>
+      </div>
+
+      <button type="submit" id="submitBtn">📩 送出需求</button>
+    </form>
+
+    <div class="cta">
+      <div style="font-size: 1.1rem; margin-bottom: 5px;">💬 立即加入 LINE 官方顧問</div>
+      <small style="color: #555;">即時提供房價分析與貸款建議</small>
+      <br>
+      <a href="https://lin.ee/jfWdNKB" target="_blank" class="line-btn">加入好友</a>
+    </div>
+  </div>
+
+  <!-- 成功提交彈窗 -->
+  <div class="success-modal" id="successModal">
+    <div class="success-content">
+      <div class="success-icon">✅</div>
+      <h2>需求已送出！</h2>
+      <p>感謝您的填寫，我們的專業顧問將在 24 小時內與您聯繫。</p>
+      <p><strong>請保持手機暢通 📞</strong></p>
+      <p style="margin-top: 20px; color: #666; font-size: 14px;">或立即加入 LINE 官方帳號，獲得更快回覆 👇</p>
+      <a href="https://lin.ee/jfWdNKB" target="_blank" class="line-btn" style="margin: 10px 0;">加入 LINE 好友</a>
+      <br>
+      <button class="close-btn" onclick="closeModal()">知道了</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2025 楊梅住商 | 濬瑒、子菲 | 夢想起飛
+  </div>
+
+  <script>
+    // Google Sheets 連接設定
+    const SHEET_ID = '1aYly1FtKHTxWNFera8l3aEkSs456LNEPo-14rqYCHCc';
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyGg6KP6rViA2i-P_vR6aSZTPV7gqhlAUoQndgeuPKFQn2BlAal1UE9BAusTA4Xuu6e/exec';
+    
+    // 快速選擇按鈕 - 地點
+    document.querySelectorAll('[data-location]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const location = this.getAttribute('data-location');
+        document.getElementById('location').value = location;
+        
+        // 移除其他按鈕的 active 類
+        document.querySelectorAll('[data-location]').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // 快速選擇按鈕 - 預算
+    document.querySelectorAll('[data-budget]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const budget = this.getAttribute('data-budget');
+        document.getElementById('budget').value = budget;
+        
+        document.querySelectorAll('[data-budget]').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // 快速選擇按鈕 - 坪數
+    document.querySelectorAll('[data-area]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const area = this.getAttribute('data-area');
+        document.getElementById('area').value = area;
+        
+        document.querySelectorAll('[data-area]').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+
+    // 手機號碼自動格式化
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, ''); // 移除非數字
+      
+      if (value.length > 10) {
+        value = value.slice(0, 10);
+      }
+      
+      // 格式化為 0912-345-678
+      if (value.length > 6) {
+        value = value.slice(0, 4) + '-' + value.slice(4, 7) + '-' + value.slice(7);
+      } else if (value.length > 4) {
+        value = value.slice(0, 4) + '-' + value.slice(4);
+      }
+      
+      e.target.value = value;
+      
+      // 驗證手機號碼
+      const cleanValue = value.replace(/-/g, '');
+      if (cleanValue.length === 10 && cleanValue.startsWith('09')) {
+        phoneInput.classList.remove('invalid');
+        phoneInput.classList.add('valid');
+      } else if (cleanValue.length > 0) {
+        phoneInput.classList.remove('valid');
+        phoneInput.classList.add('invalid');
+      } else {
+        phoneInput.classList.remove('valid', 'invalid');
+      }
+    });
+
+    // 姓名輸入驗證
+    const nameInput = document.getElementById('name');
+    nameInput.addEventListener('input', function(e) {
+      if (e.target.value.length >= 2) {
+        nameInput.classList.add('valid');
+        nameInput.classList.remove('invalid');
+      } else if (e.target.value.length > 0) {
+        nameInput.classList.add('invalid');
+        nameInput.classList.remove('valid');
+      } else {
+        nameInput.classList.remove('valid', 'invalid');
+      }
+    });
+
+    // 表單提交
+    document.getElementById('needForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const form = e.target;
+      
+      // 驗證手機號碼
+      const phone = document.getElementById('phone').value.replace(/-/g, '');
+      if (phone.length !== 10 || !phone.startsWith('09')) {
+        alert('❌ 請輸入正確的手機號碼格式（09開頭，10碼）');
+        return;
+      }
+      
+      // 顯示載入狀態
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = '送出中...';
+      
+      try {
+        // 收集表單資料
+        const formData = new FormData(form);
+        
+        // 收集所有勾選的房型
+        const roomTypes = [];
+        document.querySelectorAll('input[name="房型[]"]:checked').forEach(checkbox => {
+          roomTypes.push(checkbox.value);
+        });
+        
+        // 收集所有勾選的特殊需求
+        const specialNeeds = [];
+        document.querySelectorAll('input[name="特殊需求[]"]:checked').forEach(checkbox => {
+          specialNeeds.push(checkbox.value);
+        });
+        
+        const data = {
+          timestamp: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
+          需求類型: formData.get('需求類型'),
+          期望地點: formData.get('期望地點'),
+          預算: `${formData.get('預算類型')} ${formData.get('預算金額')}`,
+          坪數: formData.get('坪數') || '未填寫',
+          房型: roomTypes.length > 0 ? roomTypes.join('、') : '未填寫',
+          特殊需求: specialNeeds.length > 0 ? specialNeeds.join('、') : '無特殊需求',
+          其他說明: formData.get('其他說明') || '無',
+          姓名: formData.get('姓名'),
+          電話: formData.get('電話'),
+          LINE_ID: formData.get('LINE_ID') || '未提供',
+          聯絡方式: formData.get('聯絡方式')
+        };
+        
+        // 發送到 Google Sheets
+        // 注意：您需要設定 Google Apps Script 的 Web App
+        const response = await fetch(SHEET_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Google Apps Script 需要這個模式
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+        
+        // 由於 no-cors 模式，我們假設請求成功
+        // 顯示成功訊息
+        showSuccessModal();
+        form.reset();
+        
+        // 移除所有 active 類
+        document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
+        
+      } catch (error) {
+        console.error('提交錯誤:', error);
+        alert('❌ 送出失敗，請稍後再試或直接聯繫我們。');
+      } finally {
+        // 恢復按鈕狀態
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+        submitBtn.textContent = originalText;
+      }
+    });
+
+    // 顯示成功彈窗
+    function showSuccessModal() {
+      const modal = document.getElementById('successModal');
+      modal.classList.add('show');
+    }
+
+    // 關閉彈窗
+    function closeModal() {
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('show');
+    }
+
+    // 點擊背景關閉彈窗
+    document.getElementById('successModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+    // 預算類型改變時的提示
+    document.getElementById('budgetType').addEventListener('change', function() {
+      const budgetInput = document.getElementById('budget');
+      if (this.value === '租金/月') {
+        budgetInput.placeholder = '例如：2萬、1.5萬';
+      } else {
+        budgetInput.placeholder = '例如：1200萬、800-1000萬';
+      }
+    });
+  </script>
+
+</body>
+</html>

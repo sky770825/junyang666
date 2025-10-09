@@ -191,7 +191,15 @@
 
     .checkbox-group {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      width: 100%;
+    }
+
+    /* 房型格局專用 - 多欄顯示 */
+    .room-type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       width: 100%;
     }
@@ -429,8 +437,11 @@
         padding: 35px 28px;
       }
       .checkbox-group {
-        grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 10px;
+      }
+      .room-type-grid {
+        grid-template-columns: repeat(3, 1fr);
       }
       form {
         gap: 20px;
@@ -456,6 +467,9 @@
       .checkbox-group {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
+      }
+      .room-type-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
       .quick-options {
         gap: 8px;
@@ -499,8 +513,11 @@
         min-height: 50px;
       }
       .checkbox-group { 
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 10px;
+      }
+      .room-type-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
       .checkbox-label {
         font-size: 14px;
@@ -581,6 +598,12 @@
       }
       form {
         gap: 18px;
+      }
+      .checkbox-group {
+        grid-template-columns: 1fr;
+      }
+      .room-type-grid {
+        grid-template-columns: 1fr;
       }
       .checkbox-label {
         font-size: 13px;
@@ -682,7 +705,7 @@
       <!-- 房型格局 -->
       <div class="form-group">
         <label>🛏️ 房型格局（可複選）</label>
-        <div class="checkbox-group">
+        <div class="room-type-grid">
           <div class="checkbox-item">
             <input type="checkbox" id="room1" name="房型[]" value="套房">
             <label class="checkbox-label" for="room1">🏠 套房</label>

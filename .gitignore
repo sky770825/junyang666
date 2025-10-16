@@ -1,0 +1,29 @@
+# 備份檔案
+*.backup
+
+# 版本資料夾（保留舊版本）
+版本/
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 編輯器設定
+.vscode/
+.idea/
+.cursor/
+
+# Node modules (如果有使用)
+node_modules/
+
+# 日誌檔案
+*.log
+
+# 暫存檔案
+*.tmp
+*.temp
+
+# Git 資料夾（避免上傳到用戶主目錄）
+.git
+

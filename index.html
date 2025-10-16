@@ -50,6 +50,19 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
+        /* 防止按鈕雙擊縮放和文字選取 */
+        .building-filter-button,
+        .room-filter-button,
+        .filter-button,
+        button {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
         /* 大螢幕 3 欄佈局 */
         @media (min-width: 1200px) {
             .properties-grid {

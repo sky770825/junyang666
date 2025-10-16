@@ -684,14 +684,25 @@
             div[id^="tiktok-embed-container-"] iframe {
                 width: 100% !important;
                 max-width: 100% !important;
-                height: 600px !important;
+                height: 70vh !important;
+                min-height: 500px !important;
+                max-height: 700px !important;
                 min-width: 100% !important;
             }
             
             .modal iframe[src*="tiktok.com/embed"] {
                 width: 100% !important;
                 max-width: 100% !important;
-                height: 600px !important;
+                height: 70vh !important;
+                min-height: 500px !important;
+                max-height: 700px !important;
+            }
+            
+            /* TikTok 嵌入容器手機版高度調整 */
+            div[id^="tiktok-embed-container-"] {
+                min-height: 70vh !important;
+                max-height: 75vh !important;
+                padding: 10px !important;
             }
             
             /* TikTok 彈窗關閉按鈕手機版優化 */
@@ -712,9 +723,23 @@
             
             /* TikTok 彈窗容器手機版優化 */
             .modal > div[style*="max-width"] {
-                max-height: 95vh !important;
+                max-height: 90vh !important;
                 overflow-y: auto !important;
-                margin: 10px !important;
+                margin: 5px !important;
+                width: 98vw !important;
+            }
+            
+            /* TikTok 標題區域手機版縮小 */
+            .modal div[style*="background: linear-gradient(135deg, #000000, #fe2c55)"] {
+                padding: 15px 20px 10px 20px !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #000000, #fe2c55)"] h2 {
+                font-size: 1.1rem !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #000000, #fe2c55)"] p {
+                font-size: 0.85rem !important;
             }
         }
         

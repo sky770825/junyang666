@@ -64,7 +64,10 @@ const embeddedPropertiesData = {
         market: "萬大市場",
         park: "四維公園"
     },
-    google_maps: "https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469"
+    google_maps: "https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469",
+    tiktok_video_id: "7531311616948948230",
+    tiktok_username: "@aihouse168",
+    tiktok_thumbnail: "images/2-1/客廳.jpg"  // 暂时使用客厅照片，之后可替换成真实的TikTok缩略图
 },
 {
     id: "prop_002", 
@@ -138,6 +141,8 @@ const embeddedPropertiesData = {
     parking_space: "B3-28",
     motorcycle_space: "B2-200",
     current_status: "空屋，隨時可看",
+    status: "sold",
+    statusText: "己售出",
     features: [
         "金山重劃區、生活機能優異",
         "全室輕裝潢、拎包即可入住",
@@ -181,7 +186,7 @@ const embeddedPropertiesData = {
     title: "絕美景觀稀有 | 2房+平車 | 近車站",
     number: "2-4",
     type: "2房",
-    address: "桃園市楊梅區楊新北路***號",
+    address: "桃園市楊梅區楊新北路***號10樓",
     price: "1,230萬",
     total_area: "38.95坪",
     layout: "2房2廳1衛",
@@ -248,7 +253,7 @@ const embeddedPropertiesData = {
     number: "2-5",
     type: "2房",
     community: "X計畫-世紀城",
-    address: "桃園市楊梅區金山街368巷***號",
+    address: "桃園市楊梅區金山街368巷***號14樓",
     price: "998萬",
     total_area: "36.43坪",
     main_area: "15.999坪",
@@ -666,7 +671,10 @@ const embeddedPropertiesData = {
         "images/3-1/格局圖.jpg"
     ],
     description: "世紀美妝雙開三房車，高樓層景觀戶全室美裝潢，稀有衛浴開窗設計，前後雙陽台，環東路新農街商圈，近楊明國中小學區，屋主誠意出售。",
-    google_maps: "https://www.google.com/maps/embed?pb=!4v1758710686802!6m8!1m7!1s7LZSjlMNTSAfghbzIa7ejw!2m2!1d24.91239663360834!2d121.1626274308514!3f146.1238597931058!4f17.34832990737047!5f0.7820865974627469"
+    google_maps: "https://www.google.com/maps/embed?pb=!4v1758710686802!6m8!1m7!1s7LZSjlMNTSAfghbzIa7ejw!2m2!1d24.91239663360834!2d121.1626274308514!3f146.1238597931058!4f17.34832990737047!5f0.7820865974627469",
+    tiktok_video_id: "7496377462591327543",
+    tiktok_username: "@aihouse168",
+    tiktok_thumbnail: "images/3-1/客廳.jpg"  // 使用客厅照片作为预览
 },
 {
     id: "prop_012",
@@ -1019,6 +1027,9 @@ const embeddedPropertiesData = {
     ],
     description: "新都悅3+1房雙車位，室內空間寬敞明亮採光充足，設計通風優良，鄰近夜市和市集購物娛樂便利，埔心車站與楊梅交流道交通十分便利，近明星學區及公園綠地，24小時警衛收發包裹管理優良，屋主誠意出售。",
     google_maps: "https://www.google.com/maps/embed?pb=!4v1758714048855!6m8!1m7!1s92gHaMrfLXzuJ-5EHgVYew!2m2!1d24.90576200280845!2d121.1774291899799!3f286.15984707525587!4f19.07089499120373!5f0.7820865974627469",
+    tiktok_video_id: "7509388926201646392",
+    tiktok_username: "@aihouse168",
+    tiktok_thumbnail: "images/3-6/客廳.jpg",  // 使用客厅照片作为预览
     status: "about-to-sell",
     statusText: "即將出售"
 },
@@ -1316,7 +1327,192 @@ const embeddedPropertiesData = {
         "images/4-2/格局圖.jpg"
     ],
     description: "和耀新加州四房雙車位，室內空間大好規劃，新農環東雙商圈生活機能完善，近楊明國中小提升生活品質，屋主割愛出售。",
-    google_maps: "https://www.google.com/maps/embed?pb=!4v1758708898393!6m8!1m7!1s-W5byR51RZ8R453xgsx_Ow!2m2!1d24.91221018735056!2d121.1723769198098!3f338.53221078559045!4f22.73248465991972!5f0.7820865974627469"
+    google_maps: "https://www.google.com/maps/embed?pb=!4v1758708898393!6m8!1m7!1s-W5byR51RZ8R453xgsx_Ow!2m2!1d24.91221018735056!2d121.1723769198098!3f338.53221078559045!4f22.73248465991972!5f0.7820865974627469",
+    tiktok_video_id: "7492303046551063814",
+    tiktok_username: "@aihouse168",
+    tiktok_thumbnail: "images/4-2/客廳全景.jpg"  // 使用客厅全景照片作为预览
+},
+{
+    id: "prop_022",
+    title: "振翔富琚 | 埔心車站市中心景觀兩房",
+    number: "2-11",
+    type: "2房",
+    community: "振翔富琚",
+    address: "桃園市楊梅區金龍三路***號8樓",
+    price: "958萬",
+    total_area: "28.65坪",
+    main_area: "18.492坪",
+    layout: "2房2廳1衛",
+    age: "5年",
+    floor: "8F/15F",
+    orientation: "無",
+    current_status: "自住,需提前約",
+    building_type: "大樓",
+    decoration_level: "無",
+    management_fee: "1,433元/月",
+    with_lease: "否",
+    legal_use: "住家用",
+    parking: "平面車位",
+    parking_space: "洽業務",
+    public_ratio: "30.83%",
+    ancillary_area: "1.313坪",
+    auxiliary_area: "1.313坪",
+    parking_area: "0坪",
+    common_area: "8.845坪",
+    unit_price: "33.42萬/坪",
+    completion_date: "108.12.31",
+    natural_gas: "有",
+    security: "有",
+    motorcycle_space: "有",
+    amenities: [
+        "近便利商店",
+        "近公園綠地",
+        "近夜市",
+        "近傳統市場",
+        "近學校",
+        "近百貨公司",
+        "近醫療機構"
+    ],
+    transportation: {
+        facilities: [
+            "埔心車站",
+            "四維國小",
+            "文化商圈",
+            "中興路商圈",
+            "全聯福利中心"
+        ],
+        transport: [
+            "埔心火車站",
+            "楊梅交流道",
+            "國道1號"
+        ],
+        schools: [
+            "四維國小",
+            "治平高中國中部"
+        ],
+        market: "埔心市場",
+        park: "埔心公園"
+    },
+    features: [
+        "埔心車站市中心景觀兩房",
+        "四維國小文化商圈中興路商圈",
+        "交通便利生活機能完善",
+        "社區設施齊全管理良好",
+        "環境優美安全性高"
+    ],
+    images: [
+        "images/2-11/客廳.jpg",
+        "images/2-11/外觀照.jpg",
+        "images/2-11/格局圖.jpg",
+        "images/2-11/IMG_9099.jpg",
+        "images/2-11/IMG_9100.jpg",
+        "images/2-11/截圖 2025-09-06 18.57.29.png",
+        "images/2-11/截圖 2025-09-06 18.57.45.png",
+        "images/2-11/截圖 2025-09-06 18.57.58.png",
+        "images/2-11/截圖 2025-09-06 18.58.10.png",
+        "images/2-11/截圖 2025-09-06 18.58.19.png",
+        "images/2-11/截圖 2025-09-06 18.58.40.png",
+        "images/2-11/截圖 2025-09-06 18.58.49.png",
+        "images/2-11/截圖 2025-09-06 18.58.56.png"
+    ],
+    description: "振翔富琚埔心車站市中心景觀兩房，四維國小文化商圈中興路商圈，交通便利生活機能完善，社區設施齊全管理良好，環境優美安全性高，屋主誠意出售。",
+    google_maps: "https://www.google.com/maps/embed?pb=!4v1760608411845!6m8!1m7!1sMBanod3aZaCvVaWI74VtAw!2m2!1d24.91210018580394!2d121.1869591111168!3f276.51629685092115!4f22.618057606839585!5f0.7820865974627469",
+    tiktok_video_id: "7557232980352159032",
+    tiktok_username: "@aihouse168",
+    tiktok_thumbnail: "images/2-11/客廳.jpg",
+    status: "new",
+    statusText: "新進物件"
+},
+{
+    id: "prop_023",
+    title: "千萬內幸福宣言三房車 | 低於鑑價",
+    number: "3-10",
+    type: "3房",
+    community: "幸福宣言",
+    address: "楊梅區瑞溪路二段***號9樓",
+    price: "968萬",
+    total_area: "42.45坪",
+    main_area: "23.19坪",
+    auxiliary_area: "3.273坪",
+    parking_area: "7.11坪",
+    common_area: "8.873坪",
+    land_area: "8.98坪",
+    layout: "3房2廳2衛",
+    age: "19年",
+    floor: "9/13樓",
+    orientation: "座東南朝西北",
+    current_status: "空屋,需提前約",
+    building_type: "大樓",
+    decoration_level: "有",
+    management_fee: "2,585元/月",
+    with_lease: "否",
+    legal_use: "住家用",
+    parking: "平面車位",
+    parking_space: "B2-27",
+    public_ratio: "約21%",
+    natural_gas: "有",
+    security: "有",
+    motorcycle_space: "B2-10",
+    completion_date: "95.09.04",
+    road_width: "8米",
+    base_area: "2677 M²",
+    share_ratio: "111/10000",
+    status: "below-appraisal",
+    statusText: "低於鑑價",
+    amenities: [
+        "近便利商店",
+        "近公園綠地",
+        "近傳統市場",
+        "近學校",
+        "近醫療機構"
+    ],
+    transportation: {
+        facilities: [
+            "四維路商圈",
+            "全聯福利中心"
+        ],
+        transport: [
+            "楊梅交流道",
+            "幼獅交流道", 
+            "五楊交流道",
+            "埔心火車站"
+        ],
+        schools: [
+            "瑞坪國中",
+            "瑞塘國小"
+        ],
+        market: "埔心市場",
+        park: "楊明公園"
+    },
+    features: [
+        "超級景觀戶,間間採光極佳",
+        "大陽台設計",
+        "雙衛浴皆可乾濕分離",
+        "主臥室可以泡澡",
+        "鄰近國中小學高中學區火車站公車站牌",
+        "鄰近一龍科/幼獅/平鎮工業區置產收租皆宜"
+    ],
+    images: [
+        "images/3-10/外觀照.jpg",
+        "images/3-10/客廳.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_6.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_7.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_14.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_20.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_23.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_26.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_27.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_28.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_32.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_34.jpg",
+        "images/3-10/LINE_ALBUM_幸福宣言三房車968萬總42.47坪（含車位坪數7.13坪）_251007_36.jpg",
+        "images/3-10/格局圖.jpg"
+    ],
+    description: "千萬內幸福宣言三房車，超級景觀戶間間採光極佳大陽台，雙衛浴皆可乾濕分離主臥室可以泡澡，鄰近國中小學高中學區火車站公車站牌，全聯/萬大黃昏市場/埔心市場/文化四維商圈，鄰近一龍科/幼獅/平鎮工業區置產收租皆宜。",
+    google_maps: "https://www.google.com/maps/embed?pb=!4v1760611960560!6m8!1m7!1sVQQA0xo0gH8DbE8sJvR3sQ!2m2!1d24.90907158049039!2d121.1823672146689!3f330.0345428274088!4f21.49431510411746!5f0.7820865974627469",
+    tiktok_video_id: "7560186639100775736",
+    tiktok_username: "@aihouse168",
+    tiktok_thumbnail: "images/3-10/外觀照.jpg"
 }
     ],
     settings: {

@@ -186,6 +186,12 @@ class EmbeddedPropertyPaginationSystem {
         if (mapIframe) {
             mapIframe.onclick = () => showMapModal(property.id);
         }
+        
+        // 重新綁定 TikTok 點擊
+        const tiktokPreview = card.querySelector('div[onclick*="showTikTokModal"]');
+        if (tiktokPreview) {
+            tiktokPreview.onclick = () => showTikTokModal(property.id);
+        }
     }
 
     createPropertyCard(property) {
@@ -239,16 +245,66 @@ class EmbeddedPropertyPaginationSystem {
                 </div>
                 ` : ''}
                 
-                <!-- 街景地圖預覽 -->
+                <!-- 街景地圖 & TikTok 預覽區 -->
                 <div style="margin-bottom: 0.6rem;">
-                    <div style="border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; cursor: pointer;" onclick="showMapModal('${property.id}')">
-                        <iframe src="${property.google_maps || 'https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469'}" width="100%" height="120" style="border:0;" allow="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
-                            <div style="background: rgba(0,0,0,0.7); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
-                                <i class="fas fa-expand"></i> 查看大地圖
+                    ${property.tiktok_video_id ? `
+                        <!-- 2欄佈局：地圖 + TikTok -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                            <!-- 地圖預覽 -->
+                            <div style="border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; cursor: pointer;" onclick="showMapModal('${property.id}')">
+                                <iframe src="${property.google_maps || 'https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469'}" width="100%" height="120" style="border:0;" allow="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
+                                    <div style="background: rgba(0,0,0,0.7); color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: 600;">
+                                        <i class="fas fa-expand"></i> 地圖
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- TikTok 預覽 -->
+                            <div style="border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; cursor: pointer; background: ${property.tiktok_thumbnail ? '#000' : 'linear-gradient(135deg, #000000, #fe2c55)'}; display: flex; align-items: center; justify-content: center; height: 120px;" onclick="showTikTokModal('${property.id}')">
+                                ${property.tiktok_thumbnail ? `
+                                    <!-- 影片縮略圖 -->
+                                    <img src="${property.tiktok_thumbnail}" 
+                                         alt="TikTok影片預覽" 
+                                         style="width: 100%; height: 100%; object-fit: cover;"
+                                         onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #000000, #fe2c55)'; this.parentElement.innerHTML='<div style=\\'text-align: center; color: white;\\'><div style=\\'font-size: 2rem; margin-bottom: 0.3rem;\\'><i class=\\'fab fa-tiktok\\'></i></div><div style=\\'font-size: 0.75rem; font-weight: 600; opacity: 0.9;\\'>TikTok 影片</div></div>';">
+                                    <!-- TikTok 標識覆蓋層 -->
+                                    <div style="position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.7); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fab fa-tiktok" style="color: white; font-size: 1rem;"></i>
+                                    </div>
+                                    <!-- 播放圖標覆蓋層 -->
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                                        <i class="fas fa-play" style="color: white; font-size: 1.2rem; margin-left: 3px;"></i>
+                                    </div>
+                                ` : `
+                                    <!-- 無縮略圖時的預設顯示 -->
+                                    <div style="text-align: center; color: white;">
+                                        <div style="font-size: 2rem; margin-bottom: 0.3rem;">
+                                            <i class="fab fa-tiktok"></i>
+                                        </div>
+                                        <div style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;">
+                                            TikTok 影片
+                                        </div>
+                                    </div>
+                                `}
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
+                                    <div style="background: rgba(254,44,85,0.9); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                        <i class="fas fa-play"></i> 觀看影片
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ` : `
+                        <!-- 單獨地圖預覽（無 TikTok 時） -->
+                        <div style="border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; cursor: pointer;" onclick="showMapModal('${property.id}')">
+                            <iframe src="${property.google_maps || 'https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469'}" width="100%" height="120" style="border:0;" allow="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
+                                <div style="background: rgba(0,0,0,0.7); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                                    <i class="fas fa-expand"></i> 查看大地圖
+                                </div>
+                            </div>
+                        </div>
+                    `}
                 </div>
                 
                 <div style="display: flex; gap: 10px; justify-content: center; align-items: center; position: relative; margin-bottom: 0;">

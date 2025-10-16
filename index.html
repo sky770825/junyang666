@@ -678,6 +678,23 @@
             border-radius: 8px;/* 加上圓角，看起來更現代 */
         }
 
+        /* TikTok 彈窗手機優化 */
+        @media (max-width: 768px) {
+            /* TikTok iframe 手機版樣式 */
+            div[id^="tiktok-embed-container-"] iframe {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: 600px !important;
+                min-width: 100% !important;
+            }
+            
+            .modal iframe[src*="tiktok.com/embed"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: 600px !important;
+            }
+        }
+        
         /* 地圖彈窗手機優化 */
         @media (max-width: 768px) {
             .map-container iframe {

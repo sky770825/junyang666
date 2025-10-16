@@ -693,6 +693,29 @@
                 max-width: 100% !important;
                 height: 600px !important;
             }
+            
+            /* TikTok 彈窗關閉按鈕手機版優化 */
+            .modal button[onclick*="closeTikTok"] {
+                position: fixed !important;
+                top: 10px !important;
+                right: 10px !important;
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 28px !important;
+                z-index: 10002 !important;
+                background: rgba(231, 76, 60, 0.95) !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+                border: 2px solid white !important;
+                float: none !important;
+                margin: 0 !important;
+            }
+            
+            /* TikTok 彈窗容器手機版優化 */
+            .modal > div[style*="max-width"] {
+                max-height: 95vh !important;
+                overflow-y: auto !important;
+                margin: 10px !important;
+            }
         }
         
         /* 地圖彈窗手機優化 */

@@ -586,7 +586,11 @@ class EmbeddedPropertyPaginationSystem {
         const buildingButtons = document.querySelectorAll('.building-filter-button');
         buildingButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                const building = e.target.getAttribute('data-building');
+                // 🔥 修正：確保獲取按鈕元素，而不是子元素（如 span）
+                const clickedButton = e.target.closest('.building-filter-button');
+                if (!clickedButton) return;
+                
+                const building = clickedButton.getAttribute('data-building');
                 this.setBuildingFilter(building);
                 
                 // 更新按鈕狀態
@@ -598,11 +602,11 @@ class EmbeddedPropertyPaginationSystem {
                     btn.classList.remove('active');
                 });
                 
-                e.target.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
-                e.target.style.color = 'white';
-                e.target.style.border = 'none';
-                e.target.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
-                e.target.classList.add('active');
+                clickedButton.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
+                clickedButton.style.color = 'white';
+                clickedButton.style.border = 'none';
+                clickedButton.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                clickedButton.classList.add('active');
             });
         });
 
@@ -610,7 +614,11 @@ class EmbeddedPropertyPaginationSystem {
         const roomButtons = document.querySelectorAll('.room-filter-button');
         roomButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                const room = e.target.getAttribute('data-room');
+                // 🔥 修正：確保獲取按鈕元素，而不是子元素（如 span）
+                const clickedButton = e.target.closest('.room-filter-button');
+                if (!clickedButton) return;
+                
+                const room = clickedButton.getAttribute('data-room');
                 this.setRoomFilter(room);
                 
                 // 更新按鈕狀態
@@ -622,11 +630,11 @@ class EmbeddedPropertyPaginationSystem {
                     btn.classList.remove('active');
                 });
                 
-                e.target.style.background = 'linear-gradient(45deg, #10b981, #3b82f6)';
-                e.target.style.color = 'white';
-                e.target.style.border = 'none';
-                e.target.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
-                e.target.classList.add('active');
+                clickedButton.style.background = 'linear-gradient(45deg, #10b981, #3b82f6)';
+                clickedButton.style.color = 'white';
+                clickedButton.style.border = 'none';
+                clickedButton.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
+                clickedButton.classList.add('active');
             });
         });
 

@@ -34,12 +34,27 @@
     
     <!-- 手機響應式優化 -->
     <style>
+        /* 全域邊距重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        
         /* 基本樣式 */
         .properties-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 0.8rem 0.3rem;
             margin: 2rem 0;
+            padding: 0 0.5rem;
         }
         
         .filter-buttons {
@@ -66,12 +81,12 @@
         /* 大螢幕 3 欄佈局 */
         @media (min-width: 1200px) {
             .properties-grid {
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 3rem !important;  /* ✅ 增加桌面版卡片間距到 3rem */
-                max-width: 1400px !important;
-                margin: 2rem auto !important;
-                padding: 0 2rem !important;  /* ✅ 左右留白 */
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
+                margin: 2rem 0 !important;
+                padding: 0 0.5rem !important;  /* ✅ 更貼近視窗邊緣 */
             }
+        }
             
             /* 電腦版卡片格局屋齡文字大小 */
             .property-card div[style*="background: #e8f5e8"] {
@@ -79,8 +94,6 @@
             }
             
             .property-card {
-                max-width: 340px !important;  /* ✅ 縮小卡片寬度 */
-                margin: 0 auto !important;
                 padding: 1rem 1rem 0.5rem 1rem !important;  /* ✅ 縮小下內距 */
             }
             
@@ -118,16 +131,44 @@
             .contact-button {
                 font-size: 1.2rem !important;
             }
+        
+        /* 中等螢幕 2-3 欄佈局 */
+        @media (min-width: 1000px) and (max-width: 1199px) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
+                margin: 2rem 0 !important;
+                padding: 0 0.5rem !important;
+            }
         }
         
         /* 中等螢幕 2 欄佈局 */
-        @media (min-width: 769px) and (max-width: 1199px) {
+        @media (min-width: 900px) and (max-width: 999px) {
             .properties-grid {
                 grid-template-columns: repeat(2, 1fr) !important;
-                gap: 2.5rem !important;  /* ✅ 增加平板間距 */
-                max-width: 1000px !important;
-                margin: 2rem auto !important;
+                gap: 2rem !important;
+                margin: 2rem 0 !important;
+                padding: 0 2rem !important;
             }
+        }
+        
+        /* 中等螢幕過渡區域 - 2欄佈局 */
+        @media (min-width: 769px) and (max-width: 899px) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                gap: 0.8rem 0.3rem !important;
+                padding: 0 0.5rem !important;
+            }
+        }
+        
+        /* 小螢幕過渡區域 - 1-2欄佈局 */
+        @media (min-width: 600px) and (max-width: 768px) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+                gap: 0.8rem 0.3rem !important;
+                padding: 0 0.5rem !important;
+            }
+        }
             
             /* 中等螢幕卡片格局屋齡文字大小 */
             .property-card div[style*="background: #e8f5e8"] {
@@ -135,8 +176,6 @@
             }
             
             .property-card {
-                max-width: 420px !important;
-                margin: 0 auto !important;
                 padding: 1.1rem 1.1rem 0.6rem 1.1rem !important;  /* ✅ 縮小下內距 */
             }
             
@@ -174,17 +213,16 @@
             .contact-button {
                 font-size: 1.1rem !important;
             }
-        }
         
         /* 平板橫向模式 */
         @media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
             .properties-grid {
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 2rem !important;  /* ✅ 增加平板橫向間距 */
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
+                padding: 0 0.5rem !important;
             }
             
             .property-card {
-                max-width: 300px !important;
                 padding: 0.9rem 0.9rem 0.5rem 0.9rem !important;  /* ✅ 縮小下內距 */
             }
             
@@ -218,7 +256,7 @@
             
             /* 搜尋和篩選區域 */
             .search-filter-container {
-                padding: 0 0.8rem !important;  /* ✅ 搜尋區域保留少許邊距 */
+                padding: 0 0.5rem !important;  /* ✅ 搜尋區域與物件卡片對齊 */
                 margin: 1rem 0 !important;
             }
             
@@ -390,7 +428,7 @@
             .pagination {
                 flex-wrap: wrap !important;
                 gap: 0.3rem !important;
-                padding: 0 0.8rem !important;  /* ✅ 保留少許邊距 */
+                padding: 0 0.5rem !important;  /* ✅ 與物件卡片對齊 */
             }
             
             .pagination button {
@@ -401,7 +439,7 @@
             
             /* 統計資訊 */
             #stats-container {
-                padding: 0 0.8rem !important;  /* ✅ 保留少許邊距 */
+                padding: 0 0.5rem !important;
             }
             
             /* 強制覆蓋所有手機版容器padding */
@@ -1510,13 +1548,33 @@
             }
         }
         
+        /* 中等螢幕橫向模式 3 欄佈局 */
+        @media (min-width: 1000px) and (max-width: 1199px) and (orientation: landscape) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                gap: 0.8rem 0.3rem !important;
+                max-width: none !important;
+                padding: 0 0.5rem !important;
+            }
+        }
+        
+        /* 中等螢幕橫向模式 2 欄佈局 */
+        @media (min-width: 900px) and (max-width: 999px) and (orientation: landscape) {
+            .properties-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 2rem !important;
+                max-width: 1000px !important;
+                padding: 0 2rem !important;
+            }
+        }
+        
         /* 大螢幕橫向模式 3 欄佈局 */
         @media (min-width: 1200px) and (orientation: landscape) {
             .properties-grid {
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 3rem !important;  /* ✅ 增加大螢幕橫向間距 */
-                max-width: 1600px !important;
-                padding: 0 3rem !important;  /* ✅ 更多左右留白 */
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
+                max-width: none !important;
+                padding: 0 0.5rem !important;  /* ✅ 更貼近視窗邊緣 */
             }
             
             .property-card {
@@ -1665,6 +1723,130 @@
         .property-card {
             position: relative;
         }
+        
+        /* 🔥 已售物件專用樣式 */
+        .sold-property-card {
+            position: relative;
+            opacity: 0.85;
+            filter: grayscale(20%);
+            margin-bottom: 1rem !important; /* 確保卡片間距 */
+        }
+        
+        .sold-property-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            opacity: 0.9;
+            filter: grayscale(10%);
+        }
+        
+        .sold-property-card .property-title {
+            color: #6c757d !important;
+        }
+        
+        .sold-property-card .property-title::before {
+            content: '🏠 ';
+        }
+        
+        .sold-property-card .info-item {
+            background: rgba(108, 117, 125, 0.1) !important;
+            color: #6c757d !important;
+        }
+        
+        .sold-property-card .photo-item:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 已售物件區域樣式 */
+        .sold-properties-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-top: 3px solid #6c757d;
+            position: relative;
+        }
+        
+        /* 已售物件容器確保適當間距 */
+        #sold-properties-container.properties-grid {
+            gap: 1rem !important; /* 確保grid間距 */
+        }
+        
+        .sold-properties-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #6c757d, transparent);
+        }
+        
+        /* 已售物件分頁樣式 */
+        .sold-properties-section .pagination button {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+        
+        .sold-properties-section .pagination button:hover {
+            background: #6c757d;
+            color: white;
+        }
+        
+        /* 中等螢幕已售物件優化 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #sold-properties-container.properties-grid {
+                gap: 1.2rem !important; /* 中等螢幕間距 */
+            }
+            
+            .sold-property-card {
+                margin-bottom: 1.2rem !important;
+            }
+        }
+        
+        /* 手機版已售物件優化 */
+        @media (max-width: 768px) {
+            /* 手機版滑動容器樣式 */
+            .mobile-sold-slide-container {
+                display: flex !important;
+                overflow-x: auto !important;
+                gap: 1rem !important;
+                padding: 0.5rem 0 !important;
+                scroll-behavior: smooth !important;
+                scrollbar-width: thin !important;
+                scrollbar-color: #6c757d #f1f1f1 !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            
+            /* 手機版已售物件容器改為flex */
+            #sold-properties-container.properties-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0 !important;
+            }
+            
+            /* 手機版已售物件卡片樣式 */
+            .mobile-sold-card {
+                opacity: 0.9 !important;
+                filter: grayscale(10%) !important;
+                padding: 0.5rem 0.5rem 0.2rem 0.5rem !important;
+                margin-bottom: 0 !important;
+                flex-shrink: 0 !important;
+                width: 280px !important;
+                min-width: 280px !important;
+                max-height: 160px !important;
+                min-height: 160px !important;
+                overflow: hidden !important;
+            }
+            
+            .sold-property-card:hover {
+                transform: none;
+            }
+            
+            .sold-properties-section {
+                padding: 0.6rem 0.8rem !important;
+                margin: 0.4rem 0 !important;
+            }
+            
+            .sold-properties-section h2 {
+                font-size: 1.1rem !important;
+            }
+        }
 
         /* 彈窗中的狀態標籤樣式 */
         .modal-status-tag {
@@ -1801,13 +1983,6 @@
         /* ========================================
            ✅ 物件卡片基礎樣式（從 style.css 移植）
            ======================================== */
-        .properties-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;  /* ✅ 增加卡片間距，讓排版更舒適 */
-            margin-top: 2rem;
-            padding: 0 1rem;  /* ✅ 左右留白 */
-        }
         
         .property-card {
             background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
@@ -1922,8 +2097,8 @@
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: none;
+            margin: 0;
             background: white;
             box-shadow: 0 0 30px rgba(0,0,0,0.1);
             height: 100vh;
@@ -2012,14 +2187,41 @@
             <div id="pagination-container"></div>
         </section>
         
+        <!-- 已售物件專區 -->
+        <section class="sold-properties-section" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1rem 1.5rem; margin: 1rem 0; border-top: 3px solid #6c757d;">
+            <!-- 可收合的標題區域 -->
+            <div style="text-align: center; margin: 0.3rem 0 0.8rem 0;">
+                <button id="sold-section-toggle" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; box-shadow: 0 3px 12px rgba(108, 117, 125, 0.3); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <span>🏠 已售物件展示</span>
+                    <span id="sold-toggle-icon" style="transition: transform 0.3s ease;">▼</span>
+                </button>
+            </div>
+            
+            <!-- 可收合的內容區域 -->
+            <div id="sold-content" style="display: none; transition: all 0.3s ease;">
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <p style="color: #6c757d; font-size: 0.9rem; font-weight: 500; margin: 0;">感謝客戶信任，以下物件已成功售出</p>
+                </div>
+                
+                <!-- 已售物件容器 -->
+                <div id="sold-properties-container" class="properties-grid">
+                    <!-- 已售物件將由 JavaScript 動態載入 -->
+                </div>
+                
+                <!-- 已售物件分頁導航 -->
+                <div id="sold-pagination-container"></div>
+            </div>
+        </section>
+        
         
         <!-- 相關資料連結 -->
         <section class="related-links-section" style="background: #f8f9fa; padding: 1.2rem 0; margin: 1rem 0; text-align: center;">
             <h2 style="color: #2c3e50; margin-bottom: 0.8rem;">📎 相關資料連結</h2>
-            <div class="related-links-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: 1000px; margin: 0 auto;">
+            <div class="related-links-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: none; margin: 0 auto;">
                 <a href="https://realtor.houseprice.tw/agent/buy/0925666597/" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(46, 204, 113, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🏠 更多物件資料</a>
                 <a href="https://www.tiktok.com/@aihouse168" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #000000, #333333); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🎵 TikTok短影音</a>
                 <a href="https://sky770825.github.io/junyang666/checkpice" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🧮 房產比價試算</a>
+                <a href="https://salersteam.pages.dev/junyang" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #9b59b6, #8e44ad); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(155, 89, 182, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🏢 預售團購區</a>
                 
                 <!-- 房產資訊參考下拉選單 -->
                 <div style="position: relative; display: inline-block;">
@@ -2048,7 +2250,7 @@
             
             <h2 style="text-align: center; margin-bottom: 1.2rem; color: white; font-size: 1.4rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3); position: relative; z-index: 2;">💬 客戶見證</h2>
             
-            <div style="max-width: 800px; margin: 0 auto; position: relative; z-index: 2;">
+            <div style="max-width: none; margin: 0 auto; position: relative; z-index: 2;">
                 <div id="testimonialSlides" style="display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);">
                     <div class="testimonial-slide" style="min-width: 100%; padding: 1.4rem; text-align: center; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
                         <div style="color: #ffd700; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">⭐⭐⭐⭐⭐</div>
@@ -2103,7 +2305,7 @@
             <h2 style="text-align: center; margin-bottom: 1.5rem; color: #2c3e50; font-size: 1.6rem; font-weight: 800; position: relative;">
                 <span style="background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📞 聯絡方式</span>
             </h2>
-            <div class="contact-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; max-width: 1000px; margin: 0 auto;">
+            <div class="contact-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; max-width: none; margin: 0 auto;">
                 <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); padding: 1.8rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid rgba(102, 126, 234, 0.1); position: relative; overflow: hidden; display: flex; flex-direction: column; height: 100%;">
                     <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
                     <h3 style="color: #2c3e50; margin-bottom: 1.2rem; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem;">
@@ -2318,13 +2520,23 @@
         console.log('📦 模組列表: property-data.js, property-modals.js, pagination-system.js, main-script.js');
         console.log('🎨 樣式狀態: 100%保留在HTML中，與原版完全相同');
         
+        // 🔥 初始化已售物件分頁系統
+        let soldPaginationSystem;
+        
         // 🔍 調試：檢查模組載入狀態
         setTimeout(() => {
             console.log('\n🔍 模組載入狀態檢查：');
             console.log('embeddedPropertiesData:', typeof embeddedPropertiesData !== 'undefined' ? '✅ 已載入 (' + embeddedPropertiesData.properties.length + ' 個物件)' : '❌ 未定義');
             console.log('EmbeddedPropertyPaginationSystem:', typeof EmbeddedPropertyPaginationSystem !== 'undefined' ? '✅ 已載入' : '❌ 未定義');
+            console.log('SoldPropertyPaginationSystem:', typeof SoldPropertyPaginationSystem !== 'undefined' ? '✅ 已載入' : '❌ 未定義');
             console.log('showPropertyDetails:', typeof showPropertyDetails !== 'undefined' ? '✅ 已載入' : '❌ 未定義');
             console.log('adjustTitleFontSize:', typeof adjustTitleFontSize !== 'undefined' ? '✅ 已載入' : '❌ 未定義');
+            
+            // 初始化已售物件分頁系統
+            if (typeof SoldPropertyPaginationSystem !== 'undefined') {
+                soldPaginationSystem = new SoldPropertyPaginationSystem();
+                console.log('🏠 已售物件分頁系統已初始化');
+            }
             
             // 檢查DOM元素
             const grid = document.querySelector('.properties-grid');
@@ -2335,6 +2547,14 @@
                 if (cards.length === 0) {
                     console.error('❌ 沒有渲染任何卡片！請檢查分頁系統初始化');
                 }
+            }
+            
+            // 檢查已售物件容器
+            const soldGrid = document.getElementById('sold-properties-container');
+            console.log('#sold-properties-container 元素:', soldGrid ? '✅ 存在' : '❌ 不存在');
+            if (soldGrid) {
+                const soldCards = soldGrid.querySelectorAll('.sold-property-card');
+                console.log('已售卡片數量:', soldCards.length);
             }
         }, 1000);
     </script>

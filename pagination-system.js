@@ -4,7 +4,11 @@
 // 修改分頁系統以使用內嵌資料
 class EmbeddedPropertyPaginationSystem {
     constructor() {
-        this.properties = embeddedPropertiesData.properties;
+        // 🔥 分離已售和未售物件
+        this.allProperties = embeddedPropertiesData.properties;
+        this.properties = this.allProperties.filter(p => p.status !== 'sold'); // 只顯示未售物件
+        this.soldProperties = this.allProperties.filter(p => p.status === 'sold'); // 已售物件
+        
         this.currentPage = 1;
         this.itemsPerPage = embeddedPropertiesData.settings.itemsPerPage || 4;
         this.currentFilter = 'all'; // 保留舊版相容性
@@ -678,7 +682,650 @@ class EmbeddedPropertyPaginationSystem {
     }
 }
 
+// 🔥 已售物件分頁系統
+class SoldPropertyPaginationSystem {
+    constructor() {
+        this.soldProperties = embeddedPropertiesData.properties.filter(p => p.status === 'sold');
+        this.currentPage = 1;
+        // 🔥 響應式分頁：手機版單欄滑動，桌面版多欄
+        this.itemsPerPage = window.innerWidth <= 768 ? 1 : 4; // 手機版1個，桌面版4個
+        this.searchTerm = '';
+        
+        // 緩存機制
+        this.filteredCache = null;
+        this.cacheKey = '';
+        this.cardCache = new Map();
+        
+        this.init();
+    }
+
+    init() {
+        this.renderSoldProperties();
+        this.setupSoldEventListeners();
+    }
+
+    getFilteredSoldProperties() {
+        const newCacheKey = `sold_${this.searchTerm}`;
+        if (this.cacheKey === newCacheKey && this.filteredCache) {
+            return this.filteredCache;
+        }
+        
+        let filtered = this.soldProperties;
+        
+        // 搜尋功能
+        if (this.searchTerm) {
+            const term = this.searchTerm.toLowerCase();
+            filtered = filtered.filter(property => 
+                property.title.toLowerCase().includes(term) ||
+                property.address.toLowerCase().includes(term) ||
+                (property.community && property.community.toLowerCase().includes(term))
+            );
+        }
+        
+        this.filteredCache = filtered;
+        this.cacheKey = newCacheKey;
+        
+        return filtered;
+    }
+
+    getPaginatedSoldProperties() {
+        const filtered = this.getFilteredSoldProperties();
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        return filtered.slice(startIndex, endIndex);
+    }
+
+    getTotalSoldPages() {
+        const filtered = this.getFilteredSoldProperties();
+        return Math.ceil(filtered.length / this.itemsPerPage);
+    }
+
+    renderSoldProperties() {
+        const container = document.getElementById('sold-properties-container');
+        if (!container) return;
+
+        const paginatedProperties = this.getPaginatedSoldProperties();
+        
+        if (paginatedProperties.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #6c757d;">
+                    <i class="fas fa-home" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h3>暫無已售物件</h3>
+                    <p>感謝客戶信任，更多成功案例即將展示</p>
+                </div>
+            `;
+            this.renderSoldPagination();
+            return;
+        }
+
+        // 🔥 手機版使用滑動容器
+        if (window.innerWidth <= 768) {
+            this.renderMobileSlideContainer(container, paginatedProperties);
+        } else {
+            // 桌面版使用原本的grid佈局
+            const fragment = document.createDocumentFragment();
+            paginatedProperties.forEach(property => {
+                let card;
+                if (this.cardCache.has(property.id)) {
+                    card = this.cardCache.get(property.id).cloneNode(true);
+                    this.rebindCardEvents(card, property);
+                } else {
+                    card = this.createSoldPropertyCard(property);
+                    this.cardCache.set(property.id, card.cloneNode(true));
+                }
+                fragment.appendChild(card);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(fragment);
+        }
+        
+        this.renderSoldPagination();
+        
+        // 調整標題字體大小
+        setTimeout(() => {
+            adjustTitleFontSize();
+        }, 100);
+    }
+
+    createSoldPropertyCard(property) {
+        const card = document.createElement('div');
+        card.className = 'property-card sold-property-card';
+        card.style.cssText = `
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 0.8rem 0.8rem 0.4rem 0.8rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+            position: relative;
+            overflow: hidden;
+            opacity: 0.85;
+        `;
+
+        // 已售標籤
+        const statusTag = document.createElement('div');
+        statusTag.className = 'property-status-tag status-sold';
+        statusTag.textContent = '已售出';
+        statusTag.style.cssText = `
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(45deg, #6b7280, #374151);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            border: 2px solid #ffffff;
+        `;
+        card.appendChild(statusTag);
+
+        // 標題
+        const title = document.createElement('h3');
+        title.className = 'property-title';
+        title.textContent = property.title;
+        title.style.cssText = `
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 0.4rem;
+            margin-top: 0.1rem;
+            border-bottom: 2px solid transparent;
+            background: linear-gradient(90deg, #6c757d, #495057) bottom/100% 2px no-repeat;
+            padding-bottom: 0.3rem;
+            line-height: 1.2;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        `;
+        card.appendChild(title);
+
+        // 照片滾動區域
+        const photoContainer = document.createElement('div');
+        photoContainer.className = 'photo-scroll-container';
+        photoContainer.style.cssText = `
+            display: flex;
+            gap: 0.3rem;
+            overflow-x: auto;
+            padding: 0.3rem 0;
+            margin: 0.3rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: #6c757d #f1f1f1;
+        `;
+
+        if (property.images && property.images.length > 0) {
+            property.images.slice(0, 4).forEach((image, index) => { // 減少到4張照片
+                const photoItem = document.createElement('img');
+                photoItem.className = 'photo-item';
+                photoItem.src = image;
+                photoItem.alt = `${property.title} - 照片 ${index + 1}`;
+                photoItem.style.cssText = `
+                    width: 70px;
+                    height: 52px;
+                    object-fit: cover;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: transform 0.2s ease;
+                    flex-shrink: 0;
+                `;
+                photoItem.addEventListener('click', () => this.showPhotoModal(property, index));
+                photoContainer.appendChild(photoItem);
+            });
+        }
+        card.appendChild(photoContainer);
+
+        // 物件資訊
+        const infoContainer = document.createElement('div');
+        infoContainer.className = 'property-info';
+        infoContainer.style.cssText = `
+            background: rgba(108, 117, 125, 0.05);
+            border-radius: 6px;
+            padding: 0.5rem;
+            margin: 0.3rem 0;
+        `;
+
+        const infoGrid = document.createElement('div');
+        infoGrid.className = 'info-grid';
+        infoGrid.style.cssText = `
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem;
+            margin-bottom: 0.3rem;
+        `;
+
+        // 價格
+        const priceItem = document.createElement('div');
+        priceItem.className = 'info-item';
+        priceItem.innerHTML = `<strong>售價：</strong>${property.price}`;
+        priceItem.style.cssText = `
+            background: rgba(108, 117, 125, 0.1);
+            padding: 0.3rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: #6c757d;
+        `;
+        infoGrid.appendChild(priceItem);
+
+        // 格局
+        const layoutItem = document.createElement('div');
+        layoutItem.className = 'info-item';
+        layoutItem.innerHTML = `<strong>格局：</strong>${property.layout}`;
+        layoutItem.style.cssText = `
+            background: rgba(108, 117, 125, 0.1);
+            padding: 0.3rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: #6c757d;
+        `;
+        infoGrid.appendChild(layoutItem);
+
+        // 屋齡
+        const ageItem = document.createElement('div');
+        ageItem.className = 'info-item';
+        ageItem.innerHTML = `<strong>屋齡：</strong>${property.age}`;
+        ageItem.style.cssText = `
+            background: rgba(108, 117, 125, 0.1);
+            padding: 0.3rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: #6c757d;
+        `;
+        infoGrid.appendChild(ageItem);
+
+        // 坪數
+        const areaItem = document.createElement('div');
+        areaItem.className = 'info-item';
+        areaItem.innerHTML = `<strong>坪數：</strong>${property.total_area}`;
+        areaItem.style.cssText = `
+            background: rgba(108, 117, 125, 0.1);
+            padding: 0.3rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: #6c757d;
+        `;
+        infoGrid.appendChild(areaItem);
+
+        infoContainer.appendChild(infoGrid);
+        card.appendChild(infoContainer);
+
+        // 已售出提示
+        const soldNotice = document.createElement('div');
+        soldNotice.className = 'sold-notice';
+        soldNotice.style.cssText = `
+            text-align: center;
+            padding: 0.4rem;
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-top: 0.3rem;
+            font-size: 0.75rem;
+        `;
+        soldNotice.innerHTML = '✅ 已售出';
+        card.appendChild(soldNotice);
+
+        return card;
+    }
+
+    // 🔥 手機版滑動容器渲染
+    renderMobileSlideContainer(container, properties) {
+        const allProperties = this.getFilteredSoldProperties();
+        
+        // 創建滑動容器
+        const slideContainer = document.createElement('div');
+        slideContainer.className = 'mobile-sold-slide-container';
+        slideContainer.style.cssText = `
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: #6c757d #f1f1f1;
+            -webkit-overflow-scrolling: touch;
+        `;
+
+        // 添加所有已售物件到滑動容器
+        allProperties.forEach(property => {
+            let card;
+            if (this.cardCache.has(property.id)) {
+                card = this.cardCache.get(property.id).cloneNode(true);
+                this.rebindCardEvents(card, property);
+            } else {
+                card = this.createMobileSoldPropertyCard(property);
+                this.cardCache.set(property.id, card.cloneNode(true));
+            }
+            
+            // 手機版卡片樣式調整
+            card.style.cssText += `
+                flex-shrink: 0;
+                width: 280px;
+                min-width: 280px;
+            `;
+            
+            slideContainer.appendChild(card);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(slideContainer);
+    }
+
+    // 🔥 手機版專用已售物件卡片（更緊湊）
+    createMobileSoldPropertyCard(property) {
+        const card = document.createElement('div');
+        card.className = 'property-card sold-property-card mobile-sold-card';
+        card.style.cssText = `
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 0.5rem 0.5rem 0.2rem 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+            position: relative;
+            overflow: hidden;
+            opacity: 0.85;
+            height: auto;
+            min-height: 160px;
+            max-height: 160px;
+        `;
+
+        // 已售標籤
+        const statusTag = document.createElement('div');
+        statusTag.className = 'property-status-tag status-sold';
+        statusTag.textContent = '已售出';
+        statusTag.style.cssText = `
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 10;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(45deg, #6b7280, #374151);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            border: 1px solid #ffffff;
+        `;
+        card.appendChild(statusTag);
+
+        // 標題
+        const title = document.createElement('h3');
+        title.className = 'property-title';
+        title.textContent = property.title;
+        title.style.cssText = `
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.2rem;
+            margin-top: 0.05rem;
+            border-bottom: 1px solid transparent;
+            background: linear-gradient(90deg, #6c757d, #495057) bottom/100% 1px no-repeat;
+            padding-bottom: 0.15rem;
+            line-height: 1.1;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        `;
+        card.appendChild(title);
+
+        // 照片滾動區域（手機版更緊湊）
+        const photoContainer = document.createElement('div');
+        photoContainer.className = 'photo-scroll-container';
+        photoContainer.style.cssText = `
+            display: flex;
+            gap: 0.15rem;
+            overflow-x: auto;
+            padding: 0.1rem 0;
+            margin: 0.1rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: #6c757d #f1f1f1;
+        `;
+
+        if (property.images && property.images.length > 0) {
+            property.images.slice(0, 3).forEach((image, index) => { // 只顯示3張照片
+                const photoItem = document.createElement('img');
+                photoItem.className = 'photo-item';
+                photoItem.src = image;
+                photoItem.alt = `${property.title} - 照片 ${index + 1}`;
+                photoItem.style.cssText = `
+                    width: 50px;
+                    height: 38px;
+                    object-fit: cover;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    transition: transform 0.2s ease;
+                    flex-shrink: 0;
+                `;
+                photoItem.addEventListener('click', () => this.showPhotoModal(property, index));
+                photoContainer.appendChild(photoItem);
+            });
+        }
+        card.appendChild(photoContainer);
+
+        // 物件資訊（手機版更緊湊）
+        const infoContainer = document.createElement('div');
+        infoContainer.className = 'property-info';
+        infoContainer.style.cssText = `
+            background: rgba(108, 117, 125, 0.05);
+            border-radius: 3px;
+            padding: 0.3rem;
+            margin: 0.1rem 0;
+        `;
+
+        const infoGrid = document.createElement('div');
+        infoGrid.className = 'info-grid';
+        infoGrid.style.cssText = `
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.15rem;
+            margin-bottom: 0.1rem;
+        `;
+
+        // 價格
+        const priceItem = document.createElement('div');
+        priceItem.className = 'info-item';
+        priceItem.innerHTML = `<strong>售價：</strong>${property.price}`;
+        priceItem.style.cssText = `
+            background: rgba(108, 117, 125, 0.1);
+            padding: 0.15rem;
+            border-radius: 2px;
+            font-size: 0.65rem;
+            text-align: center;
+            color: #6c757d;
+        `;
+        infoGrid.appendChild(priceItem);
+
+        // 格局
+        const layoutItem = document.createElement('div');
+        layoutItem.className = 'info-item';
+        layoutItem.innerHTML = `<strong>格局：</strong>${property.layout}`;
+        layoutItem.style.cssText = `
+            background: rgba(108, 117, 125, 0.1);
+            padding: 0.15rem;
+            border-radius: 2px;
+            font-size: 0.65rem;
+            text-align: center;
+            color: #6c757d;
+        `;
+        infoGrid.appendChild(layoutItem);
+
+        // 屋齡
+        const ageItem = document.createElement('div');
+        ageItem.className = 'info-item';
+        ageItem.innerHTML = `<strong>屋齡：</strong>${property.age}`;
+        ageItem.style.cssText = `
+            background: rgba(108, 117, 125, 0.1);
+            padding: 0.15rem;
+            border-radius: 2px;
+            font-size: 0.65rem;
+            text-align: center;
+            color: #6c757d;
+        `;
+        infoGrid.appendChild(ageItem);
+
+        // 坪數
+        const areaItem = document.createElement('div');
+        areaItem.className = 'info-item';
+        areaItem.innerHTML = `<strong>坪數：</strong>${property.total_area}`;
+        areaItem.style.cssText = `
+            background: rgba(108, 117, 125, 0.1);
+            padding: 0.15rem;
+            border-radius: 2px;
+            font-size: 0.65rem;
+            text-align: center;
+            color: #6c757d;
+        `;
+        infoGrid.appendChild(areaItem);
+
+        infoContainer.appendChild(infoGrid);
+        card.appendChild(infoContainer);
+
+        // 已售出提示（手機版更小）
+        const soldNotice = document.createElement('div');
+        soldNotice.className = 'sold-notice';
+        soldNotice.style.cssText = `
+            text-align: center;
+            padding: 0.2rem;
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            border-radius: 2px;
+            font-weight: 600;
+            margin-top: 0.1rem;
+            font-size: 0.6rem;
+        `;
+        soldNotice.innerHTML = '✅ 已售出';
+        card.appendChild(soldNotice);
+
+        return card;
+    }
+
+    rebindCardEvents(card, property) {
+        // 重新綁定照片點擊事件
+        const photoItems = card.querySelectorAll('.photo-item');
+        photoItems.forEach((photo, index) => {
+            photo.onclick = () => this.showPhotoModal(property, index);
+        });
+    }
+
+    showPhotoModal(property, startIndex) {
+        // 使用主要腳本中的燈箱功能
+        if (typeof showLightbox === 'function') {
+            showLightbox(property, startIndex);
+        }
+    }
+
+    renderSoldPagination() {
+        const container = document.getElementById('sold-pagination-container');
+        if (!container) return;
+
+        // 🔥 手機版不顯示分頁按鈕（使用滑動）
+        if (window.innerWidth <= 768) {
+            container.innerHTML = '';
+            return;
+        }
+
+        const totalPages = this.getTotalSoldPages();
+        
+        if (totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let paginationHTML = '<div class="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap;">';
+        
+        // 上一頁按鈕
+        if (this.currentPage > 1) {
+            paginationHTML += `
+                <button onclick="soldPaginationSystem.goToPage(${this.currentPage - 1})" 
+                        style="padding: 0.5rem 1rem; border: 1px solid #6c757d; background: white; color: #6c757d; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">
+                    ‹ 上一頁
+                </button>
+            `;
+        }
+        
+        // 頁碼按鈕
+        for (let i = 1; i <= totalPages; i++) {
+            const isActive = i === this.currentPage;
+            paginationHTML += `
+                <button onclick="soldPaginationSystem.goToPage(${i})" 
+                        style="padding: 0.5rem 0.8rem; border: 1px solid #6c757d; background: ${isActive ? '#6c757d' : 'white'}; color: ${isActive ? 'white' : '#6c757d'}; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; min-width: 40px;">
+                    ${i}
+                </button>
+            `;
+        }
+        
+        // 下一頁按鈕
+        if (this.currentPage < totalPages) {
+            paginationHTML += `
+                <button onclick="soldPaginationSystem.goToPage(${this.currentPage + 1})" 
+                        style="padding: 0.5rem 1rem; border: 1px solid #6c757d; background: white; color: #6c757d; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">
+                    下一頁 ›
+                </button>
+            `;
+        }
+        
+        paginationHTML += '</div>';
+        container.innerHTML = paginationHTML;
+    }
+
+    goToPage(page) {
+        const totalPages = this.getTotalSoldPages();
+        if (page >= 1 && page <= totalPages) {
+            this.currentPage = page;
+            this.renderSoldProperties();
+        }
+    }
+
+    setupSoldEventListeners() {
+        // 🔥 已售物件收合功能
+        const toggleButton = document.getElementById('sold-section-toggle');
+        const toggleIcon = document.getElementById('sold-toggle-icon');
+        const soldContent = document.getElementById('sold-content');
+        
+        if (toggleButton && soldContent) {
+            toggleButton.addEventListener('click', () => {
+                const isVisible = soldContent.style.display !== 'none';
+                
+                if (isVisible) {
+                    // 收合
+                    soldContent.style.display = 'none';
+                    toggleIcon.style.transform = 'rotate(0deg)';
+                    toggleButton.style.background = 'linear-gradient(135deg, #6c757d 0%, #495057 100%)';
+                } else {
+                    // 展開
+                    soldContent.style.display = 'block';
+                    toggleIcon.style.transform = 'rotate(180deg)';
+                    toggleButton.style.background = 'linear-gradient(135deg, #495057 0%, #6c757d 100%)';
+                    
+                    // 如果已售物件還沒渲染，現在渲染
+                    if (this.soldProperties.length > 0 && document.getElementById('sold-properties-container').children.length === 0) {
+                        this.renderSoldProperties();
+                    }
+                }
+            });
+        }
+        
+        // 🔥 監聽視窗大小變化，調整分頁數量
+        window.addEventListener('resize', () => {
+            const newItemsPerPage = window.innerWidth <= 768 ? 1 : 4;
+            if (this.itemsPerPage !== newItemsPerPage) {
+                this.itemsPerPage = newItemsPerPage;
+                this.currentPage = 1; // 重置到第一頁
+                if (soldContent && soldContent.style.display !== 'none') {
+                    this.renderSoldProperties();
+                }
+            }
+        });
+    }
+}
+
 // 匯出供其他模組使用
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = EmbeddedPropertyPaginationSystem;
+    module.exports = { EmbeddedPropertyPaginationSystem, SoldPropertyPaginationSystem };
 }

@@ -1599,7 +1599,7 @@ const embeddedPropertiesData = {
     ],
     description: "楊明國小明日城三房車，近楊梅交流道南北交通極便利，棟距遠居住隱私佳後方無限棟距田園景觀，明星學區九年一貫教育就近入學，楊梅週五夜市就在樓下零距離享受美食生活，全屋通風採光佳營造健康舒適宜居環境。",
     google_maps: "https://www.google.com/maps/embed?pb=!4v1761371802256!6m8!1m7!1sjCr1aM_7tKpRqSjs9EQ12Q!2m2!1d24.91141250566124!2d121.1626209636693!3f82.37786785391584!4f12.165315149275855!5f0.72243440221442",
-    tiktok_video_id: "",
+    tiktok_video_id: "7559421876234145080",
     tiktok_username: "@aihouse168",
     tiktok_thumbnail: "images/3-1/大廳.jpg"
 }

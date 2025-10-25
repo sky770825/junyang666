@@ -359,7 +359,7 @@ function showTransportationDetails(propertyId) {
     }
 
     const transportation = property.transportation || {};
-    const schools = property.schools || {};
+    const schools = property.transportation?.schools || property.schools || {};
     const facilities = property.facilities || {};
     const parks = property.parks || [];
     
@@ -416,6 +416,13 @@ function showTransportationDetails(propertyId) {
     } else if (transportation.schools && Array.isArray(transportation.schools)) {
         schoolsItems = transportation.schools;
     }
+    
+    // 調試：確保學區資料正確獲取
+    console.log('🔍 學區資料調試:', {
+        schools: schools,
+        transportation_schools: transportation.schools,
+        schoolsItems: schoolsItems
+    });
     
     const schoolsList = schoolsItems.length > 0
         ? schoolsItems.map(school => `

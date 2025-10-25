@@ -668,16 +668,45 @@ class EmbeddedPropertyPaginationSystem {
         this.updateFilterCounts();
     }
 
-    // 調整標題字體大小
+    // 🔥 智能調整標題字體大小 - 確保文字完全適應卡片寬度
     adjustTitleFontSize() {
         const titles = document.querySelectorAll('.property-title');
         titles.forEach(title => {
-            const text = title.textContent;
-            if (text.length > 25) {
-                title.style.fontSize = '0.9rem';
-            } else if (text.length > 20) {
-                title.style.fontSize = '1rem';
+            // 獲取容器的實際可用寬度
+            const container = title.parentElement;
+            const containerWidth = container.offsetWidth - 40; // 減去padding和邊距
+            
+            // 重置字體大小
+            title.style.fontSize = '';
+            
+            // 從較大字體開始
+            let fontSize = 1.3;
+            title.style.fontSize = fontSize + 'rem';
+            
+            // 創建一個臨時元素來測量文字寬度
+            const tempElement = document.createElement('span');
+            tempElement.style.cssText = `
+                position: absolute;
+                visibility: hidden;
+                white-space: nowrap;
+                font-size: ${fontSize}rem;
+                font-weight: 600;
+                font-family: inherit;
+            `;
+            tempElement.textContent = title.textContent;
+            document.body.appendChild(tempElement);
+            
+            // 逐步縮小字體直到適合容器寬度
+            while (tempElement.offsetWidth > containerWidth && fontSize > 0.5) {
+                fontSize -= 0.05;
+                tempElement.style.fontSize = fontSize + 'rem';
             }
+            
+            // 應用最終字體大小
+            title.style.fontSize = fontSize + 'rem';
+            
+            // 清理臨時元素
+            document.body.removeChild(tempElement);
         });
     }
 }
@@ -842,39 +871,7 @@ class SoldPropertyPaginationSystem {
         `;
         card.appendChild(title);
 
-        // 照片滾動區域
-        const photoContainer = document.createElement('div');
-        photoContainer.className = 'photo-scroll-container';
-        photoContainer.style.cssText = `
-            display: flex;
-            gap: 0.3rem;
-            overflow-x: auto;
-            padding: 0.3rem 0;
-            margin: 0.3rem 0;
-            scrollbar-width: thin;
-            scrollbar-color: #6c757d #f1f1f1;
-        `;
-
-        if (property.images && property.images.length > 0) {
-            property.images.slice(0, 4).forEach((image, index) => { // 減少到4張照片
-                const photoItem = document.createElement('img');
-                photoItem.className = 'photo-item';
-                photoItem.src = image;
-                photoItem.alt = `${property.title} - 照片 ${index + 1}`;
-                photoItem.style.cssText = `
-                    width: 70px;
-                    height: 52px;
-                    object-fit: cover;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    transition: transform 0.2s ease;
-                    flex-shrink: 0;
-                `;
-                photoItem.addEventListener('click', () => this.showPhotoModal(property, index));
-                photoContainer.appendChild(photoItem);
-            });
-        }
-        card.appendChild(photoContainer);
+        // 已售物件不顯示照片，節省空間和資源
 
         // 物件資訊
         const infoContainer = document.createElement('div');
@@ -1074,39 +1071,7 @@ class SoldPropertyPaginationSystem {
         `;
         card.appendChild(title);
 
-        // 照片滾動區域（手機版更緊湊）
-        const photoContainer = document.createElement('div');
-        photoContainer.className = 'photo-scroll-container';
-        photoContainer.style.cssText = `
-            display: flex;
-            gap: 0.15rem;
-            overflow-x: auto;
-            padding: 0.1rem 0;
-            margin: 0.1rem 0;
-            scrollbar-width: thin;
-            scrollbar-color: #6c757d #f1f1f1;
-        `;
-
-        if (property.images && property.images.length > 0) {
-            property.images.slice(0, 3).forEach((image, index) => { // 只顯示3張照片
-                const photoItem = document.createElement('img');
-                photoItem.className = 'photo-item';
-                photoItem.src = image;
-                photoItem.alt = `${property.title} - 照片 ${index + 1}`;
-                photoItem.style.cssText = `
-                    width: 50px;
-                    height: 38px;
-                    object-fit: cover;
-                    border-radius: 3px;
-                    cursor: pointer;
-                    transition: transform 0.2s ease;
-                    flex-shrink: 0;
-                `;
-                photoItem.addEventListener('click', () => this.showPhotoModal(property, index));
-                photoContainer.appendChild(photoItem);
-            });
-        }
-        card.appendChild(photoContainer);
+        // 已售物件不顯示照片，節省空間和資源
 
         // 物件資訊（手機版更緊湊）
         const infoContainer = document.createElement('div');
@@ -1206,11 +1171,7 @@ class SoldPropertyPaginationSystem {
     }
 
     rebindCardEvents(card, property) {
-        // 重新綁定照片點擊事件
-        const photoItems = card.querySelectorAll('.photo-item');
-        photoItems.forEach((photo, index) => {
-            photo.onclick = () => this.showPhotoModal(property, index);
-        });
+        // 已售物件不再有照片，無需綁定照片事件
     }
 
     showPhotoModal(property, startIndex) {

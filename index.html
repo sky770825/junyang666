@@ -51,10 +51,17 @@
         /* 基本樣式 */
         .properties-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, max-content));
             gap: 0.8rem 0.3rem;
             margin: 2rem 0;
             padding: 0 0.5rem;
+            justify-content: start;
+        }
+        
+        /* 限制卡片最大寬度，防止單欄放大 */
+        .property-card {
+            max-width: 400px;
+            width: auto;
         }
         
         .filter-buttons {
@@ -81,20 +88,23 @@
         /* 大螢幕 3 欄佈局 */
         @media (min-width: 1200px) {
             .properties-grid {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
                 gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
                 margin: 2rem 0 !important;
                 padding: 0 0.5rem !important;  /* ✅ 更貼近視窗邊緣 */
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
+                padding: 1rem 1rem 0.5rem 1rem !important;  /* ✅ 縮小下內距 */
             }
         }
             
             /* 電腦版卡片格局屋齡文字大小 */
             .property-card div[style*="background: #e8f5e8"] {
                 font-size: 0.9rem !important;
-            }
-            
-            .property-card {
-                padding: 1rem 1rem 0.5rem 1rem !important;  /* ✅ 縮小下內距 */
             }
             
             .photo-item {
@@ -135,10 +145,16 @@
         /* 中等螢幕 2-3 欄佈局 */
         @media (min-width: 1000px) and (max-width: 1199px) {
             .properties-grid {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
                 gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
                 margin: 2rem 0 !important;
                 padding: 0 0.5rem !important;
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
             }
         }
         
@@ -155,18 +171,29 @@
         /* 中等螢幕過渡區域 - 2欄佈局 */
         @media (min-width: 769px) and (max-width: 899px) {
             .properties-grid {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
                 gap: 0.8rem 0.3rem !important;
                 padding: 0 0.5rem !important;
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
             }
         }
         
         /* 小螢幕過渡區域 - 1-2欄佈局 */
         @media (min-width: 600px) and (max-width: 768px) {
             .properties-grid {
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+                grid-template-columns: repeat(auto-fit, minmax(300px, max-content)) !important;
                 gap: 0.8rem 0.3rem !important;
                 padding: 0 0.5rem !important;
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
             }
         }
             
@@ -217,12 +244,15 @@
         /* 平板橫向模式 */
         @media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
             .properties-grid {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
                 gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
                 padding: 0 0.5rem !important;
+                justify-content: start !important;
             }
             
             .property-card {
+                max-width: 400px !important;
+                width: auto !important;
                 padding: 0.9rem 0.9rem 0.5rem 0.9rem !important;  /* ✅ 縮小下內距 */
             }
             
@@ -296,6 +326,7 @@
                 border-radius: 0 !important;  /* ✅ 移除圓角，完全貼合 */
                 min-height: 400px !important;
                 border-bottom: 8px solid #e9ecef !important;  /* ✅ 添加底部分隔線 */
+                max-width: none !important;  /* ✅ 手機版不限制最大寬度 */
             }
             
             .property-card:last-child {
@@ -718,6 +749,18 @@
                 right: 20px !important;
                 background: rgba(0, 0, 0, 0.8) !important;
                 box-shadow: 0 3px 10px rgba(0,0,0,0.5) !important;
+            }
+            
+            /* 手機版燈箱關閉按鈕優化 */
+            .lightbox-close-btn {
+                top: 10px !important;
+                right: 10px !important;
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 24px !important;
+                background: rgba(231, 76, 60, 0.95) !important;
+                border: 2px solid white !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
             }
         }
         
@@ -1550,10 +1593,16 @@
         /* 中等螢幕橫向模式 3 欄佈局 */
         @media (min-width: 1000px) and (max-width: 1199px) and (orientation: landscape) {
             .properties-grid {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
                 gap: 0.8rem 0.3rem !important;
                 max-width: none !important;
                 padding: 0 0.5rem !important;
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
             }
         }
         
@@ -1570,13 +1619,16 @@
         /* 大螢幕橫向模式 3 欄佈局 */
         @media (min-width: 1200px) and (orientation: landscape) {
             .properties-grid {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
                 gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
                 max-width: none !important;
                 padding: 0 0.5rem !important;  /* ✅ 更貼近視窗邊緣 */
+                justify-content: start !important;
             }
             
             .property-card {
+                max-width: 400px !important;
+                width: auto !important;
                 padding: 0.6rem 0.6rem 0.3rem 0.6rem !important;  /* ✅ 縮小下內距 */
             }
             
@@ -1999,6 +2051,8 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            width: auto;
+            max-width: 400px;
         }
         
         .property-card::before {
@@ -2113,6 +2167,39 @@
         .properties-section {
             padding: 2rem 1.5rem;  /* ✅ 增加上下留白 */
             background: #f8f9fa;
+        }
+        
+        /* 🚀 優化：更順暢的卡片動畫 */
+        .property-card {
+            animation: cardFadeIn 0.2s ease-out;
+        }
+        
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(0.99);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* 🚀 優化：更快的按鈕反饋 */
+        .building-filter-button,
+        .room-filter-button {
+            transition: all 0.1s ease;
+        }
+        
+        .building-filter-button:active,
+        .room-filter-button:active {
+            transform: scale(0.98);
+        }
+        
+        /* 🚀 新增：按鈕狀態切換動畫 */
+        .building-filter-button,
+        .room-filter-button {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>

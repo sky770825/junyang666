@@ -173,6 +173,12 @@ function showPropertyDetails(propertyId) {
                                   onmouseover="this.style.color='#5a6fd8'" 
                                   onmouseout="this.style.color='#667eea'">${property.total_area || '未設定'}</span>
                         </div>
+                        ${(property.building_type && property.building_type.includes('別墅') && (property.land_area || property.land_share)) ? `
+                        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                            <span style="color: #666; font-weight: 500;">地坪：</span>
+                            <span style="color: #e74c3c; font-weight: 600;">${property.land_area || property.land_share || '未設定'}</span>
+                        </div>
+                        ` : ''}
                         <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                             <span style="color: #666; font-weight: 500;">機能特色：</span>
                             <span style="color: #667eea; font-weight: 600; cursor: pointer; text-decoration: underline;" 
@@ -609,6 +615,12 @@ function showAreaDetails(propertyId) {
                 <span style="color: #666; font-weight: 500;">公設：</span>
                 <span style="color: #2c3e50; font-weight: 600;">${property.common_area || '未設定'}</span>
             </div>
+            ${(property.land_area || property.land_share) ? `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
+                <span style="color: #666; font-weight: 500;">地坪：</span>
+                <span style="color: #e74c3c; font-weight: 600;">${property.land_area || property.land_share || '未設定'}</span>
+            </div>
+            ` : ''}
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding: 6px 0; border-bottom: 1px solid #e9ecef;">
                 <span style="color: #666; font-weight: 500;">車位編號：</span>
                 <span style="color: #2c3e50; font-weight: 600;">${property.parking_space || '未設定'}</span>

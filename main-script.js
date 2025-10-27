@@ -60,16 +60,26 @@ let tiktokScriptLoading = false;
 
 // 關閉燈箱函數
 function closeLightbox() {
+    // 🔥 關閉所有燈箱實例
     if (currentLightbox) {
         currentLightbox.remove();
         currentLightbox = null;
-        
-        // 如果有詳細資訊彈窗被隱藏，重新顯示它
-        if (currentPropertyModal && currentPropertyModal.style.display === 'none') {
-            currentPropertyModal.style.display = 'flex';
-        }
+    }
+    
+    // 移除所有遺留的燈箱元素
+    const existingLightboxes = document.querySelectorAll('.lightbox-modal');
+    existingLightboxes.forEach(lb => {
+        lb.remove();
+    });
+    
+    // 如果有詳細資訊彈窗被隱藏，重新顯示它
+    if (currentPropertyModal && currentPropertyModal.style.display === 'none') {
+        currentPropertyModal.style.display = 'flex';
     }
 }
+
+// 確保函數在 window 物件上可用
+window.closeLightbox = closeLightbox;
 
 // 關閉地圖彈窗函數
 function closeMapModal() {
@@ -695,12 +705,23 @@ function updateLightboxImage(newImageIndex, propertyId) {
 function openLightbox(imageIndex, propertyId) {
     const property = embeddedPropertiesData.properties.find(p => p.id === propertyId);
     if (property && property.images && property.images[imageIndex]) {
+        // 🔥 先關閉所有現有的燈箱
+        if (currentLightbox) {
+            currentLightbox.remove();
+            currentLightbox = null;
+        }
+        
+        // 查找並移除所有 .lightbox-modal 元素（防止重複）
+        const existingLightboxes = document.querySelectorAll('.lightbox-modal');
+        existingLightboxes.forEach(lb => lb.remove());
+        
         // 隱藏詳細資訊彈窗
         if (currentPropertyModal) {
             currentPropertyModal.style.display = 'none';
         }
         
         const modal = document.createElement('div');
+        modal.className = 'lightbox-modal';
         modal.style.cssText = `
             position: fixed;
             top: 0;
@@ -717,7 +738,7 @@ function openLightbox(imageIndex, propertyId) {
         `;
         
         modal.innerHTML = `
-            <div style="
+            <div class="lightbox-content" style="
                 position: relative;
                 max-width: 100vw;
                 max-height: 90vh;
@@ -726,33 +747,38 @@ function openLightbox(imageIndex, propertyId) {
                 align-items: center;
             ">
                 <!-- 關閉按鈕 -->
-                <button onclick="closeLightbox()" style="
-                    position: absolute;
-                    top: -50px;
-                    right: 0;
+                <button class="lightbox-close-btn" onclick="window.closeLightbox(); return false;" style="
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
                     background: linear-gradient(45deg, #e74c3c, #c0392b);
                     color: white;
                     border: none;
-                    width: 40px;
-                    height: 40px;
+                    width: 50px;
+                    height: 50px;
                     border-radius: 50%;
                     cursor: pointer;
-                    font-size: 20px;
+                    font-size: 28px;
                     font-weight: bold;
-                    z-index: 10001;
+                    z-index: 10002;
                     box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
                     transition: all 0.3s ease;
-                " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">×</button>
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    line-height: 1;
+                    pointer-events: auto;
+                ">×</button>
                 
                 <!-- 照片容器 -->
-                <div style="
+                <div class="lightbox-image-container" style="
                     background: white;
                     border-radius: 15px;
                     padding: 20px;
                     box-shadow: 0 25px 50px rgba(0,0,0,0.4);
                     position: relative;
                     overflow: hidden;
-                ">
+                " onclick="event.stopPropagation();">
                     <!-- 左箭頭 -->
                     <button class="main-image-arrow-left" data-direction="-1" data-property-id="${propertyId}" style="
                         position: absolute;
@@ -890,16 +916,41 @@ function openLightbox(imageIndex, propertyId) {
             });
         }
         
-        // 點擊背景關閉
+        // 點擊背景關閉（在 innerHTML 設置後重新綁定）
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
+            // 檢查是否點擊的是背景或關閉按鈕
+            if (e.target === modal || 
+                e.target.classList.contains('lightbox-modal') ||
+                e.target.classList.contains('lightbox-close-btn') ||
+                e.target.closest('.lightbox-close-btn')) {
                 closeLightbox();
+                return;
+            }
+            // 如果點擊的是內容區域，不關閉
+            if (e.target.closest('.lightbox-content') || 
+                e.target.closest('.lightbox-image-container')) {
+                return;
             }
         });
         
+        // 為關閉按鈕添加事件監聽器（立即綁定）
+        const closeBtn = modal.querySelector('.lightbox-close-btn');
+        if (closeBtn) {
+            // 移除舊的事件監聽器並添加新的
+            const closeHandler = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeLightbox();
+            };
+            
+            closeBtn.addEventListener('click', closeHandler, { capture: true });
+            closeBtn.addEventListener('mousedown', closeHandler, { capture: true });
+            closeBtn.addEventListener('touchend', closeHandler, { capture: true });
+        }
+        
         // ESC 鍵關閉
         const handleEsc = (e) => {
-            if (e.key === 'Escape') {
+            if (e.key === 'Escape' || e.keyCode === 27) {
                 closeLightbox();
                 document.removeEventListener('keydown', handleEsc);
             }

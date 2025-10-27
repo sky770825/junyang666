@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>查克驗屋 Check - 專業房屋檢驗服務</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --grad:linear-gradient(135deg,#0ea5e9,#0284c7);
+  --glass-bg:rgba(255,255,255,0.9);
+  --glass-dark:rgba(30,30,30,0.6);
+  --shadow-light:0 4px 12px rgba(0,0,0,.1);
+  --border-radius:1rem;
+  --transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body{
+  background:linear-gradient(to bottom,#e0f2fe,#f0f9ff);
+  transition:var(--transition);
+  font-family:system-ui,-apple-system,sans-serif;
+  line-height:1.6;
+}
+
+.glass-card{
+  background:var(--glass-bg);
+  backdrop-filter:blur(10px);
+  border-radius:var(--border-radius);
+  border:1px solid rgba(255,255,255,0.2);
+  box-shadow:var(--shadow-light);
+}
+
+.service-card{
+  background:rgba(255,255,255,0.95);
+  border-radius:0.75rem;
+  padding:1.5rem;
+  margin-bottom:1rem;
+  transition:var(--transition);
+  border-left:4px solid #0ea5e9;
+}
+
+.service-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 25px rgba(14,165,233,0.2);
+}
+
+.price-card{
+  background:linear-gradient(135deg,#fff,#f8fafc);
+  border:2px solid #e0f2fe;
+  border-radius:1rem;
+  padding:2rem;
+  transition:var(--transition);
+}
+
+.price-card:hover{
+  border-color:#0ea5e9;
+  transform:translateY(-4px);
+  box-shadow:0 8px 25px rgba(14,165,233,0.3);
+}
+
+.btn-primary{
+  background:var(--grad);
+  color:white;
+  padding:0.75rem 2rem;
+  border-radius:9999px;
+  font-weight:600;
+  transition:var(--transition);
+  border:none;
+  cursor:pointer;
+}
+
+.btn-primary:hover{
+  transform:scale(1.05);
+  box-shadow:0 4px 15px rgba(14,165,233,0.4);
+}
+
+.form-input{
+  width:100%;
+  padding:0.75rem;
+  border:2px solid #e0e7ff;
+  border-radius:0.5rem;
+  transition:var(--transition);
+  font-size:1rem;
+}
+
+.form-input:focus{
+  outline:none;
+  border-color:#0ea5e9;
+  box-shadow:0 0 0 3px rgba(14,165,233,0.1);
+}
+
+#themeToggle{
+  position:fixed;
+  top:1rem;
+  right:1rem;
+  background:var(--grad);
+  color:#fff;
+  border:none;
+  padding:.5rem .75rem;
+  border-radius:9999px;
+  z-index:50;
+  transition:var(--transition);
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 15px rgba(14,165,233,0.3);
+}
+
+#themeToggle:hover{
+  transform:scale(1.1);
+}
+
+.logo-section{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  margin-bottom:2rem;
+}
+
+.logo-icon{
+  width:60px;
+  height:60px;
+  background:var(--grad);
+  border-radius:1rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2rem;
+}
+
+.hero-banner{
+  background:linear-gradient(135deg,#0ea5e9,#0284c7);
+  color:white;
+  padding:3rem 1.5rem;
+  border-radius:1.5rem;
+  text-align:center;
+  margin-bottom:2rem;
+}
+
+.badge{
+  display:inline-block;
+  background:rgba(255,255,255,0.2);
+  padding:0.25rem 0.75rem;
+  border-radius:9999px;
+  font-size:0.875rem;
+  margin:0.25rem;
+}
+
+.process-step{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  padding:1rem;
+  background:white;
+  border-radius:0.75rem;
+  margin-bottom:1rem;
+  transition:var(--transition);
+}
+
+.process-step:hover{
+  background:#f0f9ff;
+  transform:translateX(4px);
+}
+
+.step-number{
+  width:40px;
+  height:40px;
+  background:var(--grad);
+  color:white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  flex-shrink:0;
+}
+
+/* 版面優化 */
+section{
+  animation:fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp{
+  from{
+    opacity:0;
+    transform:translateY(20px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.service-card ul{
+  list-style:none;
+  padding:0;
+}
+
+.service-card li{
+  padding:0.25rem 0;
+  position:relative;
+  padding-left:1rem;
+}
+
+.service-card li::before{
+  content:'✓';
+  position:absolute;
+  left:0;
+  color:#0ea5e9;
+  font-weight:bold;
+}
+
+.hero-banner{
+  position:relative;
+  overflow:hidden;
+}
+
+.hero-banner::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+  opacity:0.3;
+}
+
+.price-card .flex{
+  transition:var(--transition);
+}
+
+.price-card .flex:hover{
+  background:#e0f2fe !important;
+  transform:translateX(4px);
+}
+
+@media(max-width:768px){
+  .hero-banner{
+    padding:2rem 1rem;
+  }
+  
+  .hero-banner h2{
+    font-size:1.5rem;
+  }
+  
+  .service-card ul{
+    grid-template-columns:1fr !important;
+  }
+  
+  .logo-section{
+    flex-direction:column;
+    text-align:center;
+  }
+}
+</style>
+</head>
+<body>
+<!-- 主題切換 -->
+<button id="themeToggle" aria-label="切換主題模式">🌞</button>
+
+<!-- 返回按鈕 -->
+<button onclick="history.back()" class="fixed top-4 left-4 bg-white shadow-lg rounded-full p-3 z-50 hover:scale-105 transition">
+  ←
+</button>
+
+<main class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+  <!-- Logo 區域 -->
+  <div class="logo-section">
+    <div class="logo-icon">🔍</div>
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">查克驗屋 Check</h1>
+      <p class="text-sm text-gray-600">專業房屋檢驗服務</p>
+    </div>
+  </div>
+
+  <!-- 主橫幅 -->
+  <div class="hero-banner">
+    <h2 class="text-2xl font-bold mb-4">口碑價專案</h2>
+    <p class="text-lg opacity-90 mb-4">無須團購 直享優惠</p>
+    <div class="flex flex-wrap justify-center gap-2">
+      <span class="badge">✅ 專業團隊</span>
+      <span class="badge">📋 詳細報告</span>
+      <span class="badge">⏱️ 快速回覆</span>
+    </div>
+  </div>
+
+  <!-- 驗屋項目 -->
+  <section class="glass-card p-6 shadow-lg">
+    <h2 class="text-xl font-bold mb-4 flex items-center">
+      <span class="mr-2">📋</span>
+      檢驗項目
+    </h2>
+    
+    <!-- 給排水系統檢測 -->
+    <div class="service-card">
+      <h3 class="text-lg font-semibold text-gray-800 mb-3">💧 給排水系統檢測</h3>
+      <ul class="text-sm text-gray-700 space-y-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+        <li>水壓檢測</li>
+        <li>窗框水路測試</li>
+        <li>洩水坡度檢測</li>
+        <li>地排內視鏡檢測</li>
+        <li>給水檢查</li>
+        <li>馬桶檢查</li>
+        <li>蓮蓬頭組檢查</li>
+        <li>淋浴門測試</li>
+        <li>模擬淋浴測試</li>
+        <li>乾溼區洩水測試</li>
+        <li>管道間平頂檢查</li>
+        <li>冷排檢測</li>
+        <li>衛浴浴櫃檢查</li>
+        <li>陽台門框水密性測試</li>
+        <li>熱顯像儀檢測</li>
+      </ul>
+    </div>
+
+    <!-- 電力系統檢測 -->
+    <div class="service-card">
+      <h3 class="text-lg font-semibold text-gray-800 mb-3">⚡ 電力系統及其他項儀器檢測</h3>
+      <ul class="text-sm text-gray-700 space-y-2">
+        <li><strong>電力系統檢測：</strong>配電盤、漏電斷路器、電路分析儀</li>
+        <li><strong>弱電系統檢測：</strong>電視訊號、電話訊號、網路訊號、弱電箱、CCTV功能測試</li>
+        <li><strong>環境檢測：</strong>空氣品質、輻射、電磁波、噪音檢測</li>
+        <li><strong>其他檢測：</strong>玻璃厚度、地平雷射水平及垂直檢測、廚具檢測、風機檢測</li>
+      </ul>
+    </div>
+
+    <!-- 泥作、油漆、外觀 -->
+    <div class="service-card">
+      <h3 class="text-lg font-semibold text-gray-800 mb-3">🏠 泥作、油漆、外觀、門窗框</h3>
+      <ul class="text-sm text-gray-700 space-y-2">
+        <li>地磚、壁磚、空鼓檢測及瑕疵檢查</li>
+        <li>梁柱、迎風面空鼓檢測及牆面、平頂、油漆粉刷檢查</li>
+        <li>門窗框動作、外觀檢查</li>
+        <li>其他外觀項目查看</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 定價方案 -->
+  <section class="glass-card p-6 shadow-lg">
+    <h2 class="text-xl font-bold mb-4 flex items-center">
+      <span class="mr-2">💰</span>
+      定價方案
+    </h2>
+    
+    <div class="price-card">
+      <div class="mb-4">
+        <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold mb-3">
+          依坪數計費（合約上主建物+附屬建物坪數）
+        </span>
+      </div>
+      
+      <div class="space-y-3 mb-4">
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <span class="font-medium">40-44.99 坪</span>
+          <span class="text-blue-600 font-bold text-lg">$14,000</span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <span class="font-medium">35-39.99 坪</span>
+          <span class="text-blue-600 font-bold text-lg">$13,000</span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <span class="font-medium">30-34.99 坪</span>
+          <span class="text-blue-600 font-bold text-lg">$12,000</span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <span class="font-medium">25-29.99 坪</span>
+          <span class="text-blue-600 font-bold text-lg">$11,000</span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <span class="font-medium">20-24.99 坪</span>
+          <span class="text-blue-600 font-bold text-lg">$10,000</span>
+        </div>
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <span class="font-medium">未滿20坪</span>
+          <span class="text-blue-600 font-bold text-lg">$8,000</span>
+        </div>
+      </div>
+
+      <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-4">
+        <p class="text-sm text-gray-700 mb-2">⚠️ <strong>注意事項：</strong></p>
+        <ul class="text-xs text-gray-600 space-y-1">
+          <li>• <strong>未稅價格</strong></li>
+          <li>• 其他優惠不得與此專案優惠合併使用</li>
+          <li>• 複驗優惠價：$3,000</li>
+          <li>• 訂金 $2,000 立即排定驗屋時間</li>
+          <li>• 剩餘尾款於驗屋當日付清</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 服務流程 -->
+  <section class="glass-card p-6 shadow-lg">
+    <h2 class="text-xl font-bold mb-4 flex items-center">
+      <span class="mr-2">🔄</span>
+      服務流程
+    </h2>
+    
+    <div class="space-y-3">
+      <div class="process-step">
+        <div class="step-number">1</div>
+        <div>
+          <h4 class="font-semibold text-gray-800">諮詢</h4>
+          <p class="text-sm text-gray-600">填寫表單或來電諮詢</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-number">2</div>
+        <div>
+          <h4 class="font-semibold text-gray-800">預約</h4>
+          <p class="text-sm text-gray-600">確認驗屋時間及細節</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-number">3</div>
+        <div>
+          <h4 class="font-semibold text-gray-800">初驗</h4>
+          <p class="text-sm text-gray-600">專業團隊進行現場檢驗</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-number">4</div>
+        <div>
+          <h4 class="font-semibold text-gray-800">報告</h4>
+          <p class="text-sm text-gray-600">5-7個工作天提供完整報告</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 表單區 -->
+  <section class="glass-card p-6 shadow-lg">
+    <h2 class="text-xl font-bold mb-4 flex items-center">
+      <span class="mr-2">📝</span>
+      立即預約諮詢
+    </h2>
+    
+    <form id="consultationForm" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">姓名 *</label>
+        <input type="text" name="name" class="form-input" required placeholder="請輸入姓名">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">電話 *</label>
+        <input type="tel" name="phone" class="form-input" required placeholder="請輸入聯絡電話">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">LINE ID *</label>
+        <input type="text" name="lineId" class="form-input" required placeholder="請輸入您的 LINE ID">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">驗屋地址 *</label>
+        <input type="text" name="address" class="form-input" required placeholder="請輸入驗屋地址">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">房屋坪數 *</label>
+        <select name="area" class="form-input" required>
+          <option value="">請選擇坪數</option>
+          <option value="<20">未滿20坪</option>
+          <option value="20-24.99">20-24.99坪</option>
+          <option value="25-29.99">25-29.99坪</option>
+          <option value="30-34.99">30-34.99坪</option>
+          <option value="35-39.99">35-39.99坪</option>
+          <option value="40-44.99">40-44.99坪</option>
+          <option value="45+">45坪以上</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">房屋類型 *</label>
+        <select name="type" class="form-input" required>
+          <option value="">請選擇類型</option>
+          <option value="新成屋">新成屋</option>
+          <option value="預售屋">預售屋</option>
+          <option value="中古屋">中古屋</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">希望驗屋日期 *</label>
+        <input type="date" name="date" class="form-input" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
+        <textarea name="notes" class="form-input" rows="4" placeholder="如有特殊需求或問題請註明"></textarea>
+      </div>
+
+      <button type="submit" class="btn-primary w-full">
+        📧 送出預約表單
+      </button>
+    </form>
+  </section>
+
+  <!-- 專業認證 -->
+  <section class="glass-card p-6 shadow-lg">
+    <h2 class="text-xl font-bold mb-4 flex items-center">
+      <span class="mr-2">🏆</span>
+      專業認證
+    </h2>
+    
+    <div class="space-y-3">
+      <div class="bg-blue-50 p-4 rounded-lg">
+        <p class="text-sm text-gray-700 mb-2">✅ <strong>全員持證：</strong></p>
+        <p class="text-xs text-gray-600">至少具室內配線乙級證照，或擁有用電設備檢驗、自來水管配管等相關證照</p>
+      </div>
+      <div class="bg-green-50 p-4 rounded-lg">
+        <p class="text-sm text-gray-700 mb-2">📋 <strong>專業報告：</strong></p>
+        <p class="text-xs text-gray-600">驗屋完成後約5至7個工作天，提供正式完整的房屋檢驗缺失報告書電子檔</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+// 主題切換
+document.getElementById('themeToggle').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '🌙' : '🌞';
+});
+
+// 表單提交處理
+document.getElementById('consultationForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
+  
+  // 這裡可以添加實際的表單提交邏輯
+  console.log('表單數據:', data);
+  
+  // 顯示成功訊息
+  alert('表單已送出！我們會在1個工作天內與您聯繫。\n\n您也可以直接透過 LINE 聯繫我們：@195fpiga');
+  
+  // 清空表單
+  e.target.reset();
+  
+  // 實際應用中可以發送到後端API
+  // fetch('/api/submit-consultation', {
+  //   method: 'POST',
+  //   body: JSON.stringify(data),
+  //   headers: { 'Content-Type': 'application/json' }
+  // });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日記帳 - 楊梅人在地生活集</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --grad:linear-gradient(135deg,#6366f1,#8b5cf6);
+  --glass-bg:rgba(255,255,255,0.9);
+  --shadow-light:0 4px 20px rgba(0,0,0,.08);
+  --border-radius:1.25rem;
+  --transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body{
+  background:linear-gradient(135deg,#f0f4ff 0%,#e0e7ff 50%,#fff 100%);
+  font-family:system-ui,-apple-system,sans-serif;
+  padding-bottom:70px;
+  padding-top:env(safe-area-inset-top);
+  overflow:hidden;
+  margin:0;
+  height:100vh;
+  position:relative;
+}
+
+main{
+  padding-bottom:0.5rem;
+  overflow-y:auto;
+  max-height:calc(100vh - 140px);
+  -webkit-overflow-scrolling:touch;
+}
+
+.stats-card{
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:white;
+  border-radius:0.75rem;
+  padding:0.5rem;
+  box-shadow:0 4px 15px rgba(99,102,241,0.3);
+}
+
+.expense-item{
+  background:white;
+  border-radius:0.5rem;
+  padding:0.75rem;
+  margin-bottom:0.375rem;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+  transition:var(--transition);
+  animation:slideIn 0.3s ease-out;
+  position:relative;
+}
+
+.expense-item.swipe-left{
+  transform:translateX(-80px);
+}
+
+@keyframes slideIn{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.category-badge{
+  display:inline-block;
+  padding:0.25rem 0.75rem;
+  border-radius:9999px;
+  font-size:0.75rem;
+  font-weight:600;
+}
+
+.category-food{background:#fef3c7;color:#92400e;}
+.category-transport{background:#dbeafe;color:#1e40af;}
+.category-shopping{background:#fce7f3;color:#9f1239;}
+.category-entertainment{background:#e0e7ff;color:#3730a3;}
+.category-bills{background:#dcfce7;color:#166534;}
+.category-health{background:#fee2e2;color:#991b1b;}
+.category-other{background:#f3f4f6;color:#374151;}
+
+/* 底部快速輸入區域 */
+.quick-input-panel{
+  position:fixed;
+  bottom:70px;
+  left:0;
+  right:0;
+  background:white;
+  border-top-left-radius:1.5rem;
+  border-top-right-radius:1.5rem;
+  box-shadow:0 -4px 20px rgba(0,0,0,0.1);
+  padding:0.75rem;
+  padding-bottom:0.75rem;
+  transform:translateY(100%);
+  transition:transform 0.3s ease-out;
+  z-index:45;
+  max-height:calc(100vh - 140px);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.quick-input-panel.active{
+  transform:translateY(0);
+}
+
+.panel-handle{
+  width:40px;
+  height:4px;
+  background:#d1d5db;
+  border-radius:2px;
+  margin:0 auto 1rem;
+}
+
+/* 快捷金額按鈕 */
+.quick-amount-btn{
+  padding:0.5rem 0.75rem;
+  background:#f3f4f6;
+  border-radius:0.5rem;
+  font-weight:600;
+  border:none;
+  cursor:pointer;
+  transition:var(--transition);
+  font-size:0.875rem;
+}
+
+.quick-amount-btn:hover{
+  background:#e5e7eb;
+  transform:scale(1.05);
+}
+
+.quick-amount-btn.active{
+  background:var(--grad);
+  color:white;
+}
+
+/* 大分類按鈕 */
+.category-quick-btn{
+  flex:1;
+  padding:0.75rem 0.5rem;
+  background:white;
+  border:2px solid #e5e7eb;
+  border-radius:0.75rem;
+  text-align:center;
+  cursor:pointer;
+  transition:var(--transition);
+  min-height:70px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.25rem;
+}
+
+.category-quick-btn:hover{
+  border-color:#6366f1;
+  transform:scale(1.05);
+  box-shadow:0 4px 12px rgba(99,102,241,0.2);
+}
+
+.category-quick-btn.selected{
+  background:var(--grad);
+  color:white;
+  border-color:#6366f1;
+}
+
+.category-quick-btn .icon{
+  font-size:1.5rem;
+}
+
+/* 一鍵記錄按鈕 */
+.quick-save-btn{
+  width:100%;
+  padding:0.75rem;
+  background:var(--grad);
+  color:white;
+  border:none;
+  border-radius:0.75rem;
+  font-size:1rem;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(99,102,241,0.4);
+  transition:var(--transition);
+  margin-top:0.5rem;
+  pointer-events:auto;
+}
+
+.quick-save-btn:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 12px 35px rgba(99,102,241,0.5);
+}
+
+.quick-save-btn:active:not(:disabled){
+  transform:translateY(0);
+}
+
+.quick-save-btn:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+
+/* 刪除按鈕 */
+.delete-btn-hidden{
+  position:absolute;
+  right:0;
+  top:0;
+  bottom:0;
+  width:80px;
+  background:#ef4444;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-top-right-radius:0.75rem;
+  border-bottom-right-radius:0.75rem;
+}
+
+.input-focus{
+  background:#fef3c7 !important;
+  border-color:#f59e0b !important;
+}
+
+.floating-btn{
+  position:fixed;
+  bottom:80px;
+  right:1rem;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:var(--grad);
+  color:white;
+  border:none;
+  box-shadow:0 6px 20px rgba(99,102,241,0.4);
+  font-size:1.75rem;
+  cursor:pointer;
+  transition:var(--transition);
+  z-index:60;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.floating-btn:hover{
+  transform:scale(1.1) rotate(90deg);
+  box-shadow:0 12px 35px rgba(99,102,241,0.5);
+}
+
+.floating-btn.active{
+  transform:rotate(45deg);
+}
+
+.empty-state{
+  text-align:center;
+  padding:3rem 1rem;
+  color:#6b7280;
+}
+
+.empty-state-icon{
+  font-size:4rem;
+  margin-bottom:1rem;
+  opacity:0.5;
+}
+
+/* 觸摸滑動效果 */
+.expense-item{
+  touch-action:pan-y;
+  user-select:none;
+}
+
+/* 統計模態框 */
+.stats-modal{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px);
+  z-index:200;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1rem;
+  opacity:0;
+  transition:opacity 0.3s ease;
+  pointer-events:none;
+}
+
+.stats-modal.active{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.stats-modal-content{
+  background:white;
+  border-radius:1.5rem;
+  max-width:500px;
+  width:100%;
+  max-height:90vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  transform:scale(0.9) translateY(20px);
+  transition:transform 0.3s ease;
+}
+
+.stats-modal.active .stats-modal-content{
+  transform:scale(1) translateY(0);
+}
+
+.stats-modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:1.5rem;
+  border-bottom:1px solid #e5e7eb;
+}
+
+.stats-modal-body{
+  padding:1.5rem;
+}
+
+.stat-card{
+  background:linear-gradient(135deg,#f8faff,#ffffff);
+  border:1px solid #e5e7eb;
+  border-radius:0.75rem;
+  padding:0.75rem;
+  text-align:center;
+}
+
+.stat-card-label{
+  font-size:0.75rem;
+  color:#6b7280;
+  margin-bottom:0.25rem;
+}
+
+.stat-card-value{
+  font-size:1.25rem;
+  font-weight:bold;
+  color:#1f2937;
+}
+
+.stat-card-unit{
+  font-size:0.625rem;
+  color:#9ca3af;
+  margin-top:0.125rem;
+}
+
+.period-stats{
+  background:#f9fafb;
+  border-radius:0.75rem;
+  padding:1rem;
+}
+
+.period-stat-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0.5rem 0;
+  border-bottom:1px solid #e5e7eb;
+}
+
+.period-stat-item:last-child{
+  border-bottom:none;
+}
+
+.period-label{
+  font-size:0.875rem;
+  color:#6b7280;
+}
+
+.period-value{
+  font-size:1rem;
+  font-weight:600;
+  color:#1f2937;
+}
+
+.category-stats{
+  margin-top:1rem;
+}
+
+.category-stats-title{
+  font-size:0.875rem;
+  font-weight:600;
+  color:#374151;
+  margin-bottom:1rem;
+}
+
+.category-stats-list{
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
+}
+
+.category-stat-item{
+  margin-bottom:0.75rem;
+}
+
+.category-stat-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:0.5rem;
+}
+
+.category-stat-info{
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+}
+
+.category-icon{
+  font-size:1.25rem;
+}
+
+.category-name{
+  font-size:0.875rem;
+  font-weight:500;
+  color:#374151;
+}
+
+.category-count{
+  font-size:0.75rem;
+  color:#9ca3af;
+}
+
+.category-amount{
+  font-size:0.875rem;
+  font-weight:600;
+  color:#1f2937;
+}
+
+.category-stat-bar{
+  position:relative;
+  height:24px;
+  background:#f3f4f6;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.category-stat-bar-fill{
+  height:100%;
+  border-radius:12px;
+  transition:width 0.5s ease;
+}
+
+.category-percentage{
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:0.75rem;
+  font-weight:600;
+  color:#374151;
+}
+
+/* 響應式 */
+@media (max-width: 640px) {
+  .quick-input-panel{
+    bottom:70px;
+    max-height:calc(100vh - 140px);
+  }
+  .floating-btn{
+    bottom:85px;
+    width:56px;
+    height:56px;
+    font-size:1.5rem;
+  }
+  
+  /* 手機版導航列優化 */
+  .bottom-nav {
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .bottom-nav button {
+    flex: 1;
+    min-width: 0;
+    padding: 0.25rem 0.1rem;
+    font-size: 0.7rem;
+  }
+  
+  .bottom-nav button span:first-child {
+    font-size: 1rem;
+    margin-bottom: 0.125rem;
+  }
+  .category-quick-btn{
+    min-height:80px;
+    padding:1rem 0.5rem;
+  }
+  .category-quick-btn .icon{
+    font-size:1.5rem;
+  }
+  .stats-modal-content{
+    max-height:85vh;
+  }
+  .stat-card-value{
+    font-size:1rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- 頂部標題 -->
+<header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 px-3 shadow-lg sticky top-0 z-10">
+  <div class="flex items-center justify-between mb-2">
+    <h1 class="text-lg font-bold flex items-center gap-1">
+      <span>📝</span>
+      <span>記帳</span>
+    </h1>
+    <button onclick="showStats()" class="text-xs bg-white/20 px-2 py-1 rounded-full hover:bg-white/30">
+      統計
+    </button>
+  </div>
+  
+  <!-- 統計卡片 -->
+  <div class="grid grid-cols-3 gap-1.5">
+    <div class="stats-card text-center py-1.5">
+      <div class="text-xs opacity-90">今日</div>
+      <div class="text-base font-bold" id="todayTotal">$0</div>
+    </div>
+    <div class="stats-card text-center py-1.5">
+      <div class="text-xs opacity-90">本週</div>
+      <div class="text-base font-bold" id="weekTotal">$0</div>
+    </div>
+    <div class="stats-card text-center py-1.5">
+      <div class="text-xs opacity-90">本月</div>
+      <div class="text-base font-bold" id="monthTotal">$0</div>
+    </div>
+  </div>
+</header>
+
+<main class="px-2 py-1 pb-16">
+  
+  <!-- 支出列表 -->
+  <div id="expenseList" class="space-y-1.5">
+    <!-- 動態載入的支出項目 -->
+  </div>
+
+  <!-- 空狀態 -->
+  <div id="emptyState" class="empty-state py-8">
+    <div class="empty-state-icon text-5xl">📭</div>
+    <div class="text-base font-semibold mb-1">還沒有記錄</div>
+    <div class="text-xs mb-2">點擊右下角的 ➕ 按鈕開始記帳</div>
+    <div class="text-xs text-gray-400">只需 3 秒即可完成！</div>
+  </div>
+
+</main>
+
+<!-- 快速輸入面板 -->
+<div id="quickInputPanel" class="quick-input-panel">
+  <div class="panel-handle"></div>
+  
+  <!-- 快捷金額 -->
+  <div class="mb-2">
+    <div class="text-xs font-semibold text-gray-600 mb-1">快捷金額</div>
+    <div class="grid grid-cols-4 gap-1.5">
+      <button class="quick-amount-btn" onclick="setQuickAmount(50)">50</button>
+      <button class="quick-amount-btn" onclick="setQuickAmount(100)">100</button>
+      <button class="quick-amount-btn" onclick="setQuickAmount(200)">200</button>
+      <button class="quick-amount-btn" onclick="setQuickAmount(500)">500</button>
+      <button class="quick-amount-btn" onclick="setQuickAmount(1000)">1K</button>
+      <button class="quick-amount-btn" onclick="setQuickAmount(5000)">5K</button>
+      <button class="quick-amount-btn" onclick="setQuickAmount(10000)">10K</button>
+      <button class="quick-amount-btn" onclick="openAmountInput()">自訂</button>
+    </div>
+  </div>
+
+  <!-- 自訂金額輸入 -->
+  <div id="customAmountInput" class="mb-2 hidden">
+    <input 
+      type="number" 
+      id="expenseAmount" 
+      placeholder="輸入金額"
+      class="w-full px-3 py-2 text-xl font-bold text-center border-2 border-indigo-500 rounded-lg focus:outline-none"
+      oninput="updateAmountDisplay(this.value)"
+    >
+  </div>
+
+  <!-- 分類選擇 -->
+  <div class="mb-2">
+    <div class="text-xs font-semibold text-gray-600 mb-1">選擇分類</div>
+    <div class="grid grid-cols-4 gap-1.5">
+      <button class="category-quick-btn" onclick="selectCategory('food')" data-category="food">
+        <span class="icon">🍔</span>
+        <span class="text-xs">餐飲</span>
+      </button>
+      <button class="category-quick-btn" onclick="selectCategory('transport')" data-category="transport">
+        <span class="icon">🚗</span>
+        <span class="text-xs">交通</span>
+      </button>
+      <button class="category-quick-btn" onclick="selectCategory('shopping')" data-category="shopping">
+        <span class="icon">🛍️</span>
+        <span class="text-xs">購物</span>
+      </button>
+      <button class="category-quick-btn" onclick="selectCategory('entertainment')" data-category="entertainment">
+        <span class="icon">🎬</span>
+        <span class="text-xs">娛樂</span>
+      </button>
+      <button class="category-quick-btn" onclick="selectCategory('bills')" data-category="bills">
+        <span class="icon">💳</span>
+        <span class="text-xs">帳單</span>
+      </button>
+      <button class="category-quick-btn" onclick="selectCategory('health')" data-category="health">
+        <span class="icon">🏥</span>
+        <span class="text-xs">醫療</span>
+      </button>
+      <button class="category-quick-btn" onclick="selectCategory('other')" data-category="other">
+        <span class="icon">📦</span>
+        <span class="text-xs">其他</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 顯示當前金額 -->
+  <div class="text-center mb-1">
+    <div class="text-xs text-gray-500">金額</div>
+    <div class="text-2xl font-bold text-indigo-600" id="amountDisplay">$0</div>
+  </div>
+
+  <!-- 快速備註（可選） -->
+  <div class="mb-1">
+    <input 
+      type="text" 
+      id="expenseNote" 
+      placeholder="備註（選填）"
+      class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+      maxlength="30"
+    >
+  </div>
+
+  <!-- 一鍵儲存 -->
+  <button onclick="quickSave()" class="quick-save-btn" id="saveBtn" disabled>
+    快速記錄
+  </button>
+</div>
+
+<!-- 新增按鈕 -->
+<button onclick="toggleQuickInput()" class="floating-btn" id="addBtn" aria-label="新增支出">
+  ➕
+</button>
+
+<!-- 底部導航 -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 flex justify-around py-2 bottom-nav z-50" role="navigation" aria-label="主要導航">
+  <button onclick="window.location.href='index.html'" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="回到首頁">
+    <span class="text-lg mb-1">🏠</span><span>首頁</span>
+  </button>
+  <button onclick="window.location.href='expense-tracker.html'" class="flex flex-col items-center text-indigo-600 text-xs font-semibold px-3 py-2 min-w-[60px]" aria-label="記帳">
+    <span class="text-lg mb-1">📝</span><span>記帳</span>
+  </button>
+  <button onclick="window.location.href='games.html'" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="遊戲大廳">
+    <span class="text-lg mb-1">🎮</span><span>遊戲</span>
+  </button>
+  <button onclick="window.location.href='local-life.html'" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="在地生活">
+    <span class="text-lg mb-1">🍹</span><span>生活</span>
+  </button>
+  <button onclick="window.location.href='worship.html'" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="拜拜專區">
+    <span class="text-lg mb-1">🙏</span><span>拜拜</span>
+  </button>
+</nav>
+
+<script>
+// 超級懶人記帳系統
+class LazyExpenseTracker {
+  constructor() {
+    this.expenses = this.loadExpenses();
+    this.currentAmount = 0;
+    this.currentCategory = '';
+    this.editingId = null;
+    this.lastCategory = localStorage.getItem('lastCategory') || '';
+    this.categoryNames = {
+      food: '餐飲', transport: '交通', shopping: '購物',
+      entertainment: '娛樂', bills: '帳單', health: '醫療', other: '其他'
+    };
+    this.categoryIcons = {
+      food: '🍔', transport: '🚗', shopping: '🛍️',
+      entertainment: '🎬', bills: '💳', health: '🏥', other: '📦'
+    };
+    this.init();
+  }
+
+  init() {
+    this.renderExpenses();
+    this.updateStats();
+    // 初始化按鈕狀態
+    setTimeout(() => {
+      this.updateSaveButton();
+      // 如果上次有選擇分類，自動選中
+      if (this.lastCategory) {
+        this.selectCategory(this.lastCategory);
+      }
+    }, 100);
+  }
+
+  loadExpenses() {
+    const data = localStorage.getItem('expenses');
+    return data ? JSON.parse(data) : [];
+  }
+
+  saveExpenses() {
+    localStorage.setItem('expenses', JSON.stringify(this.expenses));
+  }
+
+  addExpense(amount, category, note = '') {
+    if (!amount || !category) return false;
+    
+    // 如果是編輯模式
+    if (this.editingId) {
+      const index = this.expenses.findIndex(e => e.id === this.editingId);
+      if (index !== -1) {
+        this.expenses[index] = {
+          ...this.expenses[index],
+          amount: parseFloat(amount),
+          category: category,
+          note: note.trim()
+        };
+        this.saveExpenses();
+        this.renderExpenses();
+        this.updateStats();
+        this.resetInput();
+        return true;
+      }
+    }
+    
+    // 新增模式
+    const expense = {
+      id: Date.now().toString(),
+      amount: parseFloat(amount),
+      category: category,
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
+      note: note.trim()
+    };
+    
+    this.expenses.unshift(expense);
+    this.saveExpenses();
+    this.renderExpenses();
+    this.updateStats();
+    
+    // 記住最後使用的分類
+    localStorage.setItem('lastCategory', category);
+    
+    // 顯示成功動畫
+    this.showSuccessAnimation();
+    
+    return true;
+  }
+
+  deleteExpense(id) {
+    this.expenses = this.expenses.filter(e => e.id !== id);
+    this.saveExpenses();
+    this.renderExpenses();
+    this.updateStats();
+  }
+
+  editExpense(id) {
+    const expense = this.expenses.find(e => e.id === id);
+    if (!expense) return;
+    
+    // 填充到输入面板
+    tracker.currentAmount = expense.amount;
+    tracker.currentCategory = expense.category;
+    tracker.editingId = id;
+    
+    document.getElementById('amountDisplay').textContent = `$${expense.amount.toLocaleString()}`;
+    document.getElementById('expenseNote').value = expense.note || '';
+    
+    // 选中分类
+    document.querySelectorAll('.category-quick-btn').forEach(btn => {
+      btn.classList.remove('selected');
+      if (btn.dataset.category === expense.category) {
+        btn.classList.add('selected');
+      }
+    });
+    
+    // 选中金额按钮（如果匹配）
+    document.querySelectorAll('.quick-amount-btn').forEach(btn => {
+      btn.classList.remove('active');
+      const btnAmount = btn.textContent.replace('K', '000');
+      if (parseFloat(btnAmount) === expense.amount) {
+        btn.classList.add('active');
+      }
+    });
+    
+    tracker.updateSaveButton();
+    
+    // 打开面板
+    if (!document.getElementById('quickInputPanel').classList.contains('active')) {
+      toggleQuickInput();
+    }
+  }
+
+  renderExpenses() {
+    const list = document.getElementById('expenseList');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (this.expenses.length === 0) {
+      list.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+    
+    emptyState.classList.add('hidden');
+    
+    // 只顯示最近30筆
+    const recentExpenses = this.expenses.slice(0, 30);
+    
+    list.innerHTML = recentExpenses.map(expense => {
+      const date = new Date(expense.date);
+      const isToday = date.toDateString() === new Date().toDateString();
+      const dateStr = isToday ? '今天' : date.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' });
+      
+      return `
+        <div class="expense-item" data-id="${expense.id}">
+          <div class="flex items-center gap-2" onclick="tracker.editExpense('${expense.id}')" style="cursor:pointer;">
+            <div class="text-2xl">${this.categoryIcons[expense.category]}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="category-badge category-${expense.category}">
+                  ${this.categoryNames[expense.category]}
+                </span>
+                <span class="text-xs text-gray-500 whitespace-nowrap">${dateStr} ${expense.time || ''}</span>
+              </div>
+              ${expense.note ? `<div class="text-xs text-gray-400 mt-0.5 truncate">${expense.note}</div>` : ''}
+            </div>
+            <div class="text-right whitespace-nowrap">
+              <div class="text-lg font-bold text-gray-800">$${expense.amount.toLocaleString()}</div>
+            </div>
+            <button 
+              onclick="event.stopPropagation(); tracker.deleteExpense('${expense.id}')" 
+              class="text-red-500 text-xs px-1.5 py-0.5 active:opacity-70 bg-red-50 rounded px-2 py-1"
+            >
+              刪除
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  updateStats() {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    const todayTotal = this.expenses
+      .filter(e => new Date(e.date) >= today)
+      .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    
+    const weekTotal = this.expenses
+      .filter(e => new Date(e.date) >= weekStart)
+      .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    
+    const monthTotal = this.expenses
+      .filter(e => new Date(e.date) >= monthStart)
+      .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    
+    document.getElementById('todayTotal').textContent = `$${Math.round(todayTotal).toLocaleString()}`;
+    document.getElementById('weekTotal').textContent = `$${Math.round(weekTotal).toLocaleString()}`;
+    document.getElementById('monthTotal').textContent = `$${Math.round(monthTotal).toLocaleString()}`;
+  }
+
+  showSuccessAnimation() {
+    const btn = document.getElementById('saveBtn');
+    const originalText = btn.textContent;
+    if (this.editingId) {
+      btn.textContent = '✓ 已更新！';
+    } else {
+      btn.textContent = '✓ 已記錄！';
+    }
+    btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+    
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.style.background = '';
+      this.resetInput();
+    }, 1500);
+  }
+
+  resetInput() {
+    this.currentAmount = 0;
+    this.currentCategory = '';
+    this.editingId = null;
+    document.getElementById('amountDisplay').textContent = '$0';
+    document.getElementById('expenseAmount').value = '';
+    document.getElementById('expenseNote').value = '';
+    document.getElementById('customAmountInput').classList.add('hidden');
+    document.querySelectorAll('.category-quick-btn').forEach(btn => btn.classList.remove('selected'));
+    document.querySelectorAll('.quick-amount-btn').forEach(btn => btn.classList.remove('active'));
+    this.updateSaveButton();
+  }
+}
+
+// 全域變數
+let tracker;
+
+// 初始化
+document.addEventListener('DOMContentLoaded', () => {
+  tracker = new LazyExpenseTracker();
+});
+
+// 切換快速輸入面板
+function toggleQuickInput() {
+  const panel = document.getElementById('quickInputPanel');
+  const addBtn = document.getElementById('addBtn');
+  
+  if (panel.classList.contains('active')) {
+    panel.classList.remove('active');
+    addBtn.classList.remove('active');
+  } else {
+    panel.classList.add('active');
+    addBtn.classList.add('active');
+    // 如果有上次的分類，自動選中
+    if (tracker.lastCategory) {
+      setTimeout(() => tracker.selectCategory(tracker.lastCategory), 100);
+    }
+  }
+}
+
+// 設置快捷金額
+function setQuickAmount(amount) {
+  tracker.currentAmount = amount;
+  document.getElementById('amountDisplay').textContent = `$${amount.toLocaleString()}`;
+  document.getElementById('customAmountInput').classList.add('hidden');
+  
+  // 更新按鈕狀態
+  document.querySelectorAll('.quick-amount-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.textContent === amount.toString() || btn.textContent === `${amount/1000}K`) {
+      btn.classList.add('active');
+    }
+  });
+  
+  tracker.updateSaveButton();
+}
+
+// 打開自訂金額輸入
+function openAmountInput() {
+  document.getElementById('customAmountInput').classList.remove('hidden');
+  document.getElementById('expenseAmount').focus();
+  document.querySelectorAll('.quick-amount-btn').forEach(btn => btn.classList.remove('active'));
+}
+
+// 更新金額顯示
+function updateAmountDisplay(value) {
+  const amount = parseFloat(value) || 0;
+  tracker.currentAmount = amount;
+  document.getElementById('amountDisplay').textContent = `$${amount.toLocaleString()}`;
+  tracker.updateSaveButton();
+}
+
+// 選擇分類
+LazyExpenseTracker.prototype.selectCategory = function(category) {
+  this.currentCategory = category;
+  
+  document.querySelectorAll('.category-quick-btn').forEach(btn => {
+    btn.classList.remove('selected');
+    if (btn.dataset.category === category) {
+      btn.classList.add('selected');
+    }
+  });
+  
+  this.updateSaveButton();
+}
+
+// 全域選擇分類函數
+function selectCategory(category) {
+  if (tracker) {
+    tracker.selectCategory(category);
+  }
+}
+
+// 更新儲存按鈕狀態
+LazyExpenseTracker.prototype.updateSaveButton = function() {
+  const saveBtn = document.getElementById('saveBtn');
+  if (!saveBtn) return;
+  
+  if (this.currentAmount > 0 && this.currentCategory) {
+    saveBtn.disabled = false;
+    saveBtn.style.opacity = '1';
+    saveBtn.style.cursor = 'pointer';
+    saveBtn.style.pointerEvents = 'auto';
+  } else {
+    saveBtn.disabled = true;
+    saveBtn.style.opacity = '0.5';
+    saveBtn.style.cursor = 'not-allowed';
+    saveBtn.style.pointerEvents = 'none';
+  }
+}
+
+// 快速儲存
+function quickSave() {
+  if (!tracker) {
+    console.error('Tracker not initialized');
+    return;
+  }
+  
+  if (tracker.currentAmount > 0 && tracker.currentCategory) {
+    const note = document.getElementById('expenseNote').value || '';
+    const success = tracker.addExpense(tracker.currentAmount, tracker.currentCategory, note);
+    if (success) {
+      // 1.5秒後自動關閉面板
+      setTimeout(() => {
+        toggleQuickInput();
+      }, 1500);
+    } else {
+      alert('記錄失敗，請檢查金額和分類是否已選擇');
+    }
+  } else {
+    alert('請先選擇金額和分類');
+  }
+}
+
+// 顯示統計
+function showStats() {
+  const total = tracker.expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+  const count = tracker.expenses.length;
+  const avg = count > 0 ? (total / count).toFixed(0) : 0;
+  
+  // 計算分類統計
+  const categoryStats = {};
+  tracker.expenses.forEach(e => {
+    if (!categoryStats[e.category]) {
+      categoryStats[e.category] = { 
+        name: tracker.categoryNames[e.category], 
+        icon: tracker.categoryIcons[e.category],
+        amount: 0, 
+        count: 0 
+      };
+    }
+    categoryStats[e.category].amount += parseFloat(e.amount);
+    categoryStats[e.category].count += 1;
+  });
+  
+  // 排序分類（按金額）
+  const sortedCategories = Object.entries(categoryStats)
+    .sort((a, b) => b[1].amount - a[1].amount)
+    .map(([key, value]) => value);
+  
+  // 創建統計模態框
+  const modal = document.createElement('div');
+  modal.className = 'stats-modal';
+  modal.id = 'statsModal';
+  modal.innerHTML = `
+    <div class="stats-modal-content">
+      <div class="stats-modal-header">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <span>📊</span>
+          <span>記帳統計</span>
+        </h2>
+        <button onclick="closeStatsModal()" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">×</button>
+      </div>
+      
+      <div class="stats-modal-body">
+        <!-- 總覽卡片 -->
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          <div class="stat-card">
+            <div class="stat-card-label">總記錄</div>
+            <div class="stat-card-value">${count}</div>
+            <div class="stat-card-unit">筆</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">總支出</div>
+            <div class="stat-card-value">$${Math.round(total).toLocaleString()}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">平均</div>
+            <div class="stat-card-value">$${avg}</div>
+          </div>
+        </div>
+        
+        <!-- 期間統計 -->
+        <div class="period-stats mb-4">
+          <div class="period-stat-item">
+            <span class="period-label">今日</span>
+            <span class="period-value">$${document.getElementById('todayTotal').textContent.replace('$','')}</span>
+          </div>
+          <div class="period-stat-item">
+            <span class="period-label">本週</span>
+            <span class="period-value">$${document.getElementById('weekTotal').textContent.replace('$','')}</span>
+          </div>
+          <div class="period-stat-item">
+            <span class="period-label">本月</span>
+            <span class="period-value">$${document.getElementById('monthTotal').textContent.replace('$','')}</span>
+          </div>
+        </div>
+        
+        <!-- 分類統計 -->
+        ${sortedCategories.length > 0 ? `
+        <div class="category-stats">
+          <div class="category-stats-title">📈 分類統計</div>
+          <div class="category-stats-list">
+            ${sortedCategories.map((cat, index) => {
+              const percentage = total > 0 ? ((cat.amount / total) * 100).toFixed(1) : 0;
+              const barWidth = percentage + '%';
+              return `
+                <div class="category-stat-item">
+                  <div class="category-stat-header">
+                    <div class="category-stat-info">
+                      <span class="category-icon">${cat.icon}</span>
+                      <span class="category-name">${cat.name}</span>
+                      <span class="category-count">${cat.count}筆</span>
+                    </div>
+                    <div class="category-amount">$${Math.round(cat.amount).toLocaleString()}</div>
+                  </div>
+                  <div class="category-stat-bar">
+                    <div class="category-stat-bar-fill" style="width: ${barWidth}; background: ${getCategoryColor(cat.name)}"></div>
+                    <span class="category-percentage">${percentage}%</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+        ` : '<div class="text-center text-gray-400 py-4">還沒有分類數據</div>'}
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  setTimeout(() => modal.classList.add('active'), 10);
+  
+  // 點擊外部關閉
+  modal.addEventListener('click', (e) => {
+    if (e.target.id === 'statsModal') {
+      closeStatsModal();
+    }
+  });
+}
+
+function closeStatsModal() {
+  const modal = document.getElementById('statsModal');
+  if (modal) {
+    modal.classList.remove('active');
+    setTimeout(() => modal.remove(), 300);
+  }
+}
+
+function getCategoryColor(categoryName) {
+  const colors = {
+    '餐飲': 'linear-gradient(135deg, #fef3c7, #fde68a)',
+    '交通': 'linear-gradient(135deg, #dbeafe, #93c5fd)',
+    '購物': 'linear-gradient(135deg, #fce7f3, #f9a8d4)',
+    '娛樂': 'linear-gradient(135deg, #e0e7ff, #a5b4fc)',
+    '帳單': 'linear-gradient(135deg, #dcfce7, #86efac)',
+    '醫療': 'linear-gradient(135deg, #fee2e2, #fca5a5)',
+    '其他': 'linear-gradient(135deg, #f3f4f6, #d1d5db)'
+  };
+  return colors[categoryName] || 'linear-gradient(135deg, #6366f1, #8b5cf6)';
+}
+
+// 點擊面板外部關閉
+document.getElementById('quickInputPanel').addEventListener('click', (e) => {
+  if (e.target.id === 'quickInputPanel') {
+    toggleQuickInput();
+  }
+});
+
+// Enter 鍵快速儲存
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.getElementById('quickInputPanel').classList.contains('active')) {
+    const amountInput = document.getElementById('expenseAmount');
+    if (document.activeElement === amountInput) {
+      quickSave();
+    }
+  }
+});
+</script>
+</body>
+</html>

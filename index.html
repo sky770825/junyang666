@@ -2321,8 +2321,8 @@
                         📊 房產資訊參考 <span style="font-size: 0.8rem;">▼</span>
                     </button>
                     <div id="propertyInfoMenu" style="position: absolute; top: 100%; left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 250px; z-index: 1000; display: none; margin-top: 0.5rem; overflow: hidden;">
-                        <a href="https://drive.google.com/file/d/1NddGgXcysK-QRoozRA4XXww6c-NUv-OJ/view?usp=drive_link" target="_blank" style="display: block; padding: 0.8rem 1rem; color: #2c3e50; text-decoration: none; border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease; font-size: 0.9rem;">
-                            📈 楊梅優勢簡報
+                        <a href="https://drive.google.com/file/d/1NddGgXcysK-QRoozRA4XXww6c-NUv-OJ/view?usp=sharing" target="_blank" style="display: block; padding: 0.8rem 1rem; color: #2c3e50; text-decoration: none; border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease; font-size: 0.9rem;">
+                            📈 2026年楊梅趨勢引擊
                         </a>
                         <a href="https://drive.google.com/file/d/1PeGDx2IruOjWkeIHgVVqpk0tceB0l7Vg/view?usp=drive_link" target="_blank" style="display: block; padding: 0.8rem 1rem; color: #2c3e50; text-decoration: none; border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease; font-size: 0.9rem;">
                             🏦 新青安寬鬆政策
@@ -2607,100 +2607,28 @@
     <script src="main-script.js"></script>
     
     <script>
-        // ✅ 模組化版本標識
-        console.log('✅ 模組化版本已載入 - 所有功能已拆分成模組');
-        console.log('📦 模組列表: property-data.js, property-modals.js, pagination-system.js, main-script.js');
-        console.log('🎨 樣式狀態: 100%保留在HTML中，與原版完全相同');
-        
+        // ✅ 模組化版本初始化
         // 🔥 初始化已售物件分頁系統
         let soldPaginationSystem;
         
-        // 🔍 調試：檢查模組載入狀態
-        setTimeout(() => {
-            console.log('\n🔍 模組載入狀態檢查：');
-            console.log('embeddedPropertiesData:', typeof embeddedPropertiesData !== 'undefined' ? '✅ 已載入 (' + embeddedPropertiesData.properties.length + ' 個物件)' : '❌ 未定義');
-            console.log('EmbeddedPropertyPaginationSystem:', typeof EmbeddedPropertyPaginationSystem !== 'undefined' ? '✅ 已載入' : '❌ 未定義');
-            console.log('SoldPropertyPaginationSystem:', typeof SoldPropertyPaginationSystem !== 'undefined' ? '✅ 已載入' : '❌ 未定義');
-            console.log('showPropertyDetails:', typeof showPropertyDetails !== 'undefined' ? '✅ 已載入' : '❌ 未定義');
-            console.log('adjustTitleFontSize:', typeof adjustTitleFontSize !== 'undefined' ? '✅ 已載入' : '❌ 未定義');
-            
+        // 頁面載入完成後初始化已售物件分頁系統
+        document.addEventListener('DOMContentLoaded', function() {
             // 初始化已售物件分頁系統
             if (typeof SoldPropertyPaginationSystem !== 'undefined') {
                 soldPaginationSystem = new SoldPropertyPaginationSystem();
-                console.log('🏠 已售物件分頁系統已初始化');
             }
-            
-            // 檢查DOM元素
-            const grid = document.querySelector('.properties-grid');
-            console.log('.properties-grid 元素:', grid ? '✅ 存在' : '❌ 不存在');
-            if (grid) {
-                const cards = grid.querySelectorAll('.property-card');
-                console.log('卡片數量:', cards.length);
-                if (cards.length === 0) {
-                    console.error('❌ 沒有渲染任何卡片！請檢查分頁系統初始化');
-                }
-            }
-            
-            // 檢查已售物件容器
-            const soldGrid = document.getElementById('sold-properties-container');
-            console.log('#sold-properties-container 元素:', soldGrid ? '✅ 存在' : '❌ 不存在');
-            if (soldGrid) {
-                const soldCards = soldGrid.querySelectorAll('.sold-property-card');
-                console.log('已售卡片數量:', soldCards.length);
-            }
-        }, 1000);
+        });
         
-        // 🔥 智能調整標題字體大小函數 - 確保文字完全適應卡片寬度
-        function adjustTitleFontSize() {
-            const titles = document.querySelectorAll('.property-title');
-            titles.forEach(title => {
-                // 獲取容器的實際可用寬度
-                const container = title.parentElement;
-                const containerWidth = container.offsetWidth - 40; // 減去padding和邊距
-                
-                // 重置字體大小
-                title.style.fontSize = '';
-                
-                // 從較大字體開始
-                let fontSize = 1.3;
-                title.style.fontSize = fontSize + 'rem';
-                
-                // 創建一個臨時元素來測量文字寬度
-                const tempElement = document.createElement('span');
-                tempElement.style.cssText = `
-                    position: absolute;
-                    visibility: hidden;
-                    white-space: nowrap;
-                    font-size: ${fontSize}rem;
-                    font-weight: 600;
-                    font-family: inherit;
-                `;
-                tempElement.textContent = title.textContent;
-                document.body.appendChild(tempElement);
-                
-                // 逐步縮小字體直到適合容器寬度
-                while (tempElement.offsetWidth > containerWidth && fontSize > 0.5) {
-                    fontSize -= 0.05;
-                    tempElement.style.fontSize = fontSize + 'rem';
-                }
-                
-                // 應用最終字體大小
-                title.style.fontSize = fontSize + 'rem';
-                
-                // 清理臨時元素
-                document.body.removeChild(tempElement);
-            });
+        // 🔍 開發模式調試（生產環境可移除）
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('✅ 模組化版本已載入');
+            setTimeout(() => {
+                console.log('🔍 模組載入狀態：');
+                console.log('- embeddedPropertiesData:', typeof embeddedPropertiesData !== 'undefined' ? '✅' : '❌');
+                console.log('- EmbeddedPropertyPaginationSystem:', typeof EmbeddedPropertyPaginationSystem !== 'undefined' ? '✅' : '❌');
+                console.log('- SoldPropertyPaginationSystem:', typeof SoldPropertyPaginationSystem !== 'undefined' ? '✅' : '❌');
+            }, 1000);
         }
-        
-        // 頁面載入完成後執行
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(adjustTitleFontSize, 500);
-        });
-        
-        // 視窗大小改變時重新調整
-        window.addEventListener('resize', function() {
-            setTimeout(adjustTitleFontSize, 100);
-        });
     </script>
 </body>
 </html>

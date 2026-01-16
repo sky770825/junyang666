@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拜拜專區 - 濬瑒房產生活平台</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --grad:linear-gradient(135deg,#8b5cf6,#a855f7);
+  --grad-secondary:linear-gradient(135deg,#f59e0b,#ef4444);
+  --grad-success:linear-gradient(135deg,#10b981,#059669);
+  --grad-warning:linear-gradient(135deg,#f59e0b,#d97706);
+  --grad-info:linear-gradient(135deg,#3b82f6,#1d4ed8);
+  --glass-bg:rgba(255,255,255,0.6);
+  --glass-dark:rgba(30,30,30,0.6);
+  --shadow-light:0 4px 12px rgba(0,0,0,.1);
+  --shadow-hover:0 6px 16px rgba(0,0,0,.15);
+  --shadow-glow:0 0 20px rgba(139,92,246,0.3);
+  --border-radius:1rem;
+  --transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body{
+  background:linear-gradient(to bottom,#f0f4ff,#fff);
+  transition:var(--transition);
+  font-family:system-ui,-apple-system,sans-serif;
+  line-height:1.6;
+}
+
+body.dark{
+  background:linear-gradient(to bottom,#0f172a,#1e293b);
+  color:#e2e8f0;
+}
+
+.glass-card{
+  background:var(--glass-bg);
+  backdrop-filter:blur(10px);
+  border-radius:var(--border-radius);
+  border:1px solid rgba(255,255,255,0.2);
+}
+
+body.dark .glass-card{
+  background:var(--glass-dark);
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+.worship-card{
+  text-align:center;
+  padding:1rem;
+  border-radius:var(--border-radius);
+  box-shadow:var(--shadow-light);
+  cursor:pointer;
+  transition:var(--transition);
+  min-height:80px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-weight:500;
+  font-size:0.875rem;
+}
+
+.worship-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 25px rgba(0,0,0,0.2);
+  filter:brightness(1.1);
+}
+
+.worship-card:focus{
+  outline:2px solid #8b5cf6;
+  outline-offset:2px;
+}
+
+/* 拜拜專區配色方案 */
+.worship-card.temple{
+  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.worship-card.prayer{
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+}
+
+.worship-card.festival{
+  background: linear-gradient(135deg, #dc143c 0%, #b22222 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+}
+
+.worship-card.guide{
+  background: linear-gradient(135deg, #2f4f4f 0%, #36454f 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(47, 79, 79, 0.3);
+}
+
+.worship-card.calendar{
+  background: linear-gradient(135deg, #4682b4 0%, #5f9ea0 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(70, 130, 180, 0.3);
+}
+
+.worship-card.offering{
+  background: linear-gradient(135deg, #228b22 0%, #32cd32 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(34, 139, 34, 0.3);
+}
+
+#themeToggle{
+  position:fixed;
+  top:0.75rem;
+  right:0.75rem;
+  background:linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  color:#fff;
+  border:none;
+  padding:.4rem .6rem;
+  border-radius:9999px;
+  z-index:50;
+  transition:var(--transition);
+  cursor:pointer;
+  font-size:1rem;
+  box-shadow:0 4px 15px rgba(212, 175, 55, 0.3);
+  max-width: calc(100vw - 1.5rem);
+}
+
+#themeToggle:hover{
+  transform:scale(1.1);
+}
+
+@media (max-width: 640px) {
+  #themeToggle {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  button[onclick="history.back()"] {
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* 動畫效果 */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+.glow-animation {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* 模態框樣式 */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: #ffffff;
+  margin: 5% auto;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e5e7eb;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+body.dark .modal-content {
+  background: #1f2937;
+  border: 1px solid #374151;
+  color: #e5e7eb;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+body.dark .modal-title {
+  color: #f9fafb;
+}
+
+.close {
+  color: #aaa;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+}
+
+body.dark .close:hover,
+body.dark .close:focus {
+  color: #fff;
+}
+
+.modal-body {
+  line-height: 1.6;
+  color: #374151;
+}
+
+body.dark .modal-body {
+  color: #d1d5db;
+}
+
+.modal-section {
+  margin-bottom: 1.5rem;
+}
+
+.modal-section h4 {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #8b4513;
+}
+
+body.dark .modal-section h4 {
+  color: #d4af37;
+}
+
+.modal-list {
+  list-style: none;
+  padding: 0;
+}
+
+.modal-list li {
+  padding: 0.25rem 0;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.modal-list li:before {
+  content: "•";
+  color: #8b4513;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+body.dark .modal-list li:before {
+  color: #d4af37;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 底部導航樣式 */
+.bottom-nav {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body.dark .bottom-nav {
+  background: rgba(30, 30, 30, 0.8);
+  border-color: #374151;
+}
+
+
+/* 響應式設計 */
+@media (max-width: 640px) {
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .worship-card {
+    min-height: 70px;
+    padding: 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .modal-content {
+    margin: 10% auto;
+    padding: 1.5rem;
+    width: 95%;
+  }
+  
+  .modal-title {
+    font-size: 1.1rem;
+  }
+  
+  header {
+    padding-top: 3rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  
+  main {
+    padding-bottom: 6rem !important;
+  }
+  
+  .bottom-nav {
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .bottom-nav button {
+    flex: 1;
+    min-width: 0;
+    padding: 0.25rem 0.1rem;
+    font-size: 0.7rem;
+  }
+  
+  .bottom-nav button span:first-child {
+    font-size: 1rem;
+    margin-bottom: 0.125rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-cols-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- 主題切換 -->
+<button id="themeToggle" aria-label="切換主題模式">🌞</button>
+
+<!-- 返回按鈕 -->
+<button onclick="history.back()" class="fixed top-3 left-3 bg-white shadow-lg rounded-full p-2.5 z-50 hover:scale-105 transition" style="max-width: calc(100vw - 4rem);">
+  ←
+</button>
+
+<!-- 標題區 -->
+<header class="text-white text-center py-8 shadow-lg relative overflow-hidden" style="background:linear-gradient(135deg, #8b4513 0%, #d4af37 50%, #b8860b 100%); padding-top: 3.5rem;">
+  <div class="absolute inset-0 opacity-20">
+    <div class="absolute top-4 left-4 text-4xl float-animation">🙏</div>
+    <div class="absolute top-8 right-8 text-3xl float-animation" style="animation-delay: 0.5s;">🕯️</div>
+    <div class="absolute bottom-6 left-12 text-2xl float-animation" style="animation-delay: 1s;">🌸</div>
+    <div class="absolute bottom-4 right-4 text-3xl float-animation" style="animation-delay: 1.5s;">🏮</div>
+  </div>
+  
+  <div class="relative z-10">
+    <h1 class="text-3xl font-bold">🙏 拜拜專區</h1>
+    <p class="text-sm opacity-90 mt-2">心誠則靈｜祈福平安｜傳統文化</p>
+    <div class="mt-3 text-yellow-200 animate-pulse">
+      <span class="text-lg">🕯️ 虔誠祈福，平安順遂 🕯️</span>
+    </div>
+  </div>
+</header>
+
+<main class="px-4 py-4 space-y-6" style="padding-bottom: 5rem;">
+
+<!-- 📖 拜拜指南 -->
+<section class="glass-card p-4 shadow">
+  <h2 class="text-lg font-semibold mb-3">📖 拜拜指南</h2>
+  <div class="grid grid-cols-3 gap-3">
+    <div class="worship-card guide" onclick="showWorshipGuide('基本禮儀')">
+      <div class="text-2xl mb-1">🙏</div>
+      <div>基本禮儀</div>
+    </div>
+    <div class="worship-card guide" onclick="showWorshipGuide('拜拜流程')">
+      <div class="text-2xl mb-1">📋</div>
+      <div>拜拜流程</div>
+    </div>
+    <div class="worship-card guide" onclick="showWorshipGuide('注意事項')">
+      <div class="text-2xl mb-1">⚠️</div>
+      <div>注意事項</div>
+    </div>
+  </div>
+</section>
+
+<!-- 📅 拜拜日曆 -->
+<section class="glass-card p-4 shadow">
+  <h2 class="text-lg font-semibold mb-3">📅 拜拜日曆</h2>
+  <div class="grid grid-cols-4 gap-3">
+    <div class="worship-card calendar" onclick="showWorshipCalendar()">
+      <div class="text-2xl mb-1">📅</div>
+      <div>拜拜日曆</div>
+    </div>
+    <div class="worship-card calendar" onclick="showGoodDays()">
+      <div class="text-2xl mb-1">✨</div>
+      <div>吉日查詢</div>
+    </div>
+    <div class="worship-card calendar" onclick="showBadDays()">
+      <div class="text-2xl mb-1">⚠️</div>
+      <div>忌日提醒</div>
+    </div>
+    <div class="worship-card calendar" onclick="showMonthlyEvents()">
+      <div class="text-2xl mb-1">🗓️</div>
+      <div>本月活動</div>
+    </div>
+  </div>
+</section>
+
+<!-- 🏛️ 廟宇資訊 -->
+<section class="glass-card p-4 shadow">
+  <h2 class="text-lg font-semibold mb-3">🏛️ 廟宇資訊</h2>
+  <div class="grid grid-cols-3 gap-3">
+    <div class="worship-card temple" onclick="showTempleInfo('龍潭龍元宮')">
+      <div class="text-2xl mb-1">🏛️</div>
+      <div>龍潭龍元宮</div>
+    </div>
+    <div class="worship-card temple" onclick="showTempleInfo('楊梅三元宮')">
+      <div class="text-2xl mb-1">🏛️</div>
+      <div>楊梅三元宮</div>
+    </div>
+    <div class="worship-card temple" onclick="showTempleInfo('楊梅昊天宮')">
+      <div class="text-2xl mb-1">🏛️</div>
+      <div>楊梅昊天宮</div>
+    </div>
+    <div class="worship-card temple" onclick="showTempleInfo('平鎮褒忠祠')">
+      <div class="text-2xl mb-1">🏛️</div>
+      <div>平鎮褒忠祠</div>
+    </div>
+    <div class="worship-card temple" onclick="showTempleInfo('楊梅錫福宮')">
+      <div class="text-2xl mb-1">🏛️</div>
+      <div>楊梅錫福宮</div>
+    </div>
+    <div class="worship-card temple" onclick="showTempleInfo('龍潭南天宮')">
+      <div class="text-2xl mb-1">🏛️</div>
+      <div>龍潭南天宮</div>
+    </div>
+  </div>
+</section>
+
+<!-- 🙏 祈福服務 -->
+<section class="glass-card p-4 shadow">
+  <h2 class="text-lg font-semibold mb-3">🙏 祈福服務</h2>
+  <div class="grid grid-cols-4 gap-3">
+    <div class="worship-card prayer" onclick="showPrayerGuide('事業')">
+      <div class="text-2xl mb-1">💼</div>
+      <div>事業祈福</div>
+    </div>
+    <div class="worship-card prayer" onclick="showPrayerGuide('健康')">
+      <div class="text-2xl mb-1">❤️</div>
+      <div>健康祈福</div>
+    </div>
+    <div class="worship-card prayer" onclick="showPrayerGuide('學業')">
+      <div class="text-2xl mb-1">📚</div>
+      <div>學業祈福</div>
+    </div>
+    <div class="worship-card prayer" onclick="showPrayerGuide('感情')">
+      <div class="text-2xl mb-1">💕</div>
+      <div>感情祈福</div>
+    </div>
+    <div class="worship-card prayer" onclick="showPrayerGuide('財運')">
+      <div class="text-2xl mb-1">💰</div>
+      <div>財運祈福</div>
+    </div>
+    <div class="worship-card prayer" onclick="showPrayerGuide('平安')">
+      <div class="text-2xl mb-1">🛡️</div>
+      <div>平安祈福</div>
+    </div>
+    <div class="worship-card prayer" onclick="showPrayerGuide('家庭')">
+      <div class="text-2xl mb-1">👨‍👩‍👧‍👦</div>
+      <div>家庭祈福</div>
+    </div>
+    <div class="worship-card prayer" onclick="showPrayerGuide('考試')">
+      <div class="text-2xl mb-1">📝</div>
+      <div>考試祈福</div>
+    </div>
+  </div>
+</section>
+
+<!-- 🎊 節慶活動 -->
+<section class="glass-card p-4 shadow">
+  <h2 class="text-lg font-semibold mb-3">🎊 節慶活動</h2>
+  <div class="grid grid-cols-4 gap-3">
+    <div class="worship-card festival" onclick="showFestivalInfo('春節')">
+      <div class="text-2xl mb-1">🧧</div>
+      <div>春節</div>
+    </div>
+    <div class="worship-card festival" onclick="showFestivalInfo('元宵')">
+      <div class="text-2xl mb-1">🏮</div>
+      <div>元宵節</div>
+    </div>
+    <div class="worship-card festival" onclick="showFestivalInfo('清明')">
+      <div class="text-2xl mb-1">🌿</div>
+      <div>清明節</div>
+    </div>
+    <div class="worship-card festival" onclick="showFestivalInfo('端午')">
+      <div class="text-2xl mb-1">🐲</div>
+      <div>端午節</div>
+    </div>
+    <div class="worship-card festival" onclick="showFestivalInfo('中元')">
+      <div class="text-2xl mb-1">👻</div>
+      <div>中元節</div>
+    </div>
+    <div class="worship-card festival" onclick="showFestivalInfo('中秋')">
+      <div class="text-2xl mb-1">🌕</div>
+      <div>中秋節</div>
+    </div>
+    <div class="worship-card festival" onclick="showFestivalInfo('重陽')">
+      <div class="text-2xl mb-1">🍂</div>
+      <div>重陽節</div>
+    </div>
+    <div class="worship-card festival" onclick="showFestivalInfo('冬至')">
+      <div class="text-2xl mb-1">❄️</div>
+      <div>冬至</div>
+    </div>
+  </div>
+</section>
+
+<!-- 🎁 供品指南 -->
+<section class="glass-card p-4 shadow">
+  <h2 class="text-lg font-semibold mb-3">🎁 供品指南</h2>
+  <div class="grid grid-cols-4 gap-3">
+    <div class="worship-card offering" onclick="showOfferingGuide('水果')">
+      <div class="text-2xl mb-1">🍎</div>
+      <div>水果供品</div>
+    </div>
+    <div class="worship-card offering" onclick="showOfferingGuide('鮮花')">
+      <div class="text-2xl mb-1">🌸</div>
+      <div>鮮花供品</div>
+    </div>
+    <div class="worship-card offering" onclick="showOfferingGuide('香燭')">
+      <div class="text-2xl mb-1">🕯️</div>
+      <div>香燭供品</div>
+    </div>
+    <div class="worship-card offering" onclick="showOfferingGuide('金紙')">
+      <div class="text-2xl mb-1">📜</div>
+      <div>金紙供品</div>
+    </div>
+    <div class="worship-card offering" onclick="showOfferingGuide('素食')">
+      <div class="text-2xl mb-1">🥬</div>
+      <div>素食供品</div>
+    </div>
+    <div class="worship-card offering" onclick="showOfferingGuide('甜點')">
+      <div class="text-2xl mb-1">🍰</div>
+      <div>甜點供品</div>
+    </div>
+    <div class="worship-card offering" onclick="showOfferingGuide('茶酒')">
+      <div class="text-2xl mb-1">🍵</div>
+      <div>茶酒供品</div>
+    </div>
+    <div class="worship-card offering" onclick="showOfferingGuide('其他')">
+      <div class="text-2xl mb-1">🎁</div>
+      <div>其他供品</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- 📍 底部導航 -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 flex justify-around py-2 bottom-nav z-50" role="navigation" aria-label="主要導航">
+  <button onclick="window.location.href='index.html'" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="回到首頁">
+    <span class="text-lg mb-1">🏠</span><span>首頁</span>
+  </button>
+  <button onclick="openTool('expense-tracker.html')" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="記帳">
+    <span class="text-lg mb-1">📝</span><span>記帳</span>
+  </button>
+  <button onclick="openTool('games.html')" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="遊戲大廳">
+    <span class="text-lg mb-1">🎮</span><span>遊戲</span>
+  </button>
+  <button onclick="openTool('local-life.html')" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="在地生活">
+    <span class="text-lg mb-1">🍹</span><span>生活</span>
+  </button>
+  <button class="flex flex-col items-center text-indigo-600 text-xs font-semibold px-3 py-2 min-w-[60px]" aria-label="拜拜專區">
+    <span class="text-lg mb-1">🙏</span><span>拜拜</span>
+  </button>
+</nav>
+
+<!-- 模態框 -->
+<div id="worshipModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">標題</h2>
+      <span class="close" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- 內容將在這裡動態插入 -->
+    </div>
+  </div>
+</div>
+
+<script>
+// 主題切換
+document.getElementById('themeToggle').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '🌙' : '🌞';
+});
+
+// 模態框功能
+function showModal(title, content) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = content;
+  document.getElementById('worshipModal').style.display = 'block';
+  document.body.style.overflow = 'hidden'; // 防止背景滾動
+}
+
+function closeModal() {
+  document.getElementById('worshipModal').style.display = 'none';
+  document.body.style.overflow = 'auto'; // 恢復滾動
+}
+
+// 點擊模態框外部關閉
+window.onclick = function(event) {
+  const modal = document.getElementById('worshipModal');
+  if (event.target === modal) {
+    closeModal();
+  }
+}
+
+// ESC鍵關閉模態框
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeModal();
+  }
+});
+
+// 工具開啟功能（用於底部導航）
+function openTool(url) {
+  if (url.startsWith('http')) {
+    // 檢測是否為手機版
+    const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // 手機版：在當前視窗打開外部連結
+      window.location.href = url;
+    } else {
+      // 桌面版：在新視窗打開外部連結
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  } else {
+    // 內部連結在原視窗打開
+    window.location.href = url;
+  }
+}
+
+
+// 廟宇資訊
+function showTempleInfo(templeName) {
+  const temples = {
+    '龍潭龍元宮': {
+      address: '桃園市龍潭區東龍路246號',
+      phone: '03-479-2025',
+      hours: '06:00-21:00',
+      god: '五穀神農大帝',
+      special: '求事業、求健康、求平安',
+      area: '龍潭區',
+      popularity: '最熱門'
+    },
+    '楊梅三元宮': {
+      address: '桃園市楊梅區三元街1號',
+      phone: '03-478-1234',
+      hours: '06:00-21:00',
+      god: '三官大帝',
+      special: '求財運、求事業、求平安',
+      area: '楊梅區',
+      popularity: '最熱門'
+    },
+    '楊梅昊天宮': {
+      address: '桃園市楊梅區楊新路一段123號',
+      phone: '03-478-5678',
+      hours: '06:00-20:00',
+      god: '玉皇大帝',
+      special: '求事業、求健康、求平安',
+      area: '楊梅區',
+      popularity: '熱門'
+    },
+    '平鎮褒忠祠': {
+      address: '桃園市平鎮區復旦路二段23巷8號',
+      phone: '03-492-1234',
+      hours: '06:00-20:00',
+      god: '義民爺',
+      special: '求平安、求健康、求事業',
+      area: '平鎮區',
+      popularity: '熱門'
+    },
+    '楊梅錫福宮': {
+      address: '桃園市楊梅區新農街337號',
+      phone: '03-478-9012',
+      hours: '06:00-21:00',
+      god: '三官大帝',
+      special: '求財運、求事業、求平安',
+      area: '楊梅區',
+      popularity: '一般'
+    },
+    '龍潭南天宮': {
+      address: '桃園市龍潭區中正路210號',
+      phone: '03-479-3456',
+      hours: '06:00-20:00',
+      god: '關聖帝君',
+      special: '求事業、求財運、求健康',
+      area: '龍潭區',
+      popularity: '一般'
+    }
+  };
+  
+  const temple = temples[templeName];
+  const popularityColor = temple.popularity === '最熱門' ? '#ef4444' : temple.popularity === '熱門' ? '#f59e0b' : '#6b7280';
+  const content = `
+    <div class="modal-section">
+      <h4>🏛️ ${templeName}</h4>
+      <ul class="modal-list">
+        <li><strong>📍 地址：</strong>${temple.address}</li>
+        <li><strong>📞 電話：</strong>${temple.phone}</li>
+        <li><strong>🕐 開放時間：</strong>${temple.hours}</li>
+        <li><strong>🙏 主神：</strong>${temple.god}</li>
+        <li><strong>✨ 特色：</strong>${temple.special}</li>
+        <li><strong>🏘️ 地區：</strong>${temple.area}</li>
+        <li><strong>🔥 熱門度：</strong><span style="color: ${popularityColor}; font-weight: bold;">${temple.popularity}</span></li>
+      </ul>
+    </div>
+  `;
+  showModal(`🏛️ ${templeName}`, content);
+}
+
+// 祈福指南
+function showPrayerGuide(type) {
+  const prayers = {
+    '事業': {
+      icon: '💼',
+      title: '事業祈福',
+      method: ['準備鮮花、水果、香燭', '誠心祈求事業順利', '可準備事業相關物品'],
+      prayer: '「祈求神明保佑事業順利，工作穩定，升遷順利」'
+    },
+    '健康': {
+      icon: '❤️',
+      title: '健康祈福',
+      method: ['準備鮮花、水果、香燭', '誠心祈求身體健康', '可準備健康相關物品'],
+      prayer: '「祈求神明保佑身體健康，疾病遠離，平安順遂」'
+    },
+    '學業': {
+      icon: '📚',
+      title: '學業祈福',
+      method: ['準備鮮花、水果、香燭', '誠心祈求學業進步', '可準備文具用品'],
+      prayer: '「祈求神明保佑學業進步，考試順利，金榜題名」'
+    },
+    '感情': {
+      icon: '💕',
+      title: '感情祈福',
+      method: ['準備鮮花、水果、香燭', '誠心祈求感情順利', '可準備紅線或相關物品'],
+      prayer: '「祈求神明保佑感情順利，姻緣美滿，幸福快樂」'
+    },
+    '財運': {
+      icon: '💰',
+      title: '財運祈福',
+      method: ['準備鮮花、水果、香燭', '誠心祈求財運亨通', '可準備金元寶或相關物品'],
+      prayer: '「祈求神明保佑財運亨通，投資順利，財源廣進」'
+    },
+    '平安': {
+      icon: '🛡️',
+      title: '平安祈福',
+      method: ['準備鮮花、水果、香燭', '誠心祈求平安順遂', '可準備平安符或相關物品'],
+      prayer: '「祈求神明保佑平安順遂，出入平安，萬事如意」'
+    },
+    '家庭': {
+      icon: '👨‍👩‍👧‍👦',
+      title: '家庭祈福',
+      method: ['準備鮮花、水果、香燭', '誠心祈求家庭和睦', '可準備家庭相關物品'],
+      prayer: '「祈求神明保佑家庭和睦，家人健康，幸福美滿」'
+    },
+    '考試': {
+      icon: '📝',
+      title: '考試祈福',
+      method: ['準備鮮花、水果、香燭', '誠心祈求考試順利', '可準備文具用品'],
+      prayer: '「祈求神明保佑考試順利，金榜題名，學業有成」'
+    }
+  };
+  
+  const prayer = prayers[type];
+  const content = `
+    <div class="modal-section">
+      <h4>${prayer.icon} ${prayer.title}</h4>
+      <div class="modal-section">
+        <h4>🙏 拜拜方式：</h4>
+        <ul class="modal-list">
+          ${prayer.method.map(item => `<li>${item}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="modal-section">
+        <h4>✨ 祈福詞：</h4>
+        <p style="font-style: italic; color: #4f46e5; padding: 0.5rem; background: rgba(79, 70, 229, 0.1); border-radius: 0.5rem; margin: 0;">${prayer.prayer}</p>
+      </div>
+    </div>
+  `;
+  showModal(`${prayer.icon} ${prayer.title}`, content);
+}
+
+// 節慶活動
+function showFestivalInfo(festival) {
+  const festivals = {
+    '春節': {
+      icon: '🧧',
+      title: '春節',
+      time: '農曆正月初一',
+      worship: ['拜天公、拜祖先', '祈求新年平安順利', '準備年糕、發糕等供品'],
+      customs: ['貼春聯、放鞭炮', '發紅包、拜年', '吃年夜飯、守歲']
+    },
+    '元宵': {
+      icon: '🏮',
+      title: '元宵節',
+      time: '農曆正月十五',
+      worship: ['拜天公、拜祖先', '祈求光明前程', '準備湯圓、燈籠等供品'],
+      customs: ['賞花燈、猜燈謎', '吃湯圓、放天燈', '舞龍舞獅表演']
+    },
+    '清明': {
+      icon: '🌿',
+      title: '清明節',
+      time: '國曆4月4-6日',
+      worship: ['掃墓祭祖', '祈求祖先保佑', '準備鮮花、水果等供品'],
+      customs: ['掃墓、祭祖', '踏青、放風箏', '吃潤餅、青團']
+    },
+    '端午': {
+      icon: '🐲',
+      title: '端午節',
+      time: '農曆五月初五',
+      worship: ['拜天公、拜祖先', '祈求健康平安', '準備粽子、艾草等供品'],
+      customs: ['吃粽子、划龍舟', '掛艾草、菖蒲', '喝雄黃酒']
+    },
+    '中元': {
+      icon: '👻',
+      title: '中元節',
+      time: '農曆七月十五',
+      worship: ['普渡好兄弟', '祈求平安順遂', '準備豐盛供品'],
+      customs: ['普渡、放水燈', '燒紙錢、放鞭炮', '吃平安米']
+    },
+    '中秋': {
+      icon: '🌕',
+      title: '中秋節',
+      time: '農曆八月十五',
+      worship: ['拜天公、拜祖先', '祈求團圓美滿', '準備月餅、柚子等供品'],
+      customs: ['賞月、吃月餅', '烤肉、放天燈', '猜燈謎']
+    },
+    '重陽': {
+      icon: '🍂',
+      title: '重陽節',
+      time: '農曆九月初九',
+      worship: ['拜天公、拜祖先', '祈求長壽健康', '準備菊花、重陽糕等供品'],
+      customs: ['登高、賞菊', '吃重陽糕、喝菊花酒', '敬老活動']
+    },
+    '冬至': {
+      icon: '❄️',
+      title: '冬至',
+      time: '國曆12月21-23日',
+      worship: ['拜天公、拜祖先', '祈求平安順遂', '準備湯圓、年糕等供品'],
+      customs: ['吃湯圓、補冬', '祭祖、拜神', '進補養生']
+    }
+  };
+  
+  const festivalInfo = festivals[festival];
+  const content = `
+    <div class="modal-section">
+      <h4>${festivalInfo.icon} ${festivalInfo.title}</h4>
+      <ul class="modal-list">
+        <li><strong>📅 時間：</strong>${festivalInfo.time}</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <h4>🙏 拜拜重點：</h4>
+      <ul class="modal-list">
+        ${festivalInfo.worship.map(item => `<li>${item}</li>`).join('')}
+      </ul>
+    </div>
+    <div class="modal-section">
+      <h4>✨ 傳統習俗：</h4>
+      <ul class="modal-list">
+        ${festivalInfo.customs.map(item => `<li>${item}</li>`).join('')}
+      </ul>
+    </div>
+  `;
+  showModal(`${festivalInfo.icon} ${festivalInfo.title}`, content);
+}
+
+// 拜拜日曆
+function showWorshipCalendar() {
+  const today = new Date();
+  const currentMonth = today.getMonth() + 1;
+  const currentYear = today.getFullYear();
+  const currentDate = today.getDate();
+  
+  // 獲取本月天數
+  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  
+  // 計算本月的拜拜日期（簡化版農曆轉換）
+  const getWorshipDates = (month, year) => {
+    const dates = [];
+    // 這裡使用簡化的農曆日期計算，實際應用中可以使用更精確的農曆轉換庫
+    const baseLunarDates = {
+      1: [1, 2, 9, 14, 15, 16], // 農曆正月的拜拜日
+      2: [1, 2, 9, 14, 15, 16], // 農曆二月的拜拜日
+      3: [1, 2, 9, 14, 15, 16], // 農曆三月的拜拜日
+      4: [1, 2, 9, 14, 15, 16], // 農曆四月的拜拜日
+      5: [1, 2, 9, 14, 15, 16], // 農曆五月的拜拜日
+      6: [1, 2, 9, 14, 15, 16], // 農曆六月的拜拜日
+      7: [1, 2, 9, 14, 15, 16], // 農曆七月的拜拜日
+      8: [1, 2, 9, 14, 15, 16], // 農曆八月的拜拜日
+      9: [1, 2, 9, 14, 15, 16], // 農曆九月的拜拜日
+      10: [1, 2, 9, 14, 15, 16], // 農曆十月的拜拜日
+      11: [1, 2, 9, 14, 15, 16], // 農曆十一月的拜拜日
+      12: [1, 2, 9, 14, 15, 16] // 農曆十二月的拜拜日
+    };
+    
+    const lunarDates = baseLunarDates[month] || [1, 2, 9, 14, 15, 16];
+    
+    lunarDates.forEach(day => {
+      if (day <= daysInMonth) {
+        const isToday = day === currentDate;
+        const worshipType = day === 1 || day === 15 ? '拜天公' : 
+                           day === 2 || day === 16 ? '拜土地公' :
+                           day === 9 ? '拜天公' : '拜祖先';
+        
+        dates.push({
+          date: day,
+          type: worshipType,
+          isToday: isToday
+        });
+      }
+    });
+    
+    return dates.sort((a, b) => a.date - b.date);
+  };
+  
+  const worshipDates = getWorshipDates(currentMonth, currentYear);
+  
+  // 獲取本月特別節日
+  const getMonthlyFestivals = (month) => {
+    const festivals = {
+      1: ['農曆正月初一：春節', '農曆正月十五：元宵節'],
+      2: ['農曆二月初二：土地公生日'],
+      3: ['國曆4月4-6日：清明節'],
+      4: ['農曆四月初八：佛誕日'],
+      5: ['農曆五月初五：端午節'],
+      6: ['農曆六月初六：天貺節'],
+      7: ['農曆七月十五：中元節'],
+      8: ['農曆八月十五：中秋節'],
+      9: ['農曆九月初九：重陽節'],
+      10: ['農曆十月初一：寒衣節'],
+      11: ['農曆十一月：冬至'],
+      12: ['農曆十二月初八：臘八節', '農曆十二月二十三：送神日']
+    };
+    
+    return festivals[month] || ['請查看節慶活動專區'];
+  };
+  
+  const monthlyFestivals = getMonthlyFestivals(currentMonth);
+  
+  const content = `
+    <div class="modal-section">
+      <h4>📅 ${currentYear}年${currentMonth}月拜拜日曆</h4>
+      <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem;">今天是 ${currentYear}年${currentMonth}月${currentDate}日</p>
+      
+      <div class="modal-section">
+        <h4>🙏 本月拜拜日期：</h4>
+        <ul class="modal-list">
+          ${worshipDates.map(item => `
+            <li style="${item.isToday ? 'background: #fef3c7; padding: 0.5rem; border-radius: 0.5rem; margin: 0.25rem 0;' : ''}">
+              <strong>${item.date}日</strong> - ${item.type}
+              ${item.isToday ? ' <span style="color: #f59e0b; font-weight: bold;">(今天)</span>' : ''}
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+      
+      <div class="modal-section">
+        <h4>✨ 本月特別節日：</h4>
+        <ul class="modal-list">
+          ${monthlyFestivals.map(festival => `<li>${festival}</li>`).join('')}
+        </ul>
+      </div>
+      
+      <div class="modal-section">
+        <h4>🕐 建議拜拜時間：</h4>
+        <ul class="modal-list">
+          <li>早上6-8點 (最佳時段)</li>
+          <li>下午2-4點 (次佳時段)</li>
+          <li>晚上6-8點 (一般時段)</li>
+        </ul>
+      </div>
+      
+      <div class="modal-section">
+        <h4>💡 拜拜提醒：</h4>
+        <ul class="modal-list">
+          <li>初一、十五是重要拜拜日，建議前往</li>
+          <li>初二、十六是土地公生日，求財運最佳</li>
+          <li>初九是天公生日，求事業運勢</li>
+          <li>避開雨天和身體不適時拜拜</li>
+        </ul>
+      </div>
+    </div>
+  `;
+  showModal('📅 拜拜日曆', content);
+}
+
+// 吉日查詢
+function showGoodDays() {
+  const today = new Date();
+  const currentMonth = today.getMonth() + 1;
+  const currentYear = today.getFullYear();
+  const currentDate = today.getDate();
+  
+  // 計算本月的吉日
+  const getGoodDays = (month, year) => {
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const goodDays = [];
+    
+    // 傳統吉日計算（簡化版）
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayOfWeek = new Date(year, month - 1, day).getDay();
+      let isGoodDay = false;
+      let level = '';
+      
+      // 初一、十五是大吉日
+      if (day === 1 || day === 15) {
+        isGoodDay = true;
+        level = '大吉';
+      }
+      // 初九是天公生
+      else if (day === 9) {
+        isGoodDay = true;
+        level = '大吉 (天公生)';
+      }
+      // 初二、十六是土地公生日
+      else if (day === 2 || day === 16) {
+        isGoodDay = true;
+        level = '吉 (土地公生日)';
+      }
+      // 初六、十八是一般吉日
+      else if (day === 6 || day === 18) {
+        isGoodDay = true;
+        level = '吉';
+      }
+      // 週日通常是好日子
+      else if (dayOfWeek === 0) {
+        isGoodDay = true;
+        level = '小吉';
+      }
+      
+      if (isGoodDay) {
+        goodDays.push({
+          date: day,
+          level: level,
+          isToday: day === currentDate
+        });
+      }
+    }
+    
+    return goodDays;
+  };
+  
+  const goodDays = getGoodDays(currentMonth, currentYear);
+  
+  const content = `
+    <div class="modal-section">
+      <h4>✨ ${currentYear}年${currentMonth}月吉日查詢</h4>
+      <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem;">今天是 ${currentYear}年${currentMonth}月${currentDate}日</p>
+      
+      <div class="modal-section">
+        <h4>📅 本月適合拜拜的吉日：</h4>
+        <ul class="modal-list">
+          ${goodDays.map(day => `
+            <li style="${day.isToday ? 'background: #fef3c7; padding: 0.5rem; border-radius: 0.5rem; margin: 0.25rem 0;' : ''}">
+              <strong>${day.date}日</strong> - ${day.level}
+              ${day.isToday ? ' <span style="color: #f59e0b; font-weight: bold;">(今天)</span>' : ''}
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+      
+      <div class="modal-section">
+        <h4>🌟 每日吉時：</h4>
+        <ul class="modal-list">
+          <li><strong>子時（23:00-01:00）</strong>：大吉 - 適合祈福</li>
+          <li><strong>卯時（05:00-07:00）</strong>：大吉 - 適合拜拜</li>
+          <li><strong>午時（11:00-13:00）</strong>：吉 - 適合祭拜</li>
+          <li><strong>酉時（17:00-19:00）</strong>：吉 - 適合還願</li>
+        </ul>
+      </div>
+      
+      <div class="modal-section">
+        <h4>💡 選擇吉日建議：</h4>
+        <ul class="modal-list">
+          <li>優先選擇初一、十五、初九等大吉日</li>
+          <li>選擇天氣晴朗、心情平靜的日子</li>
+          <li>避開雨天、颱風天和身體不適時</li>
+          <li>週末通常人較多，可選擇平日前往</li>
+        </ul>
+      </div>
+    </div>
+  `;
+  showModal('✨ 吉日查詢', content);
+}
+
+// 忌日提醒
+function showBadDays() {
+  const content = `
+    <div class="modal-section">
+      <h4>⚠️ 拜拜忌日提醒</h4>
+      <div class="modal-section">
+        <h4>❌ 不宜拜拜的日子：</h4>
+        <ul class="modal-list">
+          <li>農曆七月：鬼月，需特別注意</li>
+          <li>三娘煞日：初三、初七、十三、十八、廿二、廿七</li>
+          <li>四絕日：立春、立夏、立秋、立冬前一日</li>
+          <li>四離日：春分、夏至、秋分、冬至前一日</li>
+        </ul>
+      </div>
+      <div class="modal-section">
+        <h4>🚫 不宜拜拜的時間：</h4>
+        <ul class="modal-list">
+          <li>晚上11點後</li>
+          <li>午時（11-13點）正午</li>
+          <li>子時（23-01點）深夜</li>
+        </ul>
+      </div>
+      <div class="modal-section">
+        <h4>💡 注意事項：</h4>
+        <ul class="modal-list">
+          <li>身體不適時不宜拜拜</li>
+          <li>心情不佳時不宜拜拜</li>
+          <li>穿著不整齊時不宜拜拜</li>
+        </ul>
+      </div>
+    </div>
+  `;
+  showModal('⚠️ 忌日提醒', content);
+}
+
+// 本月活動
+function showMonthlyEvents() {
+  const today = new Date();
+  const currentMonth = today.getMonth() + 1;
+  const currentYear = today.getFullYear();
+  
+  // 獲取本月特別活動
+  const getMonthlyEvents = (month) => {
+    const events = {
+      1: [
+        '農曆正月初一：新春祈福法會',
+        '農曆正月十五：元宵節燈會',
+        '每週日：新春特別法會'
+      ],
+      2: [
+        '農曆二月初二：土地公生日慶典',
+        '每週六：春季祈福法會',
+        '每週日：誦經祈福活動'
+      ],
+      3: [
+        '國曆4月4-6日：清明節祭祖法會',
+        '每週日：春季超度法會',
+        '每月初一、十五：誦經祈福'
+      ],
+      4: [
+        '農曆四月初八：佛誕日慶典',
+        '每週日：春季祈福法會',
+        '每月初二、十六：土地公生日'
+      ],
+      5: [
+        '農曆五月初五：端午節祈福',
+        '每週日：夏季法會',
+        '每月初一、十五：誦經祈福'
+      ],
+      6: [
+        '農曆六月初六：天貺節慶典',
+        '每週日：夏季祈福法會',
+        '每月初二、十六：土地公生日'
+      ],
+      7: [
+        '農曆七月十五：中元節普渡法會',
+        '整個農曆七月：超度法會',
+        '每週日：中元節特別法會'
+      ],
+      8: [
+        '農曆八月十五：中秋節祈福',
+        '每週日：秋季法會',
+        '每月初一、十五：誦經祈福'
+      ],
+      9: [
+        '農曆九月初九：重陽節敬老法會',
+        '每週日：秋季祈福法會',
+        '每月初二、十六：土地公生日'
+      ],
+      10: [
+        '農曆十月初一：寒衣節法會',
+        '每週日：冬季法會',
+        '每月初一、十五：誦經祈福'
+      ],
+      11: [
+        '農曆十一月：冬至祈福法會',
+        '每週日：冬季祈福法會',
+        '每月初二、十六：土地公生日'
+      ],
+      12: [
+        '農曆十二月初八：臘八節法會',
+        '農曆十二月二十三：送神法會',
+        '每週日：歲末祈福法會'
+      ]
+    };
+    
+    return events[month] || [
+      '每週日：大型法會',
+      '每月初一、十五：誦經祈福',
+      '每月初二、十六：土地公生日'
+    ];
+  };
+  
+  const monthlyEvents = getMonthlyEvents(currentMonth);
+  
+  const content = `
+    <div class="modal-section">
+      <h4>🗓️ ${currentYear}年${currentMonth}月拜拜活動</h4>
+      <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem;">本月特別活動安排</p>
+      
+      <div class="modal-section">
+        <h4>🎊 本月特別活動：</h4>
+        <ul class="modal-list">
+          ${monthlyEvents.map(event => `<li>${event}</li>`).join('')}
+        </ul>
+      </div>
+      
+      <div class="modal-section">
+        <h4>🙏 固定活動：</h4>
+        <ul class="modal-list">
+          <li>每週日：大型法會 (上午9:00-11:00)</li>
+          <li>每月初一、十五：誦經祈福 (上午8:00-10:00)</li>
+          <li>每月初二、十六：土地公生日 (上午7:00-9:00)</li>
+          <li>每週三：晚課誦經 (晚上7:00-8:00)</li>
+        </ul>
+      </div>
+      
+      <div class="modal-section">
+        <h4>📞 活動諮詢：</h4>
+        <ul class="modal-list">
+          <li>龍潭龍元宮：03-479-2025</li>
+          <li>楊梅三元宮：03-478-1234</li>
+          <li>楊梅昊天宮：03-478-5678</li>
+          <li>平鎮褒忠祠：03-492-1234</li>
+        </ul>
+      </div>
+      
+      <div class="modal-section">
+        <h4>💡 參與提醒：</h4>
+        <ul class="modal-list">
+          <li>建議提前30分鐘到達</li>
+          <li>穿著整齊，避免過於暴露</li>
+          <li>保持安靜，尊重其他信眾</li>
+          <li>可準備鮮花、水果等供品</li>
+        </ul>
+      </div>
+    </div>
+  `;
+  showModal('🗓️ 本月活動', content);
+}
+
+// 供品指南
+function showOfferingGuide(type) {
+  const offerings = {
+    '水果': {
+      icon: '🍎',
+      title: '水果供品指南',
+      good: ['蘋果：平安', '橘子：吉利', '香蕉：招財', '鳳梨：旺來', '葡萄：多子多孫'],
+      bad: ['釋迦：像釋迦牟尼佛頭', '芭樂：籽多不易消化', '番茄：內部多籽'],
+      tips: ['選擇新鮮、完整的水果', '數量以奇數為佳', '清洗乾淨後再供奉']
+    },
+    '鮮花': {
+      icon: '🌸',
+      title: '鮮花供品指南',
+      good: ['百合：純潔、吉祥', '菊花：長壽、健康', '玫瑰：愛情、美麗', '康乃馨：母愛、溫馨', '蘭花：高雅、尊貴'],
+      bad: ['帶刺的花：如玫瑰需去刺', '有異味的花：如夜來香', '凋謝的花：不新鮮'],
+      tips: ['選擇新鮮、美麗的鮮花', '顏色以紅色、粉色為佳', '定期更換保持新鮮']
+    },
+    '香燭': {
+      icon: '🕯️',
+      title: '香燭供品指南',
+      good: ['檀香：清心安神', '沉香：驅邪避災', '線香：傳統香品', '蠟燭：光明指引'],
+      bad: ['劣質香：有害健康', '過粗的香：不易點燃', '有異味的香：不適宜'],
+      tips: ['選擇天然、無毒的香', '點燃後要完全燃燒', '注意消防安全']
+    },
+    '金紙': {
+      icon: '📜',
+      title: '金紙供品指南',
+      good: ['天公金：拜天公用', '土地公金：拜土地公用', '祖先金：拜祖先用', '財神金：求財用'],
+      bad: ['破損的金紙', '過期的金紙', '劣質的金紙'],
+      tips: ['選擇正規店家的金紙', '按照用途選擇正確的金紙', '焚燒時注意安全']
+    },
+    '素食': {
+      icon: '🥬',
+      title: '素食供品指南',
+      good: ['青菜：新鮮蔬菜', '豆腐：營養豐富', '香菇：香氣濃郁', '海帶：健康食材', '豆製品：蛋白質豐富'],
+      bad: ['過期變質的食物', '有異味的食物', '不新鮮的食物'],
+      tips: ['選擇新鮮、乾淨的素食', '烹調時不加蔥蒜', '保持食物原味']
+    },
+    '甜點': {
+      icon: '🍰',
+      title: '甜點供品指南',
+      good: ['蛋糕：慶祝用', '餅乾：傳統點心', '糖果：甜蜜象徵', '糕點：節慶用'],
+      bad: ['過期變質的甜點', '有異味的甜點', '不新鮮的甜點'],
+      tips: ['選擇新鮮、美味的甜點', '包裝要完整', '避免過度甜膩']
+    },
+    '茶酒': {
+      icon: '🍵',
+      title: '茶酒供品指南',
+      good: ['清茶：清香淡雅', '米酒：傳統酒品', '高粱酒：烈酒', '花茶：香氣怡人'],
+      bad: ['過期變質的茶酒', '有異味的茶酒', '劣質的茶酒'],
+      tips: ['選擇品質良好的茶酒', '茶要泡好，酒要倒滿', '注意保存期限']
+    },
+    '其他': {
+      icon: '🎁',
+      title: '其他供品指南',
+      good: ['米：五穀豐登', '鹽：驅邪避災', '糖：甜蜜生活', '油：光明指引', '水：清淨純潔'],
+      bad: ['過期變質的物品', '有異味的物品', '不潔淨的物品'],
+      tips: ['選擇乾淨、新鮮的物品', '包裝要完整', '注意保存期限']
+    }
+  };
+  
+  const offering = offerings[type];
+  const content = `
+    <div class="modal-section">
+      <h4>${offering.icon} ${offering.title}</h4>
+      <div class="modal-section">
+        <h4>✅ 適合的${type}：</h4>
+        <ul class="modal-list">
+          ${offering.good.map(item => `<li>${item}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="modal-section">
+        <h4>❌ 不宜的${type}：</h4>
+        <ul class="modal-list">
+          ${offering.bad.map(item => `<li>${item}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="modal-section">
+        <h4>💡 注意事項：</h4>
+        <ul class="modal-list">
+          ${offering.tips.map(item => `<li>${item}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+  `;
+  showModal(`${offering.icon} ${offering.title}`, content);
+}
+
+// 拜拜指南
+function showWorshipGuide(type) {
+  const guides = {
+    '基本禮儀': {
+      icon: '🙏',
+      title: '拜拜基本禮儀',
+      sections: {
+        '👔 穿著要求': ['穿著整齊、乾淨', '避免過於暴露', '顏色以素色為佳'],
+        '🙏 拜拜姿勢': ['雙手合十', '身體微彎', '眼神專注'],
+        '🗣️ 說話方式': ['聲音清晰', '語調恭敬', '內容誠懇'],
+        '💡 注意事項': ['保持安靜', '不要大聲喧嘩', '尊重其他信眾']
+      }
+    },
+    '拜拜流程': {
+      icon: '📋',
+      title: '拜拜流程指南',
+      sections: {
+        '1️⃣ 準備階段': ['準備供品', '整理儀容', '調整心情'],
+        '2️⃣ 進入廟宇': ['從正門進入', '先拜天公', '再拜主神'],
+        '3️⃣ 拜拜步驟': ['點香三炷', '誠心祈禱', '插香入爐'],
+        '4️⃣ 結束階段': ['感謝神明', '整理供品', '安靜離開']
+      }
+    },
+    '注意事項': {
+      icon: '⚠️',
+      title: '拜拜注意事項',
+      sections: {
+        '🚫 禁止事項': ['不要大聲喧嘩', '不要隨意觸摸神像', '不要拍照攝影', '不要帶寵物進入'],
+        '✅ 應該做的事': ['保持安靜', '尊重其他信眾', '按照流程拜拜', '誠心祈禱'],
+        '💡 其他提醒': ['注意消防安全', '不要亂丟垃圾', '遵守廟宇規定', '保持環境整潔']
+      }
+    }
+  };
+  
+  const guide = guides[type];
+  const content = `
+    <div class="modal-section">
+      <h4>${guide.icon} ${guide.title}</h4>
+      ${Object.entries(guide.sections).map(([sectionTitle, items]) => `
+        <div class="modal-section">
+          <h4>${sectionTitle}：</h4>
+          <ul class="modal-list">
+            ${items.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  showModal(`${guide.icon} ${guide.title}`, content);
+}
+</script>
+</body>
+</html>

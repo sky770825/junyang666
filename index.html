@@ -1,0 +1,2887 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>住商不動產濬瑒、子菲 | 精選物件 | 專業服務</title>
+    
+    <!-- Meta 標籤 -->
+    <meta name="description" content="住商不動產濬瑒、子菲專業服務，提供楊梅地區精選優質物件，新都悅、世紀美妝等優質社區，三房車位物件推薦">
+    <meta name="keywords" content="住商不動產,濬瑒,子菲,楊梅,新都悅,世紀美妝,三房,車位,不動產,房屋">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:title" content="住商不動產濬瑒、子菲 | 精選物件 | 專業服務">
+    <meta property="og:description" content="住商不動產濬瑒、子菲專業服務，提供楊梅地區精選優質物件，新都悅、世紀美妝等優質社區，三房車位物件推薦">
+    <meta property="og:image" content="">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="">
+    <meta property="twitter:title" content="住商不動產濬瑒、子菲 | 精選物件 | 專業服務">
+    <meta property="twitter:description" content="住商不動產濬瑒、子菲專業服務，提供楊梅地區精選優質物件，新都悅、世紀美妝等優質社區，三房車位物件推薦">
+    <meta property="twitter:image" content="">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- ✅ 模組化版本：所有樣式已內嵌在HTML中 -->
+    
+    <!-- 手機響應式優化 -->
+    <style>
+        /* 全域邊距重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* 基本樣式 */
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, max-content));
+            gap: 0.8rem 0.3rem;
+            margin: 2rem 0;
+            padding: 0 0.5rem;
+            justify-content: start;
+        }
+        
+        /* 限制卡片最大寬度，防止單欄放大 */
+        .property-card {
+            max-width: 400px;
+            width: auto;
+        }
+        
+        .filter-buttons {
+            display: inline-flex;
+            background: #f8f9fa;
+            border-radius: 25px;
+            padding: 0.3rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* 防止按鈕雙擊縮放和文字選取 */
+        .building-filter-button,
+        .room-filter-button,
+        .filter-button,
+        button {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* 大螢幕 3 欄佈局 */
+        @media (min-width: 1200px) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
+                gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
+                margin: 2rem 0 !important;
+                padding: 0 0.5rem !important;  /* ✅ 更貼近視窗邊緣 */
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
+                padding: 1rem 1rem 0.5rem 1rem !important;  /* ✅ 縮小下內距 */
+            }
+        }
+            
+            /* 電腦版卡片格局屋齡文字大小 */
+            .property-card div[style*="background: #e8f5e8"] {
+                font-size: 0.9rem !important;
+            }
+            
+            .photo-item {
+                width: 100px !important;
+                height: 75px !important;
+                border-radius: 8px !important;
+            }
+            
+            /* v1.2 電腦版文字大小參數 */
+            .header h1 {
+                font-size: 2.5rem !important;
+            }
+            
+            .property-title {
+                font-size: 1.2rem !important;
+            }
+            
+            .price-highlight {
+                font-size: 1.3rem !important;
+            }
+            
+            .price-highlight span {
+                font-size: 1.1rem !important;
+            }
+            
+            .original-price {
+                font-size: 1.2rem !important;
+            }
+            
+            .features-list li {
+                font-size: 0.85rem !important;
+            }
+            
+            .contact-button {
+                font-size: 1.2rem !important;
+            }
+        
+        /* 中等螢幕 2-3 欄佈局 */
+        @media (min-width: 1000px) and (max-width: 1199px) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
+                gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
+                margin: 2rem 0 !important;
+                padding: 0 0.5rem !important;
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
+            }
+        }
+        
+        /* 中等螢幕 2 欄佈局 */
+        @media (min-width: 900px) and (max-width: 999px) {
+            .properties-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 2rem !important;
+                margin: 2rem 0 !important;
+                padding: 0 2rem !important;
+            }
+        }
+        
+        /* 中等螢幕過渡區域 - 2欄佈局 */
+        @media (min-width: 769px) and (max-width: 899px) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
+                gap: 0.8rem 0.3rem !important;
+                padding: 0 0.5rem !important;
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
+            }
+        }
+        
+        /* 小螢幕過渡區域 - 1-2欄佈局 */
+        @media (min-width: 600px) and (max-width: 768px) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, max-content)) !important;
+                gap: 0.8rem 0.3rem !important;
+                padding: 0 0.5rem !important;
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+            }
+        }
+            
+            /* 中等螢幕卡片格局屋齡文字大小 */
+            .property-card div[style*="background: #e8f5e8"] {
+                font-size: 0.9rem !important;
+            }
+            
+            .property-card {
+                padding: 1.1rem 1.1rem 0.6rem 1.1rem !important;  /* ✅ 縮小下內距 */
+            }
+            
+            .property-title {
+                font-size: 1.4rem !important;
+                line-height: 1.3 !important;
+            }
+            
+            .photo-item {
+                width: 95px !important;
+                height: 71px !important;
+            }
+            
+            /* v1.2 中等螢幕文字大小參數 */
+            .header h1 {
+                font-size: 2.2rem !important;
+            }
+            
+            .price-highlight {
+                font-size: 1.2rem !important;
+            }
+            
+            .price-highlight span {
+                font-size: 1.0rem !important;
+            }
+            
+            .original-price {
+                font-size: 1.1rem !important;
+            }
+            
+            .features-list li {
+                font-size: 0.85rem !important;
+            }
+            
+            .contact-button {
+                font-size: 1.1rem !important;
+            }
+        
+        /* 平板橫向模式 */
+        @media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
+                gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
+                padding: 0 0.5rem !important;
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
+                padding: 0.9rem 0.9rem 0.5rem 0.9rem !important;  /* ✅ 縮小下內距 */
+            }
+            
+            .property-title {
+                font-size: 1.15rem !important;
+            }
+        }
+        
+        /* 手機響應式設計 */
+        @media (max-width: 768px) {
+            /* 基本佈局調整 */
+            .container {
+                padding: 0;
+                margin: 0;
+                max-width: 100vw;
+                height: 100vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            
+            /* 標題區域優化 */
+            .header h1 {
+                font-size: 1.8rem !important;
+                padding: 0.5rem !important;
+            }
+            
+            .header p {
+                font-size: 0.9rem !important;
+                margin: 0.3rem 0 !important;
+            }
+            
+            /* 搜尋和篩選區域 */
+            .search-filter-container {
+                padding: 0 0.5rem !important;  /* ✅ 搜尋區域與物件卡片對齊 */
+                margin: 1rem 0 !important;
+            }
+            
+            #property-search {
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0.6rem 1rem !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .filter-buttons {
+                flex-direction: row !important;
+                gap: 0.3rem !important;
+                padding: 0.3rem 0 !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+            }
+            
+            .filter-button {
+                padding: 0.5rem 0.8rem !important;
+                font-size: 0.8rem !important;
+                border-radius: 15px !important;
+                flex: 1 !important;
+                min-width: 0 !important;
+            }
+            
+            /* 物件卡片優化 - 單欄垂直排列，保留適當間距 */
+            .properties-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0 !important;  /* ✅ 移除 grid gap，改用 margin 控制 */
+                padding: 0 !important;
+            }
+            
+            .property-card {
+                margin: 0 0 1.2rem 0 !important;  /* ✅ 使用 margin-bottom 控制卡片間距 */
+                padding: 1rem 1rem 1rem 1rem !important;  /* ✅ 增加下內距 */
+                border-radius: 0 !important;  /* ✅ 移除圓角，完全貼合 */
+                min-height: 400px !important;
+                border-bottom: 8px solid #e9ecef !important;  /* ✅ 添加底部分隔線 */
+                max-width: none !important;  /* ✅ 手機版不限制最大寬度 */
+            }
+            
+            .property-card:last-child {
+                margin-bottom: 0 !important;  /* ✅ 最後一張卡片不需要間距 */
+                border-bottom: none !important;
+            }
+            
+            .property-title {
+                font-size: 1.2rem !important;
+                margin-bottom: 0.8rem !important;
+                line-height: 1.3 !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                transform-origin: left !important;
+                transition: font-size 0.3s ease !important;
+                min-height: 2.6rem !important;
+                display: flex !important;
+                align-items: center !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* 照片滾動區域 */
+            .photo-scroll-container {
+                margin: 0.3rem 0 !important;
+                padding: 0.2rem 0 !important;
+            }
+            
+            .photo-item {
+                width: 85px !important;
+                height: 64px !important;
+                border-radius: 8px !important;
+            }
+            
+            /* 物件資訊區域 */
+            .property-info {
+                padding: 0.6rem !important;
+                margin: 0.4rem 0 !important;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.4rem !important;
+                margin-bottom: 0.6rem !important;
+            }
+            
+            .info-item {
+                padding: 0.3rem !important;
+                font-size: 0.9rem !important;
+                text-align: center !important;
+            }
+            
+            /* 地圖區域 */
+            iframe {
+                height: 100px !important;
+                border-radius: 6px !important;
+            }
+            
+            /* 聯絡方式區域 */
+            .contact-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+                padding: 0 !important;
+            }
+            
+            /* 相關資料連結手機版優化 - 改為 2行2欄 Grid 佈局 */
+            .related-links-section {
+                padding: 1rem 0.8rem !important;
+            }
+            
+            .related-links-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.8rem !important;
+                max-width: 100% !important;
+            }
+            
+            .related-links-section .contact-button {
+                padding: 0.7rem 0.6rem !important;
+                font-size: 1rem !important;
+                line-height: 1.3 !important;
+                min-height: 65px !important;
+                min-width: auto !important;
+                border-radius: 15px !important;
+                word-break: keep-all !important;
+                font-weight: 700 !important;
+            }
+            
+            .related-links-section #propertyInfoDropdown {
+                padding: 0.7rem 0.6rem !important;
+                font-size: 1rem !important;
+                line-height: 1.3 !important;
+                min-height: 65px !important;
+                width: 100% !important;
+                border-radius: 15px !important;
+                font-weight: 700 !important;
+            }
+            
+            .related-links-section #propertyInfoDropdown > div {
+                display: inline-block !important;
+            }
+            
+            /* 客戶見證按鈕手機版優化 */
+            #testimonialPrev, #testimonialNext {
+                font-size: 0.8rem !important;
+                padding: 0.4rem 0.8rem !important;
+                margin: 0.2rem !important;
+            }
+            
+            /* 房產資訊下拉選單手機版優化 - 配合新佈局 */
+            #propertyInfoMenu {
+                min-width: 180px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                max-width: 90vw !important;
+            }
+            
+            #propertyInfoMenu a {
+                padding: 0.7rem 0.8rem !important;
+                font-size: 0.8rem !important;
+                white-space: nowrap !important;
+            }
+            
+            .contact-grid > div {
+                padding: 1.2rem !important;
+            }
+            
+            /* 分頁按鈕 */
+            .pagination {
+                flex-wrap: wrap !important;
+                gap: 0.3rem !important;
+                padding: 0 0.5rem !important;  /* ✅ 與物件卡片對齊 */
+            }
+            
+            .pagination button {
+                padding: 0.4rem 0.8rem !important;
+                font-size: 0.8rem !important;
+                min-width: 35px !important;
+            }
+            
+            /* 統計資訊 */
+            #stats-container {
+                padding: 0 0.5rem !important;
+            }
+            
+            /* 強制覆蓋所有手機版容器padding */
+            .container {
+                padding: 0 !important;
+            }
+            
+            /* 覆蓋HTML中的inline style - 物件區域完全貼合 */
+            .properties-section {
+                padding: 1rem 0 !important;  /* ✅ 左右完全無留白 */
+            }
+            
+            section[style*="padding: 1.2rem"] {
+                padding: 1.2rem 0.8rem !important;
+            }
+            
+            section[style*="padding: 1.5rem 1.2rem"] {
+                padding: 1.5rem 0.8rem !important;
+            }
+            
+            /* 強制覆蓋搜尋框padding */
+            #property-search {
+                padding: 0.6rem 0.8rem !important;
+            }
+            
+            #stats-container > div {
+                padding: 0.8rem !important;
+                font-size: 0.9rem !important;
+            }
+        }
+        
+        /* 超小螢幕優化 */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6rem !important;
+                padding: 0.4rem !important;
+            }
+            
+            .header p {
+                font-size: 0.8rem !important;
+            }
+            
+            .property-title {
+                font-size: 1.15rem !important;
+                min-height: 2.4rem !important;
+                margin-bottom: 0.6rem !important;
+            }
+            
+            .property-card {
+                margin: 0 0 1rem 0 !important;  /* ✅ 超小螢幕間距稍小 */
+                padding: 0.8rem 0.8rem 0.8rem 0.8rem !important;  /* ✅ 增加下內距 */
+                border-radius: 0 !important;  /* ✅ 移除圓角，完全貼合 */
+                border-bottom: 6px solid #e9ecef !important;  /* ✅ 添加底部分隔線 */
+            }
+            
+            .property-card:last-child {
+                margin-bottom: 0 !important;
+                border-bottom: none !important;
+            }
+            
+            .photo-item {
+                width: 75px !important;
+                height: 56px !important;
+            }
+            
+            .property-info {
+                padding: 0.5rem !important;
+            }
+            
+            .info-item {
+                padding: 0.25rem !important;
+                font-size: 1.0rem !important;
+            }
+            
+            /* 手機版卡片格局屋齡文字大小 */
+            .property-card div[style*="background: #e8f5e8"] {
+                font-size: 0.9rem !important;
+            }
+            
+            .property-card div[style*="strong.*格局"] {
+                font-size: 0.9rem !important;
+            }
+            
+            .property-card div[style*="strong.*屋齡"] {
+                font-size: 0.9rem !important;
+            }
+            
+            /* 強制覆蓋所有可能的格局屋齡文字 */
+            div[style*="background: #e8f5e8"][style*="font-size: 1.3rem"] {
+                font-size: 0.9rem !important;
+            }
+            
+            /* 針對包含格局屋齡文字的div */
+            .property-card div[style*="font-size: 1.3rem"] {
+                font-size: 0.9rem !important;
+            }
+            
+            iframe {
+                height: 80px !important;
+            }
+            
+            .contact-grid > div {
+                padding: 1rem !important;
+            }
+            
+            .filter-button {
+                padding: 0.5rem 0.8rem !important;
+                font-size: 0.8rem !important;
+            }
+            
+            /* 超小螢幕相關資料連結優化 */
+            .related-links-section .contact-button {
+                padding: 0.6rem 0.5rem !important;
+                font-size: 0.9rem !important;
+                min-height: 60px !important;
+            }
+            
+            .related-links-section #propertyInfoDropdown {
+                padding: 0.6rem 0.5rem !important;
+                font-size: 0.9rem !important;
+                min-height: 60px !important;
+            }
+            
+            /* 詳細資訊彈窗超小螢幕優化 */
+            .modal .detail-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+        }
+        
+        /* 燈箱手機優化 */
+        @media (max-width: 768px) {
+            .modal {
+                padding: 10px !important;
+            }
+            
+            .modal > div {
+                max-width: 105vw !important;
+                max-height: 95vh !important;
+                border-radius: 12px !important;
+            }
+            
+            .modal img {
+                max-width: 100vw !important;
+                max-height: 60vh !important;
+            }
+            
+            .modal .photo-info {
+                padding: 10px 15px !important;
+                margin-top: 15px !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .modal .thumbnails {
+                margin-top: 15px !important;
+                padding: 10px 40px !important;
+                max-width: 100vw !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: thin !important;
+                scroll-behavior: smooth !important;
+            }
+            
+            .modal .thumbnails::-webkit-scrollbar {
+                height: 4px !important;
+            }
+            
+            .modal .thumbnails::-webkit-scrollbar-track {
+                background: #f1f1f1 !important;
+                border-radius: 2px !important;
+            }
+            
+            .modal .thumbnails::-webkit-scrollbar-thumb {
+                background: #667eea !important;
+                border-radius: 2px !important;
+            }
+            
+            .modal .thumbnails img {
+                width: 50px !important;
+                height: 37px !important;
+                flex-shrink: 0 !important;
+            }
+            
+            /* 詳細資訊彈窗手機優化 */
+            .modal h2 {
+                font-size: 1.1rem !important;
+            }
+            
+            .modal .grid {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+            
+            .modal .contact-buttons {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+            
+            .modal .photo-preview img {
+                width: 60px !important;
+                height: 45px !important;
+            }
+            
+            /* 主要資訊卡片手機優化 */
+            .modal .main-info-grid {
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 8px !important;
+            }
+            
+            .modal .main-info-grid > div {
+                padding: 10px !important;
+            }
+            
+            .modal .main-info-grid .info-title {
+                font-size: 0.7rem !important;
+            }
+            
+            .modal .main-info-grid .info-value {
+                font-size: 1.1rem !important;
+            }
+            
+            /* 詳細資訊表格手機優化 */
+            .modal .detail-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 12px !important;
+            }
+            
+            /* 物件詳細資訊彈窗手機版緊縮優化 */
+            .modal .property-detail-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.3rem !important;
+                font-size: 1.0rem !important;
+            }
+            
+            .modal .property-detail-grid > div {
+                padding: 0.3rem 0 !important;
+                border-bottom: 1px solid #f0f0f0 !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+            
+            .modal .property-detail-grid > div:last-child {
+                border-bottom: none !important;
+            }
+            
+            /* 手機版彈窗滾動條優化 */
+            .modal div[style*="overflow-y: auto"]::-webkit-scrollbar {
+                width: 6px !important;
+            }
+            .modal div[style*="overflow-y: auto"]::-webkit-scrollbar-track {
+                background: #f1f1f1 !important;
+                border-radius: 3px !important;
+            }
+            .modal div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb {
+                background: #667eea !important;
+                border-radius: 3px !important;
+            }
+            .modal div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb:hover {
+                background: #5a6fd8 !important;
+            }
+            
+            /* 手機版箭頭按鈕優化 */
+            .modal .main-image-arrow-left {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 20px !important;
+                left: 20px !important;
+                background: rgba(0, 0, 0, 0.8) !important;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.5) !important;
+            }
+            
+            .modal .main-image-arrow-right {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 20px !important;
+                right: 20px !important;
+                background: rgba(0, 0, 0, 0.8) !important;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.5) !important;
+            }
+            
+            /* 手機版燈箱關閉按鈕優化 */
+            .lightbox-close-btn {
+                top: 10px !important;
+                right: 10px !important;
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 24px !important;
+                background: rgba(231, 76, 60, 0.95) !important;
+                border: 2px solid white !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+            }
+        }
+        
+        /* 地圖容器樣式優化 */
+        .map-container {
+            width: 100%;       /* 讓地圖跟隨容器寬度 */
+            max-width: 600px;  /* 限制最大寬度，避免太大 */
+            margin: 0 auto;    /* 水平置中 */
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 300px;     /* 桌面版高度設為300px */
+            border-radius: 8px;/* 加上圓角，看起來更現代 */
+        }
+
+        /* TikTok 彈窗手機優化 */
+        @media (max-width: 768px) {
+            /* TikTok iframe 手機版樣式 */
+            div[id^="tiktok-embed-container-"] iframe {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: 70vh !important;
+                min-height: 500px !important;
+                max-height: 700px !important;
+                min-width: 100% !important;
+            }
+            
+            .modal iframe[src*="tiktok.com/embed"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: 70vh !important;
+                min-height: 500px !important;
+                max-height: 700px !important;
+            }
+            
+            /* TikTok 嵌入容器手機版高度調整 */
+            div[id^="tiktok-embed-container-"] {
+                min-height: 70vh !important;
+                max-height: 75vh !important;
+                padding: 10px !important;
+            }
+            
+            /* TikTok 彈窗關閉按鈕手機版優化 */
+            .modal button[onclick*="closeTikTok"] {
+                position: fixed !important;
+                top: 10px !important;
+                right: 10px !important;
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 28px !important;
+                z-index: 10002 !important;
+                background: rgba(231, 76, 60, 0.95) !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+                border: 2px solid white !important;
+                float: none !important;
+                margin: 0 !important;
+            }
+            
+            /* TikTok 彈窗容器手機版優化 */
+            .modal > div[style*="max-width"] {
+                max-height: 90vh !important;
+                overflow-y: auto !important;
+                margin: 5px !important;
+                width: 98vw !important;
+            }
+            
+            /* TikTok 標題區域手機版縮小 */
+            .modal div[style*="background: linear-gradient(135deg, #000000, #fe2c55)"] {
+                padding: 15px 20px 10px 20px !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #000000, #fe2c55)"] h2 {
+                font-size: 1.1rem !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #000000, #fe2c55)"] p {
+                font-size: 0.85rem !important;
+            }
+        }
+        
+        /* 地圖彈窗手機優化 */
+        @media (max-width: 768px) {
+            .map-container iframe {
+                height: 250px; /* 手機版使用較小高度 */
+            }
+            
+            /* 地圖彈窗滿版樣式 */
+            .modal div[style*="max-height: 350vh"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 0 !important;
+                height: 350vh !important;
+            }
+            
+            .modal .map-container {
+                width: 100% !important;
+                height: 70vh !important;
+                min-height: auto !important;
+            }
+            
+            .modal .map-buttons {
+                flex-direction: column !important;
+                gap: 12px !important;
+                padding: 15px 20px !important;
+                background: #f8f9fa !important;
+                border-top: 1px solid #e9ecef !important;
+                flex-shrink: 0 !important;
+            }
+            
+            .modal .map-buttons a {
+                padding: 12px 24px !important;
+                font-size: 1rem !important;
+                border-radius: 8px !important;
+                min-height: 45px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            
+            /* 地圖標題區域優化 */
+            .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] {
+                padding: 15px 20px 10px 20px !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] h2 {
+                font-size: 1.1rem !important;
+                margin: 0 !important;
+            }
+            
+            .modal div[style*="background: linear-gradient(135deg, #667eea, #764ba2)"] p {
+                font-size: 0.85rem !important;
+                margin: 3px 0 0 0 !important;
+            }
+            
+            /* 地圖彈窗整體優化 */
+            .modal {
+                padding: 8px !important;
+                margin: 0 !important;
+            }
+            
+            /* 強制覆蓋地圖彈窗樣式 */
+            .modal div[style*="max-height: 350vh"] {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                height: 350vh !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .modal div[style*="max-height: 350vh"] .map-container {
+                width: 100% !important;
+                height: 50vh !important;
+                min-height: auto !important;
+                max-height: none !important;
+            }
+            
+            .modal div[style*="max-height: 350vh"] .map-container iframe {
+                width: 100% !important;
+                height: 100% !important;
+                min-height: auto !important;
+            }
+            
+            /* 詳細資訊彈窗滑動優化 */
+            .modal div[style*="max-height: 90vh"] {
+                max-height: 95vh !important;
+                height: auto !important;
+                overflow: hidden !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            
+            .modal div[style*="overflow-y: auto"] {
+                max-height: none !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding: 15px !important;
+                flex: 1 !important;
+                min-height: 0 !important;
+                touch-action: pan-y !important;
+            }
+            
+            /* 強制滑動區域 */
+            .modal div[style*="flex: 1"] {
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+            
+            /* 詳細資訊彈窗強制滑動 */
+            .modal {
+                touch-action: pan-y !important;
+            }
+            
+            .modal div[style*="flex: 1"][style*="overflow-y: auto"] {
+                overflow-y: scroll !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+                pointer-events: auto !important;
+            }
+            
+            /* 手機版詳細資訊浮框專用樣式 - 不受其他影響 */
+            #features-details-tooltip {
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: 90vw !important;
+                max-width: 400px !important;
+                max-height: 80vh !important;
+                background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+                border: 2px solid #667eea !important;
+                border-radius: 15px !important;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.25) !important;
+                z-index: 10001 !important;
+                overflow: hidden !important;
+                font-size: 0.9rem !important;
+            }
+            
+            #features-details-tooltip > div:last-child {
+                padding: 15px !important;
+                line-height: 1.4 !important;
+                cursor: pointer !important;
+                max-height: calc(80vh - 80px) !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+            
+            /* 學區交通浮框專用樣式 - 手機版置中 */
+            #transportation-details-tooltip {
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: 90vw !important;
+                max-width: 500px !important;
+                max-height: 80vh !important;
+                background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+                border: 2px solid #667eea !important;
+                border-radius: 15px !important;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.25) !important;
+                z-index: 10001 !important;
+                overflow: hidden !important;
+                font-size: 0.9rem !important;
+            }
+            
+            /* 電腦版學區交通浮框置中樣式 */
+            @media (min-width: 769px) {
+                #transportation-details-tooltip {
+                    position: fixed !important;
+                    top: 50% !important;
+                    left: 50% !important;
+                    transform: translate(-50%, -50%) !important;
+                    width: auto !important;
+                    max-width: 600px !important;
+                    min-width: 400px !important;
+                    max-height: 70vh !important;
+                    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+                    border: 2px solid #667eea !important;
+                    border-radius: 15px !important;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.25) !important;
+                    z-index: 10001 !important;
+                    overflow: hidden !important;
+                    font-size: 0.95rem !important;
+                }
+                
+                /* 電腦版地圖容器優化 - 只影響電腦版 */
+                .modal .map-container {
+                    height: 30vh !important;
+                    min-height: 300px !important;
+                }
+                
+                /* 確保手機版地圖容器不受影響 */
+                @media (max-width: 768px) {
+                    .modal .map-container {
+                        height: 50vh !important;
+                        min-height: auto !important;
+                    }
+                }
+            }
+            
+            #transportation-details-tooltip > div:last-child {
+                padding: 15px !important;
+                line-height: 1.4 !important;
+                cursor: pointer !important;
+                max-height: calc(80vh - 80px) !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+            
+            /* 權狀坪數浮框專用樣式 */
+            #area-details-tooltip {
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: 90vw !important;
+                max-width: 400px !important;
+                max-height: 80vh !important;
+                background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+                border: 2px solid #667eea !important;
+                border-radius: 15px !important;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.25) !important;
+                z-index: 10001 !important;
+                overflow: hidden !important;
+                font-size: 0.9rem !important;
+            }
+            
+            #area-details-tooltip > div:last-child {
+                padding: 15px !important;
+                line-height: 1.4 !important;
+                cursor: pointer !important;
+                max-height: calc(80vh - 80px) !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+            
+            .modal > div {
+                width: 98vw !important;
+                max-width: none !important;
+                height: 90vh !important;
+                max-height: 90vh !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+        }
+        
+        /* 客戶見證動畫 */
+        @keyframes float {
+            0% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(10px) translateY(-10px); }
+            50% { transform: translateX(-5px) translateY(5px); }
+            75% { transform: translateX(-10px) translateY(-5px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+        
+        /* 房產資訊下拉選單hover效果 */
+        #propertyInfoMenu a:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2) !important;
+            color: white !important;
+            transform: translateX(5px);
+        }
+        
+        #propertyInfoDropdown:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4) !important;
+        }
+
+        /* ========================================
+           🎨 統一按鈕樣式系統
+           ======================================== */
+        
+        /* 基礎按鈕樣式 - 所有按鈕繼承 */
+        .btn-base {
+            padding: 0.65rem 1.3rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            min-height: 44px;
+            line-height: 1.2;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 按鈕光澤效果 */
+        .btn-base::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-base:hover::before {
+            left: 100%;
+        }
+        
+        .btn-base:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25) !important;
+        }
+        
+        .btn-base:active {
+            transform: translateY(0);
+        }
+        
+        /* 大按鈕 - 用於主要操作 */
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            min-height: 48px;
+            border-radius: 24px;
+        }
+        
+        /* 小按鈕 - 用於次要操作 */
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            min-height: 38px;
+            border-radius: 18px;
+        }
+        
+        /* 相關資料連結樣式（保留舊版相容性） */
+        .related-link-item {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .related-link-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .related-link-item:hover::before {
+            left: 100%;
+        }
+        
+        .related-link-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25) !important;
+        }
+        
+        .related-link-item:active {
+            transform: translateY(-1px);
+        }
+        
+        /* 貸款試算彈窗樣式 */
+        .loan-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .loan-modal-content {
+            background-color: #fefefe;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .loan-modal-header {
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px 12px 0 0;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .loan-modal-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .loan-modal-close {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            line-height: 1;
+            padding: 0.2rem;
+        }
+        
+        .loan-modal-close:hover {
+            transform: scale(1.1);
+        }
+        
+        .loan-modal-body {
+            padding: 1rem;
+            flex: 1;
+            overflow-y: auto;
+            max-height: calc(90vh - 80px);
+            min-height: 500px;
+            scrollbar-width: thin;
+            scrollbar-color: #10b981 #f1f5f9;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+        
+        .loan-modal-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+        }
+        
+        .loan-input-section {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 1rem;
+        }
+        
+        .loan-result-section {
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 0.6rem;
+        }
+        
+        .loan-input-group {
+            margin-bottom: 0.6rem;
+        }
+        
+        .loan-input-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            color: #374151;
+            font-size: 0.8rem;
+        }
+        
+        .loan-input {
+            width: 100%;
+            padding: 0.4rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .loan-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .loan-slider {
+            width: 100%;
+            margin: 0.4rem 0;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: #e5e7eb;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .loan-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        
+        .loan-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        
+        .loan-slider-value {
+            text-align: center;
+            font-weight: bold;
+            color: #10b981;
+            font-size: 0.8rem;
+            margin-top: 0.1rem;
+        }
+        
+        .loan-input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+        
+        .loan-result-card {
+            background: white;
+            border-radius: 6px;
+            padding: 0.8rem;
+            margin-bottom: 0.6rem;
+            border-left: 3px solid #10b981;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .loan-result-title {
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+        }
+        
+        .loan-result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+        }
+        
+        .loan-result-highlight {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            color: white;
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            text-align: center;
+            margin-top: 0.6rem;
+        }
+        
+        .loan-result-highlight h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .loan-result-highlight .amount {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 0.1rem 0;
+        }
+
+        /* 觸控優化 */
+        @media (hover: none) and (pointer: coarse) {
+            .photo-item:hover,
+            .filter-button:hover,
+            .pagination button:hover {
+                transform: none !important;
+            }
+            
+            .photo-item:active {
+                transform: scale(0.95) !important;
+            }
+            
+            .filter-button:active {
+                transform: scale(0.98) !important;
+            }
+        }
+        
+        /* 貸款試算手機版優化 */
+        @media (max-width: 768px) {
+            .loan-modal-content {
+                margin: 3% auto;
+                width: 95%;
+                max-width: 750px;
+                max-height: 90vh;
+            }
+            
+            .loan-modal-header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .loan-modal-title {
+                font-size: 1.3rem;
+            }
+            
+            .loan-input-label {
+                font-size: 1.0rem;
+            }
+            
+            .loan-input {
+                font-size: 1.0rem;
+            }
+            
+            .loan-slider-value {
+                font-size: 1.2rem;
+            }
+            
+            .loan-result-title {
+                font-size: 1.1rem;
+            }
+            
+            .loan-result-grid {
+                font-size: 1.2rem;
+            }
+            
+            .loan-result-highlight h3 {
+                font-size: 1.1rem;
+            }
+            
+            .loan-result-highlight .amount {
+                font-size: 1.7rem;
+            }
+            
+            /* 貸款試算輸入行響應式設計 */
+            .loan-input-row {
+                grid-template-columns: 1fr !important;
+                gap: 0.8rem !important;
+            }
+            
+            /* 貸款試算結果行響應式設計 */
+            .loan-result-row {
+                grid-template-columns: 1fr !important;
+                gap: 0.6rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .loan-modal-content {
+                margin: 1% auto;
+                width: 98%;
+                max-height: 98vh;
+                border-radius: 8px;
+            }
+            
+            .loan-modal-header {
+                padding: 0.5rem 0.8rem;
+            }
+            
+            .loan-modal-title {
+                font-size: 1.1rem;
+            }
+            
+            /* 超小螢幕優化 */
+            .loan-input-group {
+                margin-bottom: 0.4rem;
+            }
+            
+            .loan-input-label {
+                font-size: 1.0rem;
+            }
+            
+            .loan-input {
+                padding: 0.4rem;
+                font-size: 1.0rem;
+            }
+            
+            .loan-slider {
+                margin: 0.3rem 0;
+            }
+            
+            .loan-slider-value {
+                font-size: 1.1rem;
+            }
+            
+            .loan-result-title {
+                font-size: 1.1rem;
+            }
+            
+            .loan-result-grid {
+                font-size: 1.2rem;
+            }
+            
+            .loan-result-highlight h3 {
+                font-size: 1.1rem;
+            }
+            
+            .loan-result-highlight .amount {
+                font-size: 1.7rem;
+            }
+        }
+        
+        /* 橫向模式優化 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                padding: 0.5rem !important;
+            }
+            
+            .header h1 {
+                font-size: 1rem !important;
+                margin: 0 !important;
+            }
+            
+            .header p {
+                font-size: 0.8rem !important;
+                margin: 0.2rem 0 !important;
+            }
+            
+            .search-filter-container {
+                margin: 0.5rem 0 !important;
+            }
+            
+            .properties-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 1rem !important;  /* ✅ 手機橫向保留 gap */
+                padding: 0 !important;
+            }
+            
+            .property-card {
+                margin: 0 !important;  /* ✅ 橫向模式使用 gap 控制間距 */
+                border-radius: 8px !important;  /* ✅ 橫向模式保留圓角 */
+                border-bottom: none !important;  /* ✅ 移除底部分隔線 */
+            }
+        }
+        
+        /* 中等螢幕橫向模式 3 欄佈局 */
+        @media (min-width: 1000px) and (max-width: 1199px) and (orientation: landscape) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
+                gap: 0.8rem 0.3rem !important;
+                max-width: none !important;
+                padding: 0 0.5rem !important;
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
+            }
+        }
+        
+        /* 中等螢幕橫向模式 2 欄佈局 */
+        @media (min-width: 900px) and (max-width: 999px) and (orientation: landscape) {
+            .properties-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 2rem !important;
+                max-width: 1000px !important;
+                padding: 0 2rem !important;
+            }
+        }
+        
+        /* 大螢幕橫向模式 3 欄佈局 */
+        @media (min-width: 1200px) and (orientation: landscape) {
+            .properties-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, max-content)) !important;
+                gap: 0.8rem 0.3rem !important;  /* ✅ 上下間距0.8rem，左右間距0.3rem */
+                max-width: none !important;
+                padding: 0 0.5rem !important;  /* ✅ 更貼近視窗邊緣 */
+                justify-content: start !important;
+            }
+            
+            .property-card {
+                max-width: 400px !important;
+                width: auto !important;
+                padding: 0.6rem 0.6rem 0.3rem 0.6rem !important;  /* ✅ 縮小下內距 */
+            }
+            
+            .photo-item {
+                width: 65px !important;
+                height: 49px !important;
+            }
+        }
+
+        /* 物件狀態標籤樣式 */
+        .property-status-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            animation: pulse-glow 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .status-urgent {
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+            animation: urgent-pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-selling {
+            background: linear-gradient(45deg, #ffa502, #ff6348);
+            animation: selling-pulse 2s ease-in-out infinite;
+        }
+
+        .status-negotiating {
+            background: linear-gradient(45deg, #3742fa, #2f3542);
+            animation: negotiating-pulse 2.5s ease-in-out infinite;
+        }
+
+        .status-below-appraisal {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            animation: below-appraisal-pulse 2.2s ease-in-out infinite;
+        }
+
+        .status-about-to-sell {
+            background: linear-gradient(45deg, #f87171, #dc2626);
+            animation: about-to-sell-pulse 1.8s ease-in-out infinite;
+        }
+
+        .status-sold {
+            background: linear-gradient(45deg, #6b7280, #374151);
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            font-weight: 800;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .status-new {
+            background: linear-gradient(45deg, #10b981, #059669);
+            animation: new-pulse 2s ease-in-out infinite;
+        }
+
+        /* 動畫效果 */
+        @keyframes urgent-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 4px 16px rgba(255, 71, 87, 0.6);
+            }
+        }
+
+        @keyframes selling-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(255, 165, 2, 0.4);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 3px 12px rgba(255, 165, 2, 0.6);
+            }
+        }
+
+        @keyframes negotiating-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(55, 66, 250, 0.4);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 3px 10px rgba(55, 66, 250, 0.5);
+            }
+        }
+
+        @keyframes below-appraisal-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 3px 12px rgba(59, 130, 246, 0.6);
+            }
+        }
+
+        @keyframes about-to-sell-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(248, 113, 113, 0.4);
+            }
+            50% {
+                transform: scale(1.04);
+                box-shadow: 0 3px 12px rgba(248, 113, 113, 0.6);
+            }
+        }
+
+        @keyframes new-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 3px 12px rgba(16, 185, 129, 0.6);
+            }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* 確保物件卡片有相對定位 */
+        .property-card {
+            position: relative;
+        }
+        
+        /* 🔥 已售物件專用樣式 */
+        .sold-property-card {
+            position: relative;
+            opacity: 0.85;
+            filter: grayscale(20%);
+            margin-bottom: 1rem !important; /* 確保卡片間距 */
+        }
+        
+        .sold-property-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            opacity: 0.9;
+            filter: grayscale(10%);
+        }
+        
+        .sold-property-card .property-title {
+            color: #6c757d !important;
+        }
+        
+        .sold-property-card .property-title::before {
+            content: '';
+        }
+        
+        .sold-property-card .info-item {
+            background: rgba(108, 117, 125, 0.1) !important;
+            color: #6c757d !important;
+        }
+        
+        .sold-property-card .photo-item:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 已售物件區域樣式 */
+        .sold-properties-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-top: 3px solid #6c757d;
+            position: relative;
+        }
+        
+        /* 已售物件容器確保適當間距 */
+        #sold-properties-container.properties-grid {
+            gap: 1rem !important; /* 確保grid間距 */
+        }
+        
+        .sold-properties-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #6c757d, transparent);
+        }
+        
+        /* 已售物件分頁樣式 */
+        .sold-properties-section .pagination button {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+        
+        .sold-properties-section .pagination button:hover {
+            background: #6c757d;
+            color: white;
+        }
+        
+        /* 中等螢幕已售物件優化 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #sold-properties-container.properties-grid {
+                gap: 1.2rem !important; /* 中等螢幕間距 */
+            }
+            
+            .sold-property-card {
+                margin-bottom: 1.2rem !important;
+            }
+        }
+        
+        /* 手機版已售物件優化 */
+        @media (max-width: 768px) {
+            /* 手機版滑動容器樣式 */
+            .mobile-sold-slide-container {
+                display: flex !important;
+                overflow-x: auto !important;
+                gap: 1rem !important;
+                padding: 0.5rem 0 !important;
+                scroll-behavior: smooth !important;
+                scrollbar-width: thin !important;
+                scrollbar-color: #6c757d #f1f1f1 !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            
+            /* 手機版已售物件容器改為flex */
+            #sold-properties-container.properties-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0 !important;
+            }
+            
+            /* 手機版已售物件卡片樣式 */
+            .mobile-sold-card {
+                opacity: 0.9 !important;
+                filter: grayscale(10%) !important;
+                padding: 0.5rem 0.5rem 0.2rem 0.5rem !important;
+                margin-bottom: 0 !important;
+                flex-shrink: 0 !important;
+                width: 280px !important;
+                min-width: 280px !important;
+                max-height: 160px !important;
+                min-height: 160px !important;
+                overflow: hidden !important;
+            }
+            
+            .sold-property-card:hover {
+                transform: none;
+            }
+            
+            .sold-properties-section {
+                padding: 0.6rem 0.8rem !important;
+                margin: 0.4rem 0 !important;
+            }
+            
+            .sold-properties-section h2 {
+                font-size: 1.1rem !important;
+            }
+        }
+
+        /* 彈窗中的狀態標籤樣式 */
+        .modal-status-tag {
+            position: absolute;
+            top: 15px;
+            right: 60px;
+            z-index: 10001;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            animation: modal-pulse-glow 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .modal-status-urgent {
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+            animation: modal-urgent-pulse 1.5s ease-in-out infinite;
+        }
+
+        .modal-status-selling {
+            background: linear-gradient(45deg, #ffa502, #ff6348);
+            animation: modal-selling-pulse 2s ease-in-out infinite;
+        }
+
+        .modal-status-negotiating {
+            background: linear-gradient(45deg, #3742fa, #2f3542);
+            animation: modal-negotiating-pulse 2.5s ease-in-out infinite;
+        }
+
+        .modal-status-below-appraisal {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            animation: modal-below-appraisal-pulse 2.2s ease-in-out infinite;
+        }
+
+        .modal-status-about-to-sell {
+            background: linear-gradient(45deg, #f87171, #dc2626);
+            animation: modal-about-to-sell-pulse 1.8s ease-in-out infinite;
+        }
+
+        .modal-status-sold {
+            background: linear-gradient(45deg, #6b7280, #374151);
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            font-weight: 800;
+            border: 2px solid #ffffff;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+        }
+
+        .modal-status-new {
+            background: linear-gradient(45deg, #10b981, #059669);
+            animation: modal-new-pulse 2s ease-in-out infinite;
+        }
+
+        /* 彈窗動畫效果 */
+        @keyframes modal-urgent-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(255, 71, 87, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 5px 20px rgba(255, 71, 87, 0.7);
+            }
+        }
+
+        @keyframes modal-selling-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(255, 165, 2, 0.5);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 4px 15px rgba(255, 165, 2, 0.7);
+            }
+        }
+
+        @keyframes modal-negotiating-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(55, 66, 250, 0.5);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 4px 12px rgba(55, 66, 250, 0.6);
+            }
+        }
+
+        @keyframes modal-below-appraisal-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(59, 130, 246, 0.5);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.7);
+            }
+        }
+
+        @keyframes modal-about-to-sell-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(248, 113, 113, 0.5);
+            }
+            50% {
+                transform: scale(1.04);
+                box-shadow: 0 4px 15px rgba(248, 113, 113, 0.7);
+            }
+        }
+
+        @keyframes modal-new-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 3px 10px rgba(16, 185, 129, 0.5);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 4px 15px rgba(16, 185, 129, 0.7);
+            }
+        }
+
+        @keyframes modal-pulse-glow {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.9;
+            }
+        }
+        
+        /* ========================================
+           ✅ 物件卡片基礎樣式（從 style.css 移植）
+           ======================================== */
+        
+        .property-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 1.2rem 1.2rem 0.6rem 1.2rem;  /* ✅ 縮小下內距 */
+            box-shadow: 
+                0 8px 25px rgba(0,0,0,0.12),
+                0 4px 12px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            background-clip: padding-box;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            width: auto;
+            max-width: 400px;
+        }
+        
+        .property-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2980b9, #3498db);
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .property-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.18),
+                0 8px 20px rgba(52, 152, 219, 0.15),
+                inset 0 1px 0 rgba(255,255,255,0.9);
+            border-color: rgba(52, 152, 219, 0.4);
+        }
+        
+        .property-title {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 0.6rem;
+            margin-top: 0.2rem;
+            border-bottom: 3px solid transparent;
+            background: linear-gradient(90deg, #3498db, #2980b9) bottom/100% 3px no-repeat;
+            padding-bottom: 0.4rem;
+            line-height: 1.3;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            overflow: hidden;
+            transition: font-size 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .property-title::before {
+            content: '';
+        }
+        
+        /* ✅ 物件資訊區域樣式 */
+        .property-info {
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        /* ✅ 地圖預覽容器樣式 */
+        .map-preview-container {
+            transition: all 0.3s ease;
+        }
+        
+        .map-preview-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3) !important;
+        }
+        
+        .map-preview-container:active {
+            transform: scale(0.98);
+        }
+        
+        /* ✅ Header 樣式補充 */
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 1.2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            opacity: 0.95;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes float {
+            0% { transform: translateX(-50px) translateY(-50px); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+        
+        .container {
+            max-width: none;
+            margin: 0;
+            background: white;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .properties-section {
+            padding: 2rem 1.5rem;  /* ✅ 增加上下留白 */
+            background: #f8f9fa;
+        }
+        
+        /* 🚀 優化：更順暢的卡片動畫 */
+        .property-card {
+            animation: cardFadeIn 0.2s ease-out;
+        }
+        
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(0.99);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* 🚀 優化：更快的按鈕反饋 */
+        .building-filter-button,
+        .room-filter-button {
+            transition: all 0.1s ease;
+        }
+        
+        .building-filter-button:active,
+        .room-filter-button:active {
+            transform: scale(0.98);
+        }
+        
+        /* 🚀 新增：按鈕狀態切換動畫 */
+        .building-filter-button,
+        .room-filter-button {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <img src="https://joinus.hbhousing.com.tw/assets/images/logo.5aacccab.png" alt="住商不動產" style="height: 1.2em; width: auto; vertical-align: middle;">
+                住商不動產-楊梅大順店
+            </h1>
+            <p>精選物件 | 低於銀行鑑價 | 預約從速</p>
+        </header>
+        
+        
+        <section class="properties-section">
+            <div style="text-align: center; margin: 0.3rem 0 0.8rem 0;">
+                <h2 style="font-size: 1.6rem; color: #2c3e50; padding: 0.4rem 0.8rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); position: relative; overflow: hidden; display: inline-block; margin: 0;">濬瑒、子菲精選物件</h2>
+            </div>
+            
+            <!-- 搜尋和篩選區域 -->
+            <div class="search-filter-container" style="text-align: center; margin: 1rem 0 2rem 0;">
+                <!-- 預覽模式切換 -->
+                <div style="margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 0.9rem; color: #666; margin-right: 0.5rem;">預覽模式：</span>
+                    <button id="view-mode-grid" class="view-mode-btn active" data-mode="grid" 
+                            style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
+                        <i class="bi bi-grid-3x3-gap"></i> 網格
+                    </button>
+                    <button id="view-mode-card" class="view-mode-btn" data-mode="card" 
+                            style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="bi bi-card-text"></i> 卡片
+                    </button>
+                </div>
+                
+                <!-- 搜尋框 -->
+                <div style="margin-bottom: 1.5rem;">
+                    <input type="text" id="property-search" placeholder="搜尋物件名稱、地址、社區..." 
+                           style="width: 300px; max-width: 90%; padding: 0.8rem 1rem; border: 2px solid #e9ecef; border-radius: 25px; font-size: 1rem; outline: none; transition: all 0.3s ease;"
+                           onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                           onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
+                </div>
+                
+                <!-- 建築類型篩選 -->
+                <div style="margin-bottom: 0.5rem;">
+                    <div class="filter-buttons building-filter" style="gap: 0.4rem;">
+                        <button class="building-filter-button active" data-building="all" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
+                            全部 <span class="count"></span>
+                        </button>
+                        <button class="building-filter-button" data-building="電梯大樓" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            電梯大樓 <span class="count"></span>
+                        </button>
+                        <button class="building-filter-button" data-building="華廈" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            華廈 <span class="count"></span>
+                        </button>
+                        <button class="building-filter-button" data-building="透天別墅" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            透天別墅 <span class="count"></span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 房型篩選 -->
+                <div style="margin-bottom: 0.8rem;">
+                    <div class="filter-buttons room-filter" style="gap: 0.4rem;">
+                        <button class="room-filter-button active" data-room="all" style="background: linear-gradient(45deg, #10b981, #3b82f6); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
+                            全部房型 <span class="count"></span>
+                        </button>
+                        <button class="room-filter-button" data-room="2房" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            2房 <span class="count"></span>
+                        </button>
+                        <button class="room-filter-button" data-room="3房" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            3房 <span class="count"></span>
+                        </button>
+                        <button class="room-filter-button" data-room="4房" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            4房 <span class="count"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 統計資訊 -->
+            <div id="stats-container"></div>
+            
+            <!-- 動態物件容器 -->
+            <div id="properties-container" class="properties-grid">
+                <!-- 物件將由 JavaScript 動態載入 -->
+            </div>
+            
+            <style>
+                /* 🎨 網格預覽模式樣式 */
+                .properties-grid-view {
+                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+                    gap: 1.5rem !important;
+                    padding: 1rem !important;
+                }
+                
+                .property-grid-item {
+                    transition: transform 0.3s ease;
+                    min-width: 0; /* 允許項目縮小 */
+                    width: 100%;
+                }
+                
+                .property-grid-item:hover {
+                    transform: translateY(-4px);
+                }
+                
+                /* 🎨 網格項目照片容器響應式調整 */
+                .grid-item-image-container {
+                    padding-top: 60% !important; /* 預設比例 */
+                }
+                
+                /* 多欄顯示時（寬度>600px）照片稍大 */
+                @media (min-width: 601px) {
+                    .grid-item-image-container {
+                        padding-top: 65% !important;
+                    }
+                }
+                
+                /* 🎨 網格模式文字大小響應式優化 */
+                .property-grid-item h4,
+                .grid-item-title {
+                    font-size: clamp(1.1rem, 3.5vw, 1.2rem) !important;
+                }
+                
+                /* 價格紅色樣式 */
+                .property-grid-item div[style*="color: #e74c3c"] {
+                    color: #e74c3c !important;
+                    font-size: clamp(1.1rem, 3.5vw, 1.3rem) !important;
+                    font-weight: 700 !important;
+                }
+                
+                .property-grid-item div[style*="font-size: clamp(1.1rem"] {
+                    font-size: clamp(1.1rem, 3.5vw, 1.3rem) !important;
+                }
+                
+                .property-grid-item div[style*="font-size: clamp(0.85rem"] {
+                    font-size: clamp(0.85rem, 2.5vw, 0.95rem) !important;
+                }
+                
+                .property-grid-item span[style*="font-size: clamp(0.8rem"] {
+                    font-size: clamp(0.8rem, 2.2vw, 0.9rem) !important;
+                }
+                
+                .property-grid-item button[data-action="details"] {
+                    font-size: clamp(0.85rem, 2.5vw, 0.95rem) !important;
+                }
+                
+                /* 手機版文字更大 */
+                @media (max-width: 768px) {
+                    .property-grid-item h4,
+                    .grid-item-title {
+                        font-size: 1.2rem !important;
+                        min-height: 2.6em !important;
+                        line-height: 1.5 !important;
+                    }
+                    
+                    .property-grid-item div[style*="color: #e74c3c"] {
+                        font-size: 1.2rem !important;
+                        color: #e74c3c !important;
+                    }
+                    
+                    .property-grid-item span[style*="color: #666"] {
+                        font-size: 0.9rem !important;
+                    }
+                    
+                    .property-grid-item button {
+                        font-size: 0.9rem !important;
+                        padding: 0.55rem !important;
+                    }
+                }
+                
+                /* 超小螢幕文字優化 */
+                @media (max-width: 480px) {
+                    .property-grid-item h4 {
+                        font-size: 1rem !important;
+                    }
+                    
+                    .property-grid-item div[style*="color: #e74c3c"] {
+                        font-size: 1.1rem !important;
+                        color: #e74c3c !important;
+                    }
+                }
+                
+                /* 中等螢幕網格優化 */
+                @media (max-width: 1024px) and (min-width: 769px) {
+                    .properties-grid-view {
+                        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+                        gap: 1.2rem !important;
+                    }
+                }
+                
+                /* 平板版網格優化 */
+                @media (max-width: 768px) {
+                    .properties-grid-view {
+                        grid-template-columns: repeat(2, 1fr) !important;
+                        gap: 1rem !important;
+                        padding: 0.5rem !important;
+                    }
+                    
+                    .property-grid-item h4 {
+                        font-size: 0.85rem !important;
+                    }
+                    
+                    .property-grid-item div[style*="font-size: 1.1rem"] {
+                        font-size: 0.95rem !important;
+                    }
+                }
+                
+                /* 手機版網格優化 */
+                @media (max-width: 480px) {
+                    .properties-grid-view {
+                        grid-template-columns: 1fr !important;
+                        gap: 1rem !important;
+                        padding: 0.5rem !important;
+                    }
+                }
+                
+                /* 超小視窗優化（視窗寬度小於800px時） */
+                @media (max-width: 800px) {
+                    .properties-grid-view {
+                        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+                        gap: 0.8rem !important;
+                    }
+                    
+                    /* 照片區域縮小 */
+                    .grid-item-image-container {
+                        padding-top: 55% !important;
+                    }
+                }
+                
+                /* 極小視窗（小於600px）強制單欄 */
+                @media (max-width: 600px) {
+                    .properties-grid-view {
+                        grid-template-columns: 1fr !important;
+                    }
+                    
+                    /* 單欄時照片更小 */
+                    .grid-item-image-container {
+                        padding-top: 45% !important;
+                    }
+                    
+                    /* 單欄時標題更大 */
+                    .property-grid-item h4,
+                    .grid-item-title {
+                        font-size: 1.2rem !important;
+                        line-height: 1.5 !important;
+                        margin-bottom: 0.75rem !important;
+                    }
+                }
+                
+                /* 單欄顯示時（寬度小於500px）照片進一步縮小，標題更大 */
+                @media (max-width: 500px) {
+                    .properties-grid-view {
+                        grid-template-columns: 1fr !important;
+                    }
+                    
+                    /* 照片區域進一步縮小 */
+                    .grid-item-image-container {
+                        padding-top: 38% !important;
+                    }
+                    
+                    /* 單欄時標題更大 */
+                    .property-grid-item h4,
+                    .grid-item-title {
+                        font-size: 1.25rem !important;
+                        line-height: 1.5 !important;
+                        margin-bottom: 0.8rem !important;
+                    }
+                }
+                
+                /* 超小視窗（小於400px）照片最小化，標題更大 */
+                @media (max-width: 400px) {
+                    .grid-item-image-container {
+                        padding-top: 35% !important;
+                    }
+                    
+                    /* 超小螢幕標題還要更大 */
+                    .property-grid-item h4,
+                    .grid-item-title {
+                        font-size: 1.3rem !important;
+                        line-height: 1.5 !important;
+                        margin-bottom: 0.8rem !important;
+                    }
+                }
+                
+                /* 單欄模式（無論視窗大小）標題優化 */
+                .properties-grid-view[style*="grid-template-columns: 1fr"] .property-grid-item h4,
+                .properties-grid-view[style*="grid-template-columns: 1fr"] .grid-item-title {
+                    font-size: 1.25rem !important;
+                }
+            </style>
+            
+            <!-- 分頁導航 -->
+            <div id="pagination-container"></div>
+        </section>
+        
+        <!-- 已售物件專區 -->
+        <section class="sold-properties-section" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1rem 1.5rem; margin: 1rem 0; border-top: 3px solid #6c757d;">
+            <!-- 可收合的標題區域 -->
+            <div style="text-align: center; margin: 0.3rem 0 0.8rem 0;">
+                <button id="sold-section-toggle" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; box-shadow: 0 3px 12px rgba(108, 117, 125, 0.3); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <span>🏠 已售物件展示</span>
+                    <span id="sold-toggle-icon" style="transition: transform 0.3s ease;">▼</span>
+                </button>
+            </div>
+            
+            <!-- 可收合的內容區域 -->
+            <div id="sold-content" style="display: none; transition: all 0.3s ease;">
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <p style="color: #6c757d; font-size: 0.9rem; font-weight: 500; margin: 0;">感謝客戶信任，以下物件已成功售出</p>
+                </div>
+                
+                <!-- 已售物件容器 -->
+                <div id="sold-properties-container" class="properties-grid">
+                    <!-- 已售物件將由 JavaScript 動態載入 -->
+                </div>
+                
+                <!-- 已售物件分頁導航 -->
+                <div id="sold-pagination-container"></div>
+            </div>
+        </section>
+        
+        
+        <!-- 相關資料連結 -->
+        <section class="related-links-section" style="background: #f8f9fa; padding: 1.2rem 0; margin: 1rem 0; text-align: center;">
+            <h2 style="color: #2c3e50; margin-bottom: 0.8rem;">📎 相關資料連結</h2>
+            <div class="related-links-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: none; margin: 0 auto;">
+                <a href="https://realtor.houseprice.tw/agent/buy/0925666597/" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(46, 204, 113, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🏠 更多物件資料</a>
+                <a href="https://www.tiktok.com/@aihouse168" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #000000, #333333); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🎵 TikTok短影音</a>
+                <a href="https://housepice.pages.dev/%E4%B8%89%E5%90%88%E4%B8%80%E6%88%BF%E5%83%B9%E6%99%AE%E7%89%B9%E7%B5%B2" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🧮 房產比價試算</a>
+                <a href="https://salersteam.pages.dev/junyang" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #9b59b6, #8e44ad); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(155, 89, 182, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🏢 預售團購區</a>
+                <a href="https://liff.line.me/2008363788-4Ly1Bv0r" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #f9a825, #ff9800); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 152, 0, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">📰 楊梅生活集</a>
+                
+                <!-- 房產資訊參考下拉選單 -->
+                <div style="position: relative; display: inline-block;">
+                    <button id="propertyInfoDropdown" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; border: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem; cursor: pointer;">
+                        📊 房產資訊參考 <span style="font-size: 0.8rem;">▼</span>
+                    </button>
+                    <div id="propertyInfoMenu" style="position: absolute; top: 100%; left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 250px; z-index: 1000; display: none; margin-top: 0.5rem; overflow: hidden;">
+                        <a href="https://drive.google.com/file/d/1NddGgXcysK-QRoozRA4XXww6c-NUv-OJ/view?usp=sharing" target="_blank" style="display: block; padding: 0.8rem 1rem; color: #2c3e50; text-decoration: none; border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease; font-size: 0.9rem;">
+                            📈 2026年楊梅趨勢引擊
+                        </a>
+                        <a href="https://drive.google.com/file/d/1PeGDx2IruOjWkeIHgVVqpk0tceB0l7Vg/view?usp=drive_link" target="_blank" style="display: block; padding: 0.8rem 1rem; color: #2c3e50; text-decoration: none; border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease; font-size: 0.9rem;">
+                            🏦 新青安寬鬆政策
+                        </a>
+                        <a href="https://drive.google.com/file/d/1vVluYlY81Ew76Dc4ZyWI_Y9CZ3cWbj0t/view?usp=drive_link" target="_blank" style="display: block; padding: 0.8rem 1rem; color: #2c3e50; text-decoration: none; transition: all 0.3s ease; font-size: 0.9rem;">
+                            📊 2025年房產分析
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 客戶見證 -->
+        <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.2rem 0.8rem; margin: 0.8rem 0; position: relative; overflow: hidden;">
+            <!-- 背景裝飾 -->
+            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: url('data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 100 100&quot;><circle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;2&quot; fill=&quot;rgba(255,255,255,0.1)&quot;/><circle cx=&quot;80&quot; cy=&quot;80&quot; r=&quot;1&quot; fill=&quot;rgba(255,255,255,0.1)&quot;/><circle cx=&quot;60&quot; cy=&quot;30&quot; r=&quot;1.5&quot; fill=&quot;rgba(255,255,255,0.1)&quot;/></svg>') repeat; animation: float 20s infinite linear;"></div>
+            
+            <h2 style="text-align: center; margin-bottom: 1.2rem; color: white; font-size: 1.4rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3); position: relative; z-index: 2;">💬 客戶見證</h2>
+            
+            <div style="max-width: none; margin: 0 auto; position: relative; z-index: 2;">
+                <div id="testimonialSlides" style="display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="testimonial-slide" style="min-width: 100%; padding: 1.4rem; text-align: center; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
+                        <div style="color: #ffd700; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">⭐⭐⭐⭐⭐</div>
+                        <p style="font-size: 0.95rem; color: #2c3e50; margin-bottom: 1rem; line-height: 1.5; font-weight: 500;">「洽談透明、節奏流暢，從估價到交屋都超放心！」</p>
+                        <p style="color: #7f8c8d; font-weight: 600; font-size: 0.85rem;">— 陳先生（屋主）</p>
+                    </div>
+                    <div class="testimonial-slide" style="min-width: 100%; padding: 1.4rem; text-align: center; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
+                        <div style="color: #ffd700; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">⭐⭐⭐⭐⭐</div>
+                        <p style="font-size: 0.95rem; color: #2c3e50; margin-bottom: 1rem; line-height: 1.5; font-weight: 500;">「實地看屋安排有效率，重點介紹到位，沒有話術。」</p>
+                        <p style="color: #7f8c8d; font-weight: 600; font-size: 0.85rem;">— 吳小姐（買方）</p>
+                    </div>
+                    <div class="testimonial-slide" style="min-width: 100%; padding: 1.4rem; text-align: center; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
+                        <div style="color: #ffd700; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">⭐⭐⭐⭐⭐</div>
+                        <p style="font-size: 0.95rem; color: #2c3e50; margin-bottom: 1rem; line-height: 1.5; font-weight: 500;">「文件與流程超專業，價格談成比預期更好！」</p>
+                        <p style="color: #7f8c8d; font-weight: 600; font-size: 0.85rem;">— 葉先生（買方）</p>
+                    </div>
+                    <div class="testimonial-slide" style="min-width: 100%; padding: 1.4rem; text-align: center; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
+                        <div style="color: #ffd700; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">⭐⭐⭐⭐⭐</div>
+                        <p style="font-size: 0.95rem; color: #2c3e50; margin-bottom: 1rem; line-height: 1.5; font-weight: 500;">「劉小姐服務超專業，從看屋到成交都很細心！」</p>
+                        <p style="color: #7f8c8d; font-weight: 600; font-size: 0.85rem;">— 林太太（買方）</p>
+                    </div>
+                    <div class="testimonial-slide" style="min-width: 100%; padding: 1.4rem; text-align: center; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
+                        <div style="color: #ffd700; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">⭐⭐⭐⭐⭐</div>
+                        <p style="font-size: 0.95rem; color: #2c3e50; margin-bottom: 1rem; line-height: 1.5; font-weight: 500;">「蔡先生很誠實，不會亂推銷，價格也很合理。」</p>
+                        <p style="color: #7f8c8d; font-weight: 600; font-size: 0.85rem;">— 王先生（屋主）</p>
+                    </div>
+                    <div class="testimonial-slide" style="min-width: 100%; padding: 1.4rem; text-align: center; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
+                        <div style="color: #ffd700; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">⭐⭐⭐⭐⭐</div>
+                        <p style="font-size: 0.95rem; color: #2c3e50; margin-bottom: 1rem; line-height: 1.5; font-weight: 500;">「服務態度很好，專業度也很高，推薦給需要買房的朋友！」</p>
+                        <p style="color: #7f8c8d; font-weight: 600; font-size: 0.85rem;">— 張小姐（買方）</p>
+                    </div>
+                    <div class="testimonial-slide" style="min-width: 100%; padding: 1.4rem; text-align: center; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
+                        <div style="color: #ffd700; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">⭐⭐⭐⭐⭐</div>
+                        <p style="font-size: 0.95rem; color: #2c3e50; margin-bottom: 1rem; line-height: 1.5; font-weight: 500;">「從看屋到簽約，整個流程都很順暢，非常滿意！」</p>
+                        <p style="color: #7f8c8d; font-weight: 600; font-size: 0.85rem;">— 李太太（買方）</p>
+                    </div>
+                    <div class="testimonial-slide" style="min-width: 100%; padding: 1.4rem; text-align: center; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
+                        <div style="color: #ffd700; font-size: 1.3rem; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">⭐⭐⭐⭐⭐</div>
+                        <p style="font-size: 0.95rem; color: #2c3e50; margin-bottom: 1rem; line-height: 1.5; font-weight: 500;">「賣房過程很順利，價格也達到預期，非常推薦！」</p>
+                        <p style="color: #7f8c8d; font-weight: 600; font-size: 0.85rem;">— 林先生（屋主）</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.6rem; justify-content: center; margin-top: 1.2rem;">
+                    <button id="testimonialPrev" style="background: linear-gradient(45deg, #ff6b6b, #ee5a52); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(255,107,107,0.3);">‹ 上一則</button>
+                    <button id="testimonialNext" style="background: linear-gradient(45deg, #4ecdc4, #44a08d); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(78,205,196,0.3);">下一則 ›</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 聯絡方式 -->
+        <section style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 1.5rem 0.8rem; margin: 1rem 0; position: relative;">
+            <h2 style="text-align: center; margin-bottom: 1.5rem; color: #2c3e50; font-size: 1.6rem; font-weight: 800; position: relative;">
+                <span style="background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📞 聯絡方式</span>
+            </h2>
+            <div class="contact-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; max-width: none; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); padding: 1.8rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid rgba(102, 126, 234, 0.1); position: relative; overflow: hidden; display: flex; flex-direction: column; height: 100%;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
+                    <h3 style="color: #2c3e50; margin-bottom: 1.2rem; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">👥 聯絡方式</span>
+                    </h3>
+                    <div style="flex: 1;">
+                        <p style="margin-bottom: 0.8rem; font-size: 1rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem; background: rgba(102, 126, 234, 0.05); border-radius: 8px; border-left: 3px solid #667eea;">
+                            <i class="bi bi-person-fill" style="color: #667eea; font-size: 1.1rem;"></i>
+                            <span style="font-weight: 600;">劉子菲</span>
+                            <a href="tel:0925666597" style="color: #e74c3c; text-decoration: none; font-weight: bold; margin-left: auto; display: flex; align-items: center; gap: 0.25rem;">
+                                <i class="bi bi-phone-fill"></i> 0925-666-597
+                            </a>
+                        </p>
+                        <p style="margin-bottom: 0.8rem; font-size: 1rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem; background: rgba(102, 126, 234, 0.05); border-radius: 8px; border-left: 3px solid #667eea;">
+                            <i class="bi bi-person-fill" style="color: #667eea; font-size: 1.1rem;"></i>
+                            <span style="font-weight: 600;">蔡濬瑒</span>
+                            <a href="tel:0928776755" style="color: #e74c3c; text-decoration: none; font-weight: bold; margin-left: auto; display: flex; align-items: center; gap: 0.25rem;">
+                                <i class="bi bi-phone-fill"></i> 0928-776-755
+                            </a>
+                        </p>
+                        <p style="margin-bottom: 1.2rem; font-size: 1rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem; background: rgba(0, 200, 81, 0.05); border-radius: 8px; border-left: 3px solid #00c851;">
+                            <i class="bi bi-chat-dots-fill" style="color: #00c851; font-size: 1.1rem;"></i>
+                            <span style="font-weight: 600;">LINE：@931aeinu</span>
+                            <button id="copyLineId" style="background: linear-gradient(45deg, #00c851, #00a085); color: white; border: none; padding: 0.3rem 0.7rem; border-radius: 12px; cursor: pointer; font-size: 0.8rem; margin-left: auto; transition: all 0.3s ease;" title="複製 LINE ID">
+                                <i class="bi bi-copy"></i> 複製
+                            </button>
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: auto; padding-top: 1rem;">
+                        <a href="tel:0928776755" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3); flex: 1; justify-content: center; font-size: 0.85rem;">
+                            <i class="bi bi-telephone-outbound-fill"></i> 立即來電
+                        </a>
+                        <a href="https://lin.ee/Lax7jMka" target="_blank" style="background: linear-gradient(45deg, #00c851, #00a085); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(0, 200, 81, 0.3); flex: 1; justify-content: center; font-size: 0.85rem;">
+                            <i class="fa-brands fa-line"></i> LINE聯絡
+                        </a>
+                    </div>
+                </div>
+                <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); padding: 1.8rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid rgba(102, 126, 234, 0.1); position: relative; overflow: hidden; display: flex; flex-direction: column; height: 100%;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
+                    <h3 style="color: #2c3e50; margin-bottom: 1.2rem; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">🏢 經紀業資訊</span>
+                    </h3>
+                    <div style="flex: 1;">
+                        <p style="margin-bottom: 0.6rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 6px;">
+                            <i class="bi bi-buildings" style="color: #667eea; font-size: 1rem;"></i>
+                            <span style="font-weight: 600;">公司：常鴻悦豐企業社</span>
+                        </p>
+                        <p style="margin-bottom: 0.6rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 6px;">
+                            <i class="bi bi-person-badge-fill" style="color: #667eea; font-size: 1rem;"></i>
+                            <span style="font-weight: 600;">營業員：蔡文豪（112）桃市字第432900號</span>
+                        </p>
+                        <p style="margin-bottom: 0.6rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 6px;">
+                            <i class="bi bi-person-badge-fill" style="color: #667eea; font-size: 1rem;"></i>
+                            <span style="font-weight: 600;">營業員：劉子菲（113）桃市字第467056號</span>
+                        </p>
+                        <p style="margin-bottom: 0.6rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 6px;">
+                            <i class="bi bi-person-vcard-fill" style="color: #667eea; font-size: 1rem;"></i>
+                            <span style="font-weight: 600;">經紀人：葉靜蓉（104）新北經證字第003119號</span>
+                        </p>
+                        <p style="margin-bottom: 0.6rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 6px;">
+                            <i class="bi bi-geo-alt-fill" style="color: #667eea; font-size: 1rem;"></i>
+                            <span style="font-weight: 600;">服務據點：住商不動產楊梅大順店</span>
+                        </p>
+                        <p style="margin-bottom: 0.6rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 6px;">
+                            <i class="bi bi-clock-fill" style="color: #667eea; font-size: 1rem;"></i>
+                            <span style="font-weight: 600;">營業時間：09:00–21:00</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- 貸款試算彈窗 -->
+    <div id="loanModal" class="loan-modal">
+        <div class="loan-modal-content">
+            <div class="loan-modal-header">
+                <div class="loan-modal-title">
+                    <span style="margin-right: 8px;">🧮</span>
+                    買方費用估算
+                </div>
+                <span class="loan-modal-close" onclick="closeLoanModal()">&times;</span>
+            </div>
+            <div class="loan-modal-body">
+                <div class="loan-modal-grid">
+                    <!-- 輸入區域 -->
+                    <div class="loan-input-section">
+                        <h3 style="color: #10b981; font-weight: bold; margin-bottom: 0.8rem; font-size: 0.9rem;">📝 輸入參數</h3>
+                        
+                        <div class="loan-input-group">
+                            <label class="loan-input-label">房屋總價 (萬元)</label>
+                            <input type="number" id="modalHousePrice" class="loan-input" placeholder="例如：896" value="896">
+                        </div>
+                        
+                        <div class="loan-input-group">
+                            <label class="loan-input-label">貸款成數 (%)</label>
+                            <input type="range" id="modalLoanRatio" min="40" max="85" value="80" class="loan-slider">
+                            <div class="loan-slider-value" id="modalLoanRatioValue">80%</div>
+                        </div>
+                        
+                        <div class="loan-input-group">
+                            <label class="loan-input-label">貸款年限 (年)</label>
+                            <input type="range" id="modalLoanYears" min="0" max="40" value="40" class="loan-slider">
+                            <div class="loan-slider-value" id="modalLoanYearsValue">40年</div>
+                        </div>
+                        
+                        <div class="loan-input-group">
+                            <label class="loan-input-label">貸款利率 (%)</label>
+                            <input type="range" id="modalInterestRate" min="0.5" max="5" step="0.1" value="2.1" class="loan-slider">
+                            <div class="loan-slider-value" id="modalInterestRateValue">2.1%</div>
+                        </div>
+                        
+                        <div class="loan-input-group">
+                            <label class="loan-input-label">名下有無其他房貸</label>
+                            <select id="modalExistingLoan" class="loan-input" onchange="adjustLoanConditions()">
+                                <option value="none">無其他房貸 (首購)</option>
+                                <option value="existing">有其他房貸 (第二戶)</option>
+                                <option value="youth">新青安貸款 (限1000萬)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="loan-input-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem;">
+                            <div class="loan-input-group">
+                                <label class="loan-input-label">寬限期 (年)</label>
+                                <select id="modalGracePeriod" class="loan-input">
+                                    <option value="0">無寬限期</option>
+                                    <option value="1">1年</option>
+                                    <option value="2">2年</option>
+                                    <option value="3">3年</option>
+                                    <option value="5" selected>新青安 5年</option>
+                                </select>
+                            </div>
+                            
+                            <div class="loan-input-group">
+                                <label class="loan-input-label">還款方式</label>
+                                <select id="modalRepaymentType" class="loan-input">
+                                    <option value="equal_payment">等額本息</option>
+                                    <option value="equal_principal">等額本金</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="loan-input-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem;">
+                            <div class="loan-input-group">
+                                <label class="loan-input-label">代書費+契稅 (元)</label>
+                                <input type="number" id="modalServiceFee" class="loan-input" placeholder="100000" value="100000">
+                            </div>
+                            
+                            <div class="loan-input-group">
+                                <label class="loan-input-label">代書潤筆費 (元)</label>
+                                <input type="number" id="modalNotaryFee" class="loan-input" placeholder="2000" value="2000">
+                            </div>
+                        </div>
+                        
+                        <div class="loan-input-group">
+                            <label class="loan-input-label">仲介費 (%)</label>
+                            <input type="range" id="modalAgentFee" min="0" max="2" step="0.1" value="2" class="loan-slider">
+                            <div class="loan-slider-value" id="modalAgentFeeValue">2%</div>
+                        </div>
+                        
+                        <div class="loan-input-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem;">
+                            <div class="loan-input-group">
+                                <label class="loan-input-label">月收入 (萬元)</label>
+                                <input type="number" id="modalMonthlyIncome" class="loan-input" placeholder="例如：8" value="8">
+                            </div>
+                            
+                            <div class="loan-input-group">
+                                <label class="loan-input-label">其他月支出 (萬元)</label>
+                                <input type="number" id="modalOtherExpenses" class="loan-input" placeholder="例如：2" value="2">
+                            </div>
+                        </div>
+                        
+                        <div class="loan-input-group">
+                            <div style="text-align: center; color: #10b981; font-size: 0.8rem; font-weight: 500;">
+                                💡 所有參數即時計算，無需點擊按鈕
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 結果區域 -->
+                    <div class="loan-result-section">
+                        <h3 style="color: #10b981; font-weight: bold; margin-bottom: 0.8rem; font-size: 0.9rem;">📊 計算結果</h3>
+                        <div id="modalLoanResults">
+                            <div class="text-center text-gray-500 py-4">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                                <p style="font-size: 0.75rem;">請輸入房屋價格開始計算</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ✅ 模組化版本：腳本已拆分成多個模組 -->
+    
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    
+    <!-- 載入 Supabase 資料（已上架物件） -->
+    <script src="supabase-data-loader.js"></script>
+    
+    <!-- 載入 API 資料（從資料庫，作為備用） -->
+    <script src="api-data-loader.js"></script>
+    
+    <!-- 載入浮框功能 -->
+    <script src="property-modals.js"></script>
+    
+    <!-- 載入分頁系統 -->
+    <script src="pagination-system.js"></script>
+    
+    <!-- 載入主要功能 -->
+    <script src="main-script.js"></script>
+    
+    <script>
+        // ✅ 模組化版本初始化
+        // 注意：主要初始化邏輯在 main-script.js 中，這裡只處理已售物件分頁系統
+        let soldPaginationSystem;
+        
+        // 頁面載入完成後初始化已售物件分頁系統
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等待資料載入完成後再初始化已售物件分頁系統
+            window.addEventListener('supabaseDataLoaded', function() {
+                console.log('📦 Supabase 資料已載入，初始化已售物件分頁系統');
+                if (typeof SoldPropertyPaginationSystem !== 'undefined' && !soldPaginationSystem) {
+                    soldPaginationSystem = new SoldPropertyPaginationSystem();
+                }
+            });
+            
+            window.addEventListener('apiDataLoaded', function() {
+                console.log('📦 API 資料已載入，初始化已售物件分頁系統');
+                if (typeof SoldPropertyPaginationSystem !== 'undefined' && !soldPaginationSystem) {
+                    soldPaginationSystem = new SoldPropertyPaginationSystem();
+                }
+            });
+            
+            // 最終檢查：確保已售物件分頁系統已初始化（備用機制）
+            setTimeout(() => {
+                if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
+                    if (!soldPaginationSystem && typeof SoldPropertyPaginationSystem !== 'undefined') {
+                        console.log('⏰ 最終檢查：初始化已售物件分頁系統');
+                        soldPaginationSystem = new SoldPropertyPaginationSystem();
+                    }
+                }
+            }, 3000);
+        });
+        
+        // 🔍 開發模式調試（生產環境可移除）
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('✅ 模組化版本已載入');
+            setTimeout(() => {
+                console.log('🔍 模組載入狀態：');
+                console.log('- embeddedPropertiesData:', typeof embeddedPropertiesData !== 'undefined' ? '✅' : '❌');
+                console.log('- EmbeddedPropertyPaginationSystem:', typeof EmbeddedPropertyPaginationSystem !== 'undefined' ? '✅' : '❌');
+                console.log('- SoldPropertyPaginationSystem:', typeof SoldPropertyPaginationSystem !== 'undefined' ? '✅' : '❌');
+                console.log('- window.paginationSystem:', typeof window.paginationSystem !== 'undefined' ? '✅' : '❌');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

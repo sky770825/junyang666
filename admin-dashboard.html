@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>後台管理系統 | 住商不動產</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft JhengHei', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .nav {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .nav-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+        
+        .nav-item.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-card .change {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-card.primary { border-left: 4px solid #667eea; }
+        .stat-card.success { border-left: 4px solid #28a745; }
+        .stat-card.warning { border-left: 4px solid #ffc107; }
+        .stat-card.danger { border-left: 4px solid #dc3545; }
+        
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-card h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* 優化的彈跳視窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        .modal-dialog {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .modal-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .modal-icon.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .modal-icon.danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+            flex: 1;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 0.625rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 100px;
+        }
+        
+        .modal-btn-cancel {
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .modal-btn-cancel:hover {
+            background: #e9ecef;
+        }
+        
+        .modal-btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .modal-btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+        
+        .modal-btn-danger:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .modal-dialog {
+                width: 95%;
+                margin: 1rem;
+            }
+            
+            .modal-header {
+                padding: 1.25rem;
+            }
+            
+            .modal-body {
+                padding: 1.25rem;
+            }
+            
+            .modal-footer {
+                flex-direction: column-reverse;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+        }
+        
+        /* 子標籤切換樣式 */
+        .sub-tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #666;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sub-tab-btn:hover {
+            color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .sub-tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .property-subtab {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .property-subtab.active {
+            display: block;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        
+        .property-preview {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .property-preview img {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .property-preview-info {
+            flex: 1;
+        }
+        
+        .property-preview-info h4 {
+            margin-bottom: 0.25rem;
+            color: #333;
+        }
+        
+        .property-preview-info p {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-btn {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏠 後台管理系統</h1>
+        <p>物件管理、上下架控制、連結管理</p>
+    </div>
+    
+    <div class="nav">
+        <div class="nav-item active" onclick="switchTab('dashboard', this)">📊 儀表板</div>
+        <div class="nav-item" onclick="switchTab('properties', this)">🏘️ 物件管理</div>
+        <div class="nav-item" onclick="switchTab('publish', this)">⬆️ 上下架管理</div>
+        <div class="nav-item" onclick="switchTab('duplicates', this)">🔍 重複物件檢測</div>
+        <div class="nav-item" onclick="switchTab('links', this)">🔗 連結管理</div>
+    </div>
+    
+    <div class="container">
+        <!-- 儀表板 -->
+        <div id="dashboard-tab" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <h3>總物件數</h3>
+                    <div class="value" id="stat-total">0</div>
+                </div>
+                <div class="stat-card success">
+                    <h3>已上架</h3>
+                    <div class="value" id="stat-published">0</div>
+                </div>
+                <div class="stat-card warning">
+                    <h3>已下架</h3>
+                    <div class="value" id="stat-unpublished">0</div>
+                </div>
+                <div class="stat-card danger">
+                    <h3>已售出</h3>
+                    <div class="value" id="stat-sold">0</div>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <h2>快速操作</h2>
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="switchTab('properties', document.querySelector('.nav-item:nth-child(2)'))">
+                        ➕ 新增物件
+                    </button>
+                    <button class="btn btn-success" onclick="switchTab('publish', document.querySelector('.nav-item:nth-child(3)'))">
+                        ⬆️ 管理上下架
+                    </button>
+                    <a href="index.html" target="_blank" class="btn btn-secondary">
+                        👁️ 查看前台
+                    </a>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <h2>最近更新的物件</h2>
+                <div id="recent-properties">
+                    <p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 物件管理 -->
+        <div id="properties-tab" class="tab-content">
+            <!-- 子標籤切換 -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e9ecef;">
+                <button class="sub-tab-btn active" onclick="switchPropertySubTab('list', this)" id="property-list-tab">
+                    📋 物件列表
+                </button>
+                <button class="sub-tab-btn" onclick="switchPropertySubTab('add', this)" id="property-add-tab">
+                    ➕ 新增物件
+                </button>
+            </div>
+            
+            <!-- 物件列表子標籤 -->
+            <div id="property-list-subtab" class="property-subtab active">
+                <div class="content-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2>物件列表</h2>
+                        <div>
+                            <button class="btn btn-secondary" onclick="checkDuplicates()" style="margin-right: 0.5rem;">
+                                🔍 檢查重複
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="搜尋物件（標題、編號、地址）..." onkeyup="filterProperties()">
+                        <select id="type-filter" onchange="filterProperties()">
+                            <option value="">所有房型</option>
+                            <option value="套房">套房</option>
+                            <option value="2房">2房</option>
+                            <option value="3房">3房</option>
+                            <option value="4房">4房</option>
+                            <option value="華廈">華廈</option>
+                            <option value="公寓">公寓</option>
+                            <option value="透天">透天</option>
+                            <option value="店面">店面</option>
+                            <option value="別墅">別墅</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="setFilter('all', this)">全部</button>
+                        <button class="filter-btn" onclick="setFilter('published', this)">已上架</button>
+                        <button class="filter-btn" onclick="setFilter('unpublished', this)">已下架</button>
+                        <button class="filter-btn" onclick="setFilter('sold', this)">已售出</button>
+                        <button class="filter-btn" onclick="setFilter('internal', this)">🏠 本店物件</button>
+                        <button class="filter-btn" onclick="setFilter('external', this)">🏢 非本店物件</button>
+                    </div>
+                    
+                    <div id="properties-list">
+                        <p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 新增物件子標籤 -->
+            <div id="property-add-subtab" class="property-subtab">
+                <div class="content-card">
+                    <h2>新增物件</h2>
+                    <div id="property-add-alert-container" style="margin-bottom: 1rem;"></div>
+                    <div id="property-add-form-container">
+                        <p style="text-align: center; color: #666; padding: 2rem;">
+                            ⏳ 正在載入新增表單...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 重複物件檢測 -->
+        <div id="duplicates-tab" class="tab-content">
+            <div class="content-card">
+                <h2>🔍 重複物件檢測與清理</h2>
+                <p style="color: #666; margin-bottom: 1.5rem;">
+                    自動檢測並清理重複的物件（根據物件編號）。系統會保留最新建立的物件，刪除較舊的重複項目。
+                </p>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <button class="btn btn-primary" onclick="checkDuplicates()">
+                        🔍 開始檢測重複物件
+                    </button>
+                    <button class="btn btn-danger" onclick="cleanDuplicates()" id="clean-btn" style="display: none; margin-left: 0.5rem;">
+                        🗑️ 清理重複物件
+                    </button>
+                </div>
+                
+                <div id="duplicates-result">
+                    <p style="text-align: center; color: #666; padding: 2rem;">點擊「開始檢測」來檢查重複物件</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 上下架管理 -->
+        <div id="publish-tab" class="tab-content">
+            <div class="content-card">
+                <h2>上下架管理</h2>
+                <p style="color: #666; margin-bottom: 1rem;">
+                    快速管理物件的上架狀態。已上架的物件會顯示在前台首頁。
+                </p>
+                
+                <div id="publish-list">
+                    <p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 連結管理 -->
+        <div id="links-tab" class="tab-content">
+            <div class="content-card">
+                <h2>連結管理</h2>
+                <p style="color: #666; margin-bottom: 1rem;">
+                    管理網站相關連結和設定。
+                </p>
+                
+                <div class="form-group">
+                    <label>前台首頁連結</label>
+                    <input type="text" id="frontend-link" value="index.html" readonly>
+                    <a href="index.html" target="_blank" class="btn btn-secondary btn-small" style="margin-top: 0.5rem;">開啟前台</a>
+                </div>
+                
+                
+                <div class="form-group">
+                    <label>Supabase Dashboard 連結</label>
+                    <input type="text" id="supabase-link" value="https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa" readonly>
+                    <a href="https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa" target="_blank" class="btn btn-secondary btn-small" style="margin-top: 0.5rem;">開啟 Supabase</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Supabase 設定
+        const SUPABASE_URL = 'https://cnzqtuuegdqwkgvletaa.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE';
+        
+        let supabaseClient = null;
+        let allProperties = [];
+        let currentFilter = 'all';
+        
+        // 初始化
+        function init() {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            loadDashboard();
+        }
+        
+        // 切換標籤
+        function switchTab(tabName, element) {
+            // 更新導航
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            // 更新內容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // 載入對應資料
+            if (tabName === 'dashboard') {
+                loadDashboard();
+            } else if (tabName === 'properties') {
+                // 如果切換到物件管理標籤，載入列表（如果列表子標籤是活動的）
+                if (document.getElementById('property-list-subtab').classList.contains('active')) {
+                    loadProperties();
+                } else {
+                    loadPropertyAddForm();
+                }
+            } else if (tabName === 'publish') {
+                loadPublishList();
+            } else if (tabName === 'duplicates') {
+                // 重複物件檢測頁面已載入，等待用戶點擊檢測
+            }
+        }
+        
+        // 切換物件管理的子標籤
+        function switchPropertySubTab(subTabName, element) {
+            // 更新子標籤按鈕狀態
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            // 更新子標籤內容
+            document.querySelectorAll('.property-subtab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            if (subTabName === 'list') {
+                document.getElementById('property-list-subtab').classList.add('active');
+                loadProperties();
+            } else if (subTabName === 'add') {
+                document.getElementById('property-add-subtab').classList.add('active');
+                loadPropertyAddForm();
+            }
+        }
+        
+        // 載入新增物件表單
+        function loadPropertyAddForm() {
+            const container = document.getElementById('property-add-form-container');
+            if (!container) return;
+            
+            // 如果已經載入過，直接返回
+            if (container.dataset.loaded === 'true') {
+                return;
+            }
+            
+            // 使用 iframe 載入 property-admin-db.html 的新增表單頁面
+            // 這樣可以保持所有功能完整，包括圖片上傳等
+            container.innerHTML = `
+                <iframe 
+                    id="property-add-iframe" 
+                    src="property-admin-db.html?tab=add" 
+                    style="width: 100%; min-height: 800px; border: none; border-radius: 8px;"
+                    onload="adjustIframeHeight()">
+                </iframe>
+            `;
+            
+            container.dataset.loaded = 'true';
+        }
+        
+        // 調整 iframe 高度
+        function adjustIframeHeight() {
+            const iframe = document.getElementById('property-add-iframe');
+            if (iframe && iframe.contentWindow) {
+                try {
+                    const height = iframe.contentWindow.document.body.scrollHeight;
+                    iframe.style.height = Math.max(height, 800) + 'px';
+                } catch (e) {
+                    // 跨域限制，使用固定高度
+                    iframe.style.height = '1200px';
+                }
+            }
+        }
+        
+        // 載入儀表板
+        async function loadDashboard() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('properties')
+                    .select('*')
+                    .order('updated_at', { ascending: false })
+                    .limit(10);
+                
+                if (error) throw error;
+                
+                // 更新統計
+                updateStats();
+                
+                // 顯示最近物件
+                const recentDiv = document.getElementById('recent-properties');
+                if (data && data.length > 0) {
+                    recentDiv.innerHTML = `
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>物件</th>
+                                    <th>房型</th>
+                                    <th>價格</th>
+                                    <th>狀態</th>
+                                    <th>更新時間</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.map(prop => {
+                                    const images = Array.isArray(prop.images) ? prop.images : [];
+                                    const imgUrl = images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0].url) : '';
+                                    const publishedBadge = prop.is_published 
+                                        ? '<span class="badge badge-success">已上架</span>' 
+                                        : '<span class="badge badge-danger">已下架</span>';
+                                    
+                                    return `
+                                        <tr>
+                                            <td>
+                                                <div class="property-preview">
+                                                    ${imgUrl ? `<img src="${imgUrl}" alt="${prop.title}">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
+                                                    <div class="property-preview-info">
+                                                        <h4>${prop.title || '未命名'}</h4>
+                                                        <p>${prop.number || 'N/A'}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>${prop.type || 'N/A'}</td>
+                                            <td>${prop.price || 'N/A'}</td>
+                                            <td>${publishedBadge}</td>
+                                            <td>${new Date(prop.updated_at).toLocaleString('zh-TW')}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    recentDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">目前沒有物件</p>';
+                }
+            } catch (error) {
+                console.error('載入儀表板失敗:', error);
+                document.getElementById('recent-properties').innerHTML = 
+                    `<div class="alert alert-error">載入失敗：${error.message}</div>`;
+            }
+        }
+        
+        // 更新統計
+        async function updateStats() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('properties')
+                    .select('is_published, status, is_external');
+                
+                if (error) throw error;
+                
+                const total = data.length;
+                const published = data.filter(p => p.is_published).length;
+                const unpublished = data.filter(p => !p.is_published).length;
+                const sold = data.filter(p => p.status === 'sold').length;
+                const internal = data.filter(p => !p.is_external || p.is_external === false).length;
+                const external = data.filter(p => p.is_external === true || p.is_external === 'true').length;
+                
+                document.getElementById('stat-total').textContent = total;
+                document.getElementById('stat-published').textContent = published;
+                document.getElementById('stat-unpublished').textContent = unpublished;
+                document.getElementById('stat-sold').textContent = sold;
+                
+                // 記錄統計資訊（用於除錯）
+                console.log('📊 物件統計:', {
+                    total,
+                    published,
+                    unpublished,
+                    sold,
+                    internal,
+                    external
+                });
+            } catch (error) {
+                console.error('更新統計失敗:', error);
+            }
+        }
+        
+        // 載入物件列表
+        async function loadProperties() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('properties')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allProperties = data || [];
+                renderProperties();
+            } catch (error) {
+                console.error('載入物件失敗:', error);
+                document.getElementById('properties-list').innerHTML = 
+                    `<div class="alert alert-error">載入失敗：${error.message}</div>`;
+            }
+        }
+        
+        // 渲染物件列表
+        function renderProperties() {
+            let filtered = allProperties;
+            
+            // 應用篩選
+            if (currentFilter === 'published') {
+                filtered = filtered.filter(p => p.is_published);
+            } else if (currentFilter === 'unpublished') {
+                filtered = filtered.filter(p => !p.is_published);
+            } else if (currentFilter === 'sold') {
+                filtered = filtered.filter(p => p.status === 'sold');
+            } else if (currentFilter === 'internal') {
+                // 篩選本店物件
+                filtered = filtered.filter(p => !p.is_external || p.is_external === false);
+            } else if (currentFilter === 'external') {
+                // 篩選非本店物件
+                filtered = filtered.filter(p => p.is_external === true || p.is_external === 'true');
+            }
+            
+            // 應用搜尋
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const typeFilter = document.getElementById('type-filter').value;
+            
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    (p.title && p.title.toLowerCase().includes(searchTerm)) ||
+                    (p.number && p.number.toLowerCase().includes(searchTerm)) ||
+                    (p.address && p.address.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            if (typeFilter) {
+                filtered = filtered.filter(p => p.type === typeFilter);
+            }
+            
+            const listDiv = document.getElementById('properties-list');
+            
+            if (filtered.length === 0) {
+                listDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">沒有找到物件</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>物件</th>
+                            <th>來源</th>
+                            <th>房型</th>
+                            <th>價格</th>
+                            <th>上架狀態</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filtered.map(prop => {
+                            const images = Array.isArray(prop.images) ? prop.images : [];
+                            const imgUrl = images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0].url) : '';
+                            const publishedBadge = prop.is_published 
+                                ? '<span class="badge badge-success">已上架</span>' 
+                                : '<span class="badge badge-danger">已下架</span>';
+                            
+                            // 物件來源標籤
+                            const isExternal = prop.is_external === true || prop.is_external === 'true';
+                            const sourceBadge = isExternal 
+                                ? '<span class="badge" style="background: #ff9800; color: white;">🏢 非本店</span>' 
+                                : '<span class="badge" style="background: #28a745; color: white;">🏠 本店</span>';
+                            
+                            return `
+                                <tr>
+                                    <td>
+                                        <div class="property-preview">
+                                            ${imgUrl ? `<img src="${imgUrl}" alt="${prop.title}">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
+                                            <div class="property-preview-info">
+                                                <h4>${prop.title || '未命名'}</h4>
+                                                <p>${prop.number || 'N/A'} | ${prop.address || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>${sourceBadge}</td>
+                                    <td>${prop.type || 'N/A'}</td>
+                                    <td>${prop.price || 'N/A'}</td>
+                                    <td>${publishedBadge}</td>
+                                    <td>
+                                        <button class="btn btn-small ${prop.is_published ? 'btn-danger' : 'btn-success'}" 
+                                                onclick="togglePublish('${prop.id}', ${!prop.is_published})">
+                                            ${prop.is_published ? '⬇️ 下架' : '⬆️ 上架'}
+                                        </button>
+                                        <button class="btn btn-secondary btn-small" 
+                                                onclick="editProperty('${prop.id}')">
+                                            ✏️ 編輯
+                                        </button>
+                                        <button class="btn btn-danger btn-small" 
+                                                onclick="deleteProperty('${prop.id}')">
+                                            🗑️ 刪除
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // 設定篩選
+        function setFilter(filter, element) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+            renderProperties();
+        }
+        
+        // 搜尋和篩選
+        function filterProperties() {
+            renderProperties();
+        }
+        
+        // 切換上架狀態（優化版：減少延遲）
+        async function togglePublish(id, newStatus) {
+            try {
+                // 先更新本地資料（立即反饋）
+                const prop = allProperties.find(p => p.id === id);
+                if (prop) {
+                    prop.is_published = newStatus;
+                }
+                
+                // 立即更新 UI（樂觀更新）
+                renderProperties();
+                updateStats();
+                
+                // 異步更新資料庫
+                const { error } = await supabaseClient
+                    .from('properties')
+                    .update({ is_published: newStatus })
+                    .eq('id', id);
+                
+                if (error) {
+                    // 如果失敗，恢復原狀態
+                    if (prop) {
+                        prop.is_published = !newStatus;
+                    }
+                    renderProperties();
+                    updateStats();
+                    throw error;
+                }
+                
+                // 顯示成功訊息
+                showAlert('success', newStatus ? '物件已上架！' : '物件已下架！');
+            } catch (error) {
+                console.error('切換狀態失敗:', error);
+                showAlert('error', `操作失敗：${error.message}`);
+            }
+        }
+        
+        // 載入上下架列表
+        async function loadPublishList() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('properties')
+                    .select('*')
+                    .order('updated_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                const listDiv = document.getElementById('publish-list');
+                
+                if (!data || data.length === 0) {
+                    listDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">目前沒有物件</p>';
+                    return;
+                }
+                
+                listDiv.innerHTML = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>物件</th>
+                                <th>目前狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(prop => {
+                                const images = Array.isArray(prop.images) ? prop.images : [];
+                                const imgUrl = images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0].url) : '';
+                                const publishedBadge = prop.is_published 
+                                    ? '<span class="badge badge-success">✅ 已上架（顯示在前台）</span>' 
+                                    : '<span class="badge badge-danger">❌ 已下架（不顯示在前台）</span>';
+                                
+                                return `
+                                    <tr>
+                                        <td>
+                                            <div class="property-preview">
+                                                ${imgUrl ? `<img src="${imgUrl}" alt="${prop.title}">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
+                                                <div class="property-preview-info">
+                                                    <h4>${prop.title || '未命名'}</h4>
+                                                    <p>${prop.number || 'N/A'} | ${prop.type || 'N/A'} | ${prop.price || 'N/A'}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>${publishedBadge}</td>
+                                        <td>
+                                            <button class="btn btn-small ${prop.is_published ? 'btn-danger' : 'btn-success'}" 
+                                                    onclick="togglePublish('${prop.id}', ${!prop.is_published}); loadPublishList();">
+                                                ${prop.is_published ? '⬇️ 下架' : '⬆️ 上架'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('載入上下架列表失敗:', error);
+                document.getElementById('publish-list').innerHTML = 
+                    `<div class="alert alert-error">載入失敗：${error.message}</div>`;
+            }
+        }
+        
+        // 顯示提示訊息
+        function showAlert(type, message) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '9999';
+            alert.style.minWidth = '300px';
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+        
+        // 編輯物件
+        function editProperty(id) {
+            // 切換到物件管理標籤的新增子標籤，並載入編輯表單
+            const propertiesTab = document.querySelector('.nav-item[onclick*="properties"]');
+            if (propertiesTab) {
+                switchTab('properties', propertiesTab);
+                
+                // 切換到新增子標籤
+                setTimeout(() => {
+                    const addSubTab = document.getElementById('property-add-tab');
+                    if (addSubTab) {
+                        switchPropertySubTab('add', addSubTab);
+                        
+                        // 載入編輯表單（通過 iframe）
+                        setTimeout(() => {
+                            const iframe = document.getElementById('property-add-iframe');
+                            if (iframe) {
+                                iframe.src = `property-admin-db.html?tab=add&id=${id}`;
+                            } else {
+                                // 如果 iframe 還沒載入，重新載入表單
+                                loadPropertyAddForm();
+                                setTimeout(() => {
+                                    const newIframe = document.getElementById('property-add-iframe');
+                                    if (newIframe) {
+                                        newIframe.src = `property-admin-db.html?tab=add&id=${id}`;
+                                    }
+                                }, 500);
+                            }
+                        }, 300);
+                    }
+                }, 100);
+            }
+        }
+        
+        // 顯示確認彈跳視窗
+        function showConfirmModal(options) {
+            return new Promise((resolve) => {
+                const {
+                    title = '確認操作',
+                    message = '確定要執行此操作嗎？',
+                    icon = 'warning',
+                    confirmText = '確定',
+                    cancelText = '取消',
+                    confirmClass = 'modal-btn-danger'
+                } = options;
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                
+                const iconEmoji = icon === 'danger' ? '⚠️' : '❓';
+                const iconClass = icon === 'danger' ? 'danger' : 'warning';
+                
+                overlay.innerHTML = `
+                    <div class="modal-dialog">
+                        <div class="modal-header">
+                            <div class="modal-icon ${iconClass}">${iconEmoji}</div>
+                            <h3 class="modal-title">${title}</h3>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            ${message}
+                        </div>
+                        <div class="modal-footer">
+                            <button class="modal-btn modal-btn-cancel" onclick="this.closest('.modal-overlay').remove(); arguments[0].stopPropagation();">${cancelText}</button>
+                            <button class="modal-btn ${confirmClass}" onclick="this.closest('.modal-overlay').remove(); arguments[0].stopPropagation();">${confirmText}</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(overlay);
+                
+                // 處理確認按鈕
+                const confirmBtn = overlay.querySelector(`.${confirmClass}`);
+                confirmBtn.addEventListener('click', () => {
+                    overlay.remove();
+                    resolve(true);
+                });
+                
+                // 處理取消按鈕
+                const cancelBtn = overlay.querySelector('.modal-btn-cancel');
+                cancelBtn.addEventListener('click', () => {
+                    overlay.remove();
+                    resolve(false);
+                });
+                
+                // 處理 ESC 鍵
+                const handleEsc = (e) => {
+                    if (e.key === 'Escape') {
+                        overlay.remove();
+                        document.removeEventListener('keydown', handleEsc);
+                        resolve(false);
+                    }
+                };
+                document.addEventListener('keydown', handleEsc);
+                
+                // 點擊背景關閉
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                        document.removeEventListener('keydown', handleEsc);
+                        resolve(false);
+                    }
+                });
+            });
+        }
+        
+        // 刪除物件
+        async function deleteProperty(id) {
+            // 先取得物件資訊以顯示在確認視窗中
+            let propertyInfo = '';
+            try {
+                const { data: prop } = await supabaseClient
+                    .from('properties')
+                    .select('title, number')
+                    .eq('id', id)
+                    .single();
+                
+                if (prop) {
+                    propertyInfo = `<strong>${prop.title || prop.number || '此物件'}</strong>`;
+                }
+            } catch (e) {
+                // 忽略錯誤，繼續顯示確認視窗
+            }
+            
+            const confirmed = await showConfirmModal({
+                title: '刪除物件',
+                message: `確定要刪除 ${propertyInfo || '此物件'} 嗎？<br><br>此操作無法復原，請謹慎操作。`,
+                icon: 'danger',
+                confirmText: '🗑️ 刪除',
+                cancelText: '取消'
+            });
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('properties')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                showAlert('success', '物件已刪除！');
+                
+                // 重新載入列表
+                loadProperties();
+                loadDashboard();
+                updateStats();
+            } catch (error) {
+                console.error('刪除失敗:', error);
+                showAlert('error', `刪除失敗：${error.message}`);
+            }
+        }
+        
+        // 檢查重複物件
+        let duplicateGroups = [];
+        
+        async function checkDuplicates() {
+            try {
+                showAlert('info', '正在檢測重複物件...');
+                
+                const { data, error } = await supabaseClient
+                    .from('properties')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                // 根據 number 欄位分組
+                const numberGroups = {};
+                data.forEach(prop => {
+                    const number = prop.number;
+                    if (!number) return;
+                    
+                    if (!numberGroups[number]) {
+                        numberGroups[number] = [];
+                    }
+                    numberGroups[number].push(prop);
+                });
+                
+                // 找出重複的物件
+                duplicateGroups = Object.values(numberGroups).filter(group => group.length > 1);
+                
+                const resultDiv = document.getElementById('duplicates-result');
+                const cleanBtn = document.getElementById('clean-btn');
+                
+                if (duplicateGroups.length === 0) {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            ✅ 沒有發現重複物件！所有物件編號都是唯一的。
+                        </div>
+                    `;
+                    cleanBtn.style.display = 'none';
+                } else {
+                    let totalDuplicates = 0;
+                    duplicateGroups.forEach(group => {
+                        totalDuplicates += group.length - 1; // 減去保留的一個
+                    });
+                    
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-warning">
+                            ⚠️ 發現 ${duplicateGroups.length} 組重複物件，共 ${totalDuplicates} 個重複項目需要清理。
+                        </div>
+                        <table class="table" style="margin-top: 1rem;">
+                            <thead>
+                                <tr>
+                                    <th>物件編號</th>
+                                    <th>重複數量</th>
+                                    <th>物件列表</th>
+                                    <th>將保留</th>
+                                    <th>將刪除</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${duplicateGroups.map(group => {
+                                    // 按建立時間排序，最新的在前
+                                    group.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                                    const keep = group[0]; // 保留最新的
+                                    const toDelete = group.slice(1); // 刪除其他的
+                                    
+                                    return `
+                                        <tr>
+                                            <td><strong>${keep.number}</strong></td>
+                                            <td><span class="badge badge-warning">${group.length} 個</span></td>
+                                            <td>
+                                                ${group.map(p => `
+                                                    <div style="margin-bottom: 0.5rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px;">
+                                                        <strong>${p.title || '未命名'}</strong><br>
+                                                        <small>ID: ${p.id.substring(0, 8)}... | 建立: ${new Date(p.created_at).toLocaleString('zh-TW')}</small>
+                                                    </div>
+                                                `).join('')}
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-success">✅ ${keep.title || '未命名'}</span><br>
+                                                <small>${new Date(keep.created_at).toLocaleString('zh-TW')}</small>
+                                            </td>
+                                            <td>
+                                                ${toDelete.map(p => `
+                                                    <div style="margin-bottom: 0.25rem;">
+                                                        <span class="badge badge-danger">🗑️ ${p.title || '未命名'}</span><br>
+                                                        <small>${new Date(p.created_at).toLocaleString('zh-TW')}</small>
+                                                    </div>
+                                                `).join('')}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                    cleanBtn.style.display = 'inline-block';
+                }
+                
+                showAlert('success', '檢測完成！');
+            } catch (error) {
+                console.error('檢測失敗:', error);
+                showAlert('error', `檢測失敗：${error.message}`);
+                document.getElementById('duplicates-result').innerHTML = 
+                    `<div class="alert alert-error">檢測失敗：${error.message}</div>`;
+            }
+        }
+        
+        // 清理重複物件
+        async function cleanDuplicates() {
+            if (duplicateGroups.length === 0) {
+                showAlert('warning', '沒有重複物件需要清理');
+                return;
+            }
+            
+            if (!confirm(`確定要清理 ${duplicateGroups.length} 組重複物件嗎？此操作無法復原。`)) {
+                return;
+            }
+            
+            try {
+                showAlert('info', '正在清理重複物件...');
+                
+                let deletedCount = 0;
+                const idsToDelete = [];
+                
+                // 收集所有要刪除的物件 ID
+                duplicateGroups.forEach(group => {
+                    // 按建立時間排序，最新的在前
+                    group.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    const toDelete = group.slice(1); // 刪除除了最新之外的所有
+                    toDelete.forEach(prop => {
+                        idsToDelete.push(prop.id);
+                    });
+                });
+                
+                // 批次刪除
+                if (idsToDelete.length > 0) {
+                    for (const id of idsToDelete) {
+                        const { error } = await supabaseClient
+                            .from('properties')
+                            .delete()
+                            .eq('id', id);
+                        
+                        if (error) {
+                            console.error(`刪除物件 ${id} 失敗:`, error);
+                        } else {
+                            deletedCount++;
+                        }
+                    }
+                }
+                
+                showAlert('success', `成功清理 ${deletedCount} 個重複物件！`);
+                
+                // 重新檢測
+                duplicateGroups = [];
+                document.getElementById('clean-btn').style.display = 'none';
+                await checkDuplicates();
+                
+                // 更新其他頁面
+                loadProperties();
+                loadDashboard();
+                updateStats();
+            } catch (error) {
+                console.error('清理失敗:', error);
+                showAlert('error', `清理失敗：${error.message}`);
+            }
+        }
+        
+        // 頁面載入時初始化
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

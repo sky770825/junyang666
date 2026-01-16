@@ -1,0 +1,29 @@
+{
+  "supabase": {
+    "url": "https://cnzqtuuegdqwkgvletaa.supabase.co",
+    "anonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE",
+    "projectId": "cnzqtuuegdqwkgvletaa",
+    "storage": {
+      "bucketName": "junyang666",
+      "publicUrl": "https://cnzqtuuegdqwkgvletaa.supabase.co/storage/v1/object/public/junyang666"
+    }
+  },
+  "settings": {
+    "database": {
+      "tableName": "properties",
+      "publishedView": "published_properties",
+      "statsView": "property_stats"
+    },
+    "features": {
+      "publishStatus": true,
+      "imageUpload": true,
+      "autoNumbering": true
+    }
+  },
+  "dashboard": {
+    "url": "https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa",
+    "apiSettings": "https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa/settings/api",
+    "storage": "https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa/storage/files/buckets/junyang666",
+    "sqlEditor": "https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa/sql/new"
+  }
+}

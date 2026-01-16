@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物件管理後台 | 住商不動產</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .form-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.7rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .array-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .array-input input {
+            flex: 1;
+        }
+        
+        .array-input button {
+            padding: 0.5rem 1rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .add-btn {
+            padding: 0.5rem 1rem;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .image-item {
+            position: relative;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+        
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-item .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .preview-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        
+        .preview-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .json-output {
+            background: #2d3748;
+            color: #68d391;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .property-list {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .property-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .property-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .property-info h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .property-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .property-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 物件管理後台</h1>
+            <p>新增、編輯、管理房屋物件資料</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('add')">➕ 新增物件</button>
+            <button class="tab" onclick="switchTab('list')">📋 物件列表</button>
+            <button class="tab" onclick="switchTab('export')">💾 匯出資料</button>
+        </div>
+        
+        <!-- 新增物件 -->
+        <div id="add-tab" class="tab-content active">
+            <div id="alert-container"></div>
+            
+            <form id="property-form">
+                <!-- 基本資訊 -->
+                <div class="form-section">
+                    <h3>📝 基本資訊</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>物件編號 (自動生成)</label>
+                            <input type="text" id="number" placeholder="例如: 2-1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>物件標題 *</label>
+                            <input type="text" id="title" placeholder="例如: 低自備 | 近龍科 | 2房+車位" required>
+                        </div>
+                        <div class="form-group">
+                            <label>房型 *</label>
+                            <select id="type" required>
+                                <option value="">請選擇</option>
+                                <option value="套房">套房</option>
+                                <option value="2房">2房</option>
+                                <option value="3房">3房</option>
+                                <option value="4房">4房</option>
+                                <option value="華廈">華廈</option>
+                                <option value="公寓">公寓</option>
+                                <option value="透天">透天</option>
+                                <option value="店面">店面</option>
+                                <option value="別墅">別墅</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>地址 *</label>
+                            <input type="text" id="address" placeholder="例如: 楊梅區梅獅路二段232巷***號10樓" required>
+                        </div>
+                        <div class="form-group">
+                            <label>社區名稱</label>
+                            <input type="text" id="community" placeholder="例如: 世紀城">
+                        </div>
+                        <div class="form-group">
+                            <label>售價 *</label>
+                            <input type="text" id="price" placeholder="例如: 896萬" required>
+                        </div>
+                        <div class="form-group">
+                            <label>物件狀態</label>
+                            <select id="status">
+                                <option value="">一般物件</option>
+                                <option value="new">新上架</option>
+                                <option value="sold">已售出</option>
+                                <option value="urgent">急售</option>
+                                <option value="selling">熱銷中</option>
+                                <option value="below-appraisal">低於鑑價</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>狀態文字</label>
+                            <input type="text" id="statusText" placeholder="例如: 新上架">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 物件詳情 -->
+                <div class="form-section">
+                    <h3>📏 物件詳情</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>格局 *</label>
+                            <input type="text" id="layout" placeholder="例如: 2房2廳1衛" required>
+                        </div>
+                        <div class="form-group">
+                            <label>總坪數 *</label>
+                            <input type="text" id="total_area" placeholder="例如: 40.08坪" required>
+                        </div>
+                        <div class="form-group">
+                            <label>主建物坪數</label>
+                            <input type="text" id="main_area" placeholder="例如: 18.17坪">
+                        </div>
+                        <div class="form-group">
+                            <label>附屬建物坪數</label>
+                            <input type="text" id="auxiliary_area" placeholder="例如: 1.63坪">
+                        </div>
+                        <div class="form-group">
+                            <label>公設坪數</label>
+                            <input type="text" id="common_area" placeholder="例如: 9.07坪">
+                        </div>
+                        <div class="form-group">
+                            <label>土地坪數</label>
+                            <input type="text" id="land_area" placeholder="例如: 5.22坪">
+                        </div>
+                        <div class="form-group">
+                            <label>車位坪數</label>
+                            <input type="text" id="parking_area" placeholder="例如: 8.5坪">
+                        </div>
+                        <div class="form-group">
+                            <label>屋齡</label>
+                            <input type="text" id="age" placeholder="例如: 11年">
+                        </div>
+                        <div class="form-group">
+                            <label>樓層</label>
+                            <input type="text" id="floor" placeholder="例如: 10/14樓">
+                        </div>
+                        <div class="form-group">
+                            <label>建築類型</label>
+                            <select id="building_type">
+                                <option value="">請選擇</option>
+                                <option value="電梯大樓">電梯大樓</option>
+                                <option value="華廈">華廈</option>
+                                <option value="透天別墅">透天別墅</option>
+                                <option value="大樓">大樓</option>
+                                <option value="大廈">大廈</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>座向</label>
+                            <input type="text" id="orientation" placeholder="例如: 座北朝南">
+                        </div>
+                        <div class="form-group">
+                            <label>管理費</label>
+                            <input type="text" id="management_fee" placeholder="例如: 2,077元/月">
+                        </div>
+                        <div class="form-group">
+                            <label>車位類型</label>
+                            <input type="text" id="parking_type" placeholder="例如: 平面車位">
+                        </div>
+                        <div class="form-group">
+                            <label>車位編號</label>
+                            <input type="text" id="parking_space" placeholder="例如: B3-14">
+                        </div>
+                        <div class="form-group">
+                            <label>現況</label>
+                            <input type="text" id="current_status" placeholder="例如: 空屋">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 交通與設施 -->
+                <div class="form-section">
+                    <h3>🚗 交通與設施</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>生活設施 (每行一個)</label>
+                            <textarea id="facilities" placeholder="梅獅路商圈&#10;全聯福利中心&#10;7-ELEVEN"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>交通設施 (每行一個)</label>
+                            <textarea id="transport" placeholder="台1線&#10;楊梅交流道&#10;埔心火車站"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>學區 (每行一個)</label>
+                            <textarea id="schools" placeholder="陽光國小&#10;瑞塘國小&#10;瑞坪國中"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>市場</label>
+                            <input type="text" id="market" placeholder="例如: 萬大市場">
+                        </div>
+                        <div class="form-group">
+                            <label>公園</label>
+                            <input type="text" id="park" placeholder="例如: 四維公園">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 特色與描述 -->
+                <div class="form-section">
+                    <h3>✨ 特色與描述</h3>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>物件特色 (每行一個)</label>
+                            <textarea id="features" placeholder="近學區&#10;交通便利&#10;管理完善"></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>物件描述</label>
+                            <textarea id="description" placeholder="詳細描述物件特色..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 圖片 -->
+                <div class="form-section">
+                    <h3>📷 物件圖片</h3>
+                    <div class="form-group full-width">
+                        <label>圖片路徑 (每行一個，相對路徑)</label>
+                        <textarea id="images" placeholder="images/2-1/客廳.jpg&#10;images/2-1/主臥房.jpg&#10;images/2-1/格局圖.png" rows="5"></textarea>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
+                            💡 提示：輸入圖片路徑，每行一個。例如：images/2-1/客廳.jpg
+                        </p>
+                    </div>
+                    <div id="image-preview" class="image-preview"></div>
+                </div>
+                
+                <!-- 其他資訊 -->
+                <div class="form-section">
+                    <h3>🔗 其他資訊</h3>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Google Maps 嵌入網址</label>
+                            <input type="text" id="google_maps" placeholder="https://www.google.com/maps/embed?pb=...">
+                        </div>
+                        <div class="form-group">
+                            <label>TikTok 影片 ID</label>
+                            <input type="text" id="tiktok_video_id" placeholder="例如: 7531311616948948230">
+                        </div>
+                        <div class="form-group">
+                            <label>TikTok 使用者名稱</label>
+                            <input type="text" id="tiktok_username" placeholder="例如: @aihouse168">
+                        </div>
+                        <div class="form-group">
+                            <label>參考連結</label>
+                            <input type="text" id="reference_link" placeholder="https://...">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" onclick="generateJSON()">🔍 預覽 JSON</button>
+                    <button type="button" class="btn btn-success" onclick="saveProperty()">💾 儲存到 property-data.js</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">🔄 重設表單</button>
+                </div>
+                
+                <div class="preview-section" id="preview-section" style="display: none;">
+                    <h3>📋 生成的 JSON 預覽</h3>
+                    <div class="json-output" id="json-output"></div>
+                    <div class="btn-group" style="margin-top: 1rem;">
+                        <button type="button" class="btn btn-primary" onclick="copyJSON()">📋 複製 JSON</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 物件列表 -->
+        <div id="list-tab" class="tab-content">
+            <div class="form-section">
+                <h3>📋 現有物件列表</h3>
+                <div id="property-list" class="property-list">
+                    <p style="text-align: center; color: #666; padding: 2rem;">
+                        載入中... (需要載入 property-data.js)
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 匯出資料 -->
+        <div id="export-tab" class="tab-content">
+            <div class="form-section">
+                <h3>💾 匯出物件資料</h3>
+                <p style="margin-bottom: 1rem; color: #666;">
+                    點擊下方按鈕來複製完整的 property-data.js 檔案內容
+                </p>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" onclick="exportAllData()">📋 複製完整資料</button>
+                </div>
+                <div class="preview-section" id="export-preview" style="display: none; margin-top: 2rem;">
+                    <h3>📋 完整資料</h3>
+                    <div class="json-output" id="export-output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 載入現有資料
+        let propertiesData = { properties: [] };
+        
+        // 載入 property-data.js (如果存在)
+        function loadExistingData() {
+            // 嘗試載入 property-data.js
+            const script = document.createElement('script');
+            script.src = 'property-data.js';
+            script.onload = function() {
+                if (typeof embeddedPropertiesData !== 'undefined') {
+                    propertiesData = embeddedPropertiesData;
+                    updatePropertyList();
+                }
+            };
+            script.onerror = function() {
+                console.log('無法載入 property-data.js，將使用空資料');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // 切換標籤
+        function switchTab(tabName) {
+            // 隱藏所有標籤內容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有標籤的 active 狀態
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 顯示選中的標籤內容
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // 添加標籤的 active 狀態
+            event.target.classList.add('active');
+            
+            // 如果是列表標籤，更新列表
+            if (tabName === 'list') {
+                updatePropertyList();
+            }
+        }
+        
+        // 生成物件 ID
+        function generatePropertyId() {
+            const maxId = propertiesData.properties.reduce((max, prop) => {
+                const match = prop.id.match(/prop_(\d+)/);
+                if (match) {
+                    const num = parseInt(match[1]);
+                    return num > max ? num : max;
+                }
+                return max;
+            }, 0);
+            return `prop_${String(maxId + 1).padStart(3, '0')}`;
+        }
+        
+        // 生成 JSON
+        function generateJSON() {
+            const formData = collectFormData();
+            const jsonStr = formatPropertyJSON(formData);
+            
+            document.getElementById('json-output').textContent = jsonStr;
+            document.getElementById('preview-section').style.display = 'block';
+            
+            // 滾動到預覽區域
+            document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // 收集表單資料
+        function collectFormData() {
+            const data = {
+                id: generatePropertyId(),
+                number: document.getElementById('number').value.trim(),
+                title: document.getElementById('title').value.trim(),
+                type: document.getElementById('type').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                price: document.getElementById('price').value.trim(),
+                layout: document.getElementById('layout').value.trim(),
+                total_area: document.getElementById('total_area').value.trim(),
+                status: document.getElementById('status').value.trim(),
+                statusText: document.getElementById('statusText').value.trim()
+            };
+            
+            // 可選欄位
+            const optionalFields = [
+                'community', 'main_area', 'auxiliary_area', 'common_area', 
+                'land_area', 'parking_area', 'age', 'floor', 'building_type',
+                'orientation', 'management_fee', 'parking_type', 'parking_space',
+                'current_status', 'description', 'google_maps', 'tiktok_video_id',
+                'tiktok_username', 'reference_link'
+            ];
+            
+            optionalFields.forEach(field => {
+                const value = document.getElementById(field).value.trim();
+                if (value) {
+                    data[field] = value;
+                }
+            });
+            
+            // 處理陣列欄位
+            const imagesText = document.getElementById('images').value.trim();
+            if (imagesText) {
+                data.images = imagesText.split('\n').map(line => line.trim()).filter(line => line);
+            }
+            
+            const featuresText = document.getElementById('features').value.trim();
+            if (featuresText) {
+                data.features = featuresText.split('\n').map(line => line.trim()).filter(line => line);
+            }
+            
+            // 處理交通與設施
+            const transportation = {};
+            const facilitiesText = document.getElementById('facilities').value.trim();
+            if (facilitiesText) {
+                transportation.facilities = facilitiesText.split('\n').map(line => line.trim()).filter(line => line);
+            }
+            
+            const transportText = document.getElementById('transport').value.trim();
+            if (transportText) {
+                transportation.transport = transportText.split('\n').map(line => line.trim()).filter(line => line);
+            }
+            
+            const schoolsText = document.getElementById('schools').value.trim();
+            if (schoolsText) {
+                transportation.schools = schoolsText.split('\n').map(line => line.trim()).filter(line => line);
+            }
+            
+            const market = document.getElementById('market').value.trim();
+            if (market) transportation.market = market;
+            
+            const park = document.getElementById('park').value.trim();
+            if (park) transportation.park = park;
+            
+            if (Object.keys(transportation).length > 0) {
+                data.transportation = transportation;
+            }
+            
+            return data;
+        }
+        
+        // 格式化 JSON
+        function formatPropertyJSON(data) {
+            let json = '{\n';
+            json += `    id: "${data.id}",\n`;
+            
+            const fields = [
+                'title', 'number', 'type', 'address', 'price', 'total_area',
+                'main_area', 'status', 'statusText', 'layout', 'age', 'floor',
+                'building_type', 'parking_space', 'parking_type', 'current_status',
+                'management_fee', 'orientation', 'auxiliary_area', 'common_area',
+                'land_area', 'parking_area', 'community', 'description'
+            ];
+            
+            fields.forEach(field => {
+                if (data[field]) {
+                    json += `    ${field}: "${data[field]}",\n`;
+                }
+            });
+            
+            if (data.images && data.images.length > 0) {
+                json += `    images: [\n`;
+                data.images.forEach((img, index) => {
+                    json += `        "${img}"${index < data.images.length - 1 ? ',' : ''}\n`;
+                });
+                json += `    ],\n`;
+            }
+            
+            if (data.transportation) {
+                json += `    transportation: {\n`;
+                if (data.transportation.facilities) {
+                    json += `        facilities: [\n`;
+                    data.transportation.facilities.forEach((item, index) => {
+                        json += `            "${item}"${index < data.transportation.facilities.length - 1 ? ',' : ''}\n`;
+                    });
+                    json += `        ],\n`;
+                }
+                if (data.transportation.transport) {
+                    json += `        transport: [\n`;
+                    data.transportation.transport.forEach((item, index) => {
+                        json += `            "${item}"${index < data.transportation.transport.length - 1 ? ',' : ''}\n`;
+                    });
+                    json += `        ],\n`;
+                }
+                if (data.transportation.schools) {
+                    json += `        schools: [\n`;
+                    data.transportation.schools.forEach((item, index) => {
+                        json += `            "${item}"${index < data.transportation.schools.length - 1 ? ',' : ''}\n`;
+                    });
+                    json += `        ],\n`;
+                }
+                if (data.transportation.market) {
+                    json += `        market: "${data.transportation.market}",\n`;
+                }
+                if (data.transportation.park) {
+                    json += `        park: "${data.transportation.park}",\n`;
+                }
+                json += `    },\n`;
+            }
+            
+            if (data.features && data.features.length > 0) {
+                json += `    features: [\n`;
+                data.features.forEach((feature, index) => {
+                    json += `        "${feature}"${index < data.features.length - 1 ? ',' : ''}\n`;
+                });
+                json += `    ],\n`;
+            }
+            
+            const otherFields = ['google_maps', 'tiktok_video_id', 'tiktok_username', 'reference_link'];
+            otherFields.forEach(field => {
+                if (data[field]) {
+                    json += `    ${field}: "${data[field]}",\n`;
+                }
+            });
+            
+            json = json.slice(0, -2) + '\n}'; // 移除最後的逗號和換行
+            return json;
+        }
+        
+        // 複製 JSON
+        function copyJSON() {
+            const jsonText = document.getElementById('json-output').textContent;
+            navigator.clipboard.writeText(jsonText).then(() => {
+                showAlert('success', 'JSON 已複製到剪貼簿！');
+            });
+        }
+        
+        // 儲存物件
+        function saveProperty() {
+            const formData = collectFormData();
+            
+            // 驗證必填欄位
+            if (!formData.title || !formData.type || !formData.address || !formData.price || !formData.layout || !formData.total_area) {
+                showAlert('error', '請填寫所有必填欄位！');
+                return;
+            }
+            
+            // 添加到資料陣列
+            propertiesData.properties.push(formData);
+            
+            showAlert('success', `物件已新增！ID: ${formData.id}`);
+            
+            // 自動生成 JSON
+            generateJSON();
+            
+            // 更新列表
+            updatePropertyList();
+        }
+        
+        // 重設表單
+        function resetForm() {
+            document.getElementById('property-form').reset();
+            document.getElementById('preview-section').style.display = 'none';
+            document.getElementById('image-preview').innerHTML = '';
+        }
+        
+        // 更新物件列表
+        function updatePropertyList() {
+            const listContainer = document.getElementById('property-list');
+            
+            if (!propertiesData.properties || propertiesData.properties.length === 0) {
+                listContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">目前沒有物件資料</p>';
+                return;
+            }
+            
+            listContainer.innerHTML = propertiesData.properties.map((prop, index) => `
+                <div class="property-item">
+                    <div class="property-info">
+                        <h4>${prop.title || '未命名物件'}</h4>
+                        <p>編號: ${prop.number || 'N/A'} | 房型: ${prop.type || 'N/A'} | 價格: ${prop.price || 'N/A'}</p>
+                    </div>
+                    <div class="property-actions">
+                        <button class="btn-small btn-primary" onclick="editProperty(${index})">✏️ 編輯</button>
+                        <button class="btn-small btn-danger" onclick="deleteProperty(${index})">🗑️ 刪除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 編輯物件
+        function editProperty(index) {
+            const prop = propertiesData.properties[index];
+            
+            // 填入表單
+            Object.keys(prop).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (Array.isArray(prop[key])) {
+                        element.value = prop[key].join('\n');
+                    } else if (typeof prop[key] === 'object') {
+                        // 處理 transportation 等物件
+                        if (key === 'transportation') {
+                            if (prop[key].facilities) {
+                                document.getElementById('facilities').value = prop[key].facilities.join('\n');
+                            }
+                            if (prop[key].transport) {
+                                document.getElementById('transport').value = prop[key].transport.join('\n');
+                            }
+                            if (prop[key].schools) {
+                                document.getElementById('schools').value = prop[key].schools.join('\n');
+                            }
+                            if (prop[key].market) {
+                                document.getElementById('market').value = prop[key].market;
+                            }
+                            if (prop[key].park) {
+                                document.getElementById('park').value = prop[key].park;
+                            }
+                        }
+                    } else {
+                        element.value = prop[key];
+                    }
+                }
+            });
+            
+            // 切換到新增標籤
+            switchTab('add');
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.querySelectorAll('.tab')[0].click();
+        }
+        
+        // 刪除物件
+        function deleteProperty(index) {
+            if (confirm('確定要刪除這個物件嗎？')) {
+                propertiesData.properties.splice(index, 1);
+                updatePropertyList();
+                showAlert('success', '物件已刪除！');
+            }
+        }
+        
+        // 匯出所有資料
+        function exportAllData() {
+            let output = '// 物件資料模組 - 完整的物件資料\n';
+            output += '// 🔥 支持緩存機制，優化性能\n\n';
+            output += '// 優化的物件資料結構\n';
+            output += 'const embeddedPropertiesData = {\n';
+            output += '    properties: [\n';
+            
+            propertiesData.properties.forEach((prop, index) => {
+                const jsonStr = formatPropertyJSON(prop);
+                // 添加縮排
+                const indentedJson = jsonStr.split('\n').map(line => '        ' + line).join('\n');
+                output += indentedJson;
+                if (index < propertiesData.properties.length - 1) {
+                    output += ',\n';
+                } else {
+                    output += '\n';
+                }
+            });
+            
+            output += '    ],\n';
+            output += '    settings: {\n';
+            output += '        itemsPerPage: 8,\n';
+            output += '        maxPages: 10,\n';
+            output += '        enableSearch: true,\n';
+            output += '        enableFilter: true\n';
+            output += '    }\n';
+            output += '};\n\n';
+            output += '// 匯出資料供其他模組使用\n';
+            output += 'if (typeof module !== \'undefined\' && module.exports) {\n';
+            output += '    module.exports = embeddedPropertiesData;\n';
+            output += '}\n';
+            
+            document.getElementById('export-output').textContent = output;
+            document.getElementById('export-preview').style.display = 'block';
+            
+            // 複製到剪貼簿
+            navigator.clipboard.writeText(output).then(() => {
+                showAlert('success', '完整資料已複製到剪貼簿！您可以貼上到 property-data.js 檔案中。');
+            });
+        }
+        
+        // 顯示提示訊息
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            }, 3000);
+        }
+        
+        // 頁面載入時
+        document.addEventListener('DOMContentLoaded', function() {
+            loadExistingData();
+        });
+    </script>
+</body>
+</html>

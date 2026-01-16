@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物件編號遷移工具 | 住商不動產</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft JhengHei', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 4px;
+        }
+        
+        .info-box h3 {
+            color: #1976D2;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .info-box ul {
+            margin-left: 1.5rem;
+            color: #555;
+        }
+        
+        .info-box li {
+            margin: 0.25rem 0;
+        }
+        
+        .config-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .config-section h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .preview-table th,
+        .preview-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .preview-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .preview-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .old-number {
+            color: #dc3545;
+            font-weight: 500;
+        }
+        
+        .new-number {
+            color: #28a745;
+            font-weight: 500;
+        }
+        
+        .type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 物件編號遷移工具</h1>
+        <p class="subtitle">將舊格式編號（如：3-1、2-1）轉換為新格式編號（如：TH00001、TW00001）</p>
+        
+        <div id="alert-container"></div>
+        
+        <div class="info-box">
+            <h3>📋 編號生成規則</h3>
+            <ul>
+                <li><strong>店內物件格式：</strong>{房型代碼}{5位序號}，如：SU00001、TW00001</li>
+                <li><strong>店外物件格式：</strong>EX{房型代碼}{4位序號}，如：EXSU0001、EXTW0001</li>
+                <li><strong>房型代碼對應：</strong>
+                    套房=SU, 2房=TW, 3房=TH, 4房=FO, 
+                    華廈=HS, 公寓=AP, 透天=TT, 店面=ST, 別墅=VH
+                </li>
+                <li><strong>注意：</strong>此工具會根據物件的房型自動生成新編號，確保不與現有新格式編號衝突</li>
+            </ul>
+        </div>
+        
+        <div class="config-section">
+            <h2>⚙️ Supabase 設定</h2>
+            <div class="form-group">
+                <label>Supabase URL</label>
+                <input type="text" id="supabase-url" placeholder="https://xxx.supabase.co" value="https://cnzqtuuegdqwkgvletaa.supabase.co">
+            </div>
+            <div class="form-group">
+                <label>Supabase Anon Key</label>
+                <input type="text" id="supabase-anon-key" placeholder="輸入您的 Supabase Anon Key" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE">
+            </div>
+            <button class="btn btn-primary" onclick="initSupabase()">🔗 連接 Supabase</button>
+        </div>
+        
+        <div id="migration-section" style="display: none;">
+            <div class="stats" id="stats-container"></div>
+            
+            <div style="margin-bottom: 1rem;">
+                <button class="btn btn-primary" onclick="analyzeProperties()">🔍 分析物件編號</button>
+                <button class="btn btn-success" onclick="previewMigration()" id="preview-btn" disabled>👁️ 預覽遷移</button>
+                <button class="btn btn-danger" onclick="executeMigration()" id="execute-btn" disabled>🚀 執行遷移</button>
+            </div>
+            
+            <div id="preview-container"></div>
+        </div>
+    </div>
+    
+    <script>
+        let supabaseClient = null;
+        let allProperties = [];
+        let propertiesToMigrate = [];
+        let migrationPlan = [];
+        
+        // 房型代碼映射
+        const typePrefixMap = {
+            '套房': 'SU',
+            '2房': 'TW',
+            '3房': 'TH',
+            '4房': 'FO',
+            '華廈': 'HS',
+            '公寓': 'AP',
+            '透天': 'TT',
+            '店面': 'ST',
+            '別墅': 'VH'
+        };
+        
+        // 初始化 Supabase
+        function initSupabase() {
+            const url = document.getElementById('supabase-url').value.trim();
+            const key = document.getElementById('supabase-anon-key').value.trim();
+            
+            if (!url || !key) {
+                showAlert('error', '請輸入 Supabase URL 和 Anon Key');
+                return;
+            }
+            
+            try {
+                supabaseClient = supabase.createClient(url, key);
+                // 儲存設定到 localStorage
+                localStorage.setItem('supabase_url', url);
+                localStorage.setItem('supabase_anon_key', key);
+                showAlert('success', '✅ 已成功連接到 Supabase，正在分析物件編號...');
+                document.getElementById('migration-section').style.display = 'block';
+                // 自動開始分析
+                analyzeProperties();
+            } catch (error) {
+                showAlert('error', '❌ 連接失敗：' + error.message);
+            }
+        }
+        
+        // 顯示提示訊息
+        function showAlert(type, message) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        }
+        
+        // 檢查編號是否為舊格式
+        function isOldFormat(number) {
+            if (!number || typeof number !== 'string') return false;
+            // 舊格式：包含連字號的編號，如 3-1, 2-1, 4-2 等
+            // 或者不是標準新格式的編號
+            const oldFormatPattern = /^\d+-\d+$/;
+            const newFormatPattern = /^([A-Z]{2}\d{5}|EX[A-Z]{2}\d{4})$/;
+            
+            return oldFormatPattern.test(number) || !newFormatPattern.test(number);
+        }
+        
+        // 檢查編號是否為新格式
+        function isNewFormat(number) {
+            if (!number || typeof number !== 'string') return false;
+            // 新格式：{2字母}{5數字} 或 EX{2字母}{4數字}
+            const newFormatPattern = /^([A-Z]{2}\d{5}|EX[A-Z]{2}\d{4})$/;
+            return newFormatPattern.test(number);
+        }
+        
+        // 根據房型獲取編號前綴
+        function getTypePrefix(type) {
+            return typePrefixMap[type] || 'XX';
+        }
+        
+        // 分析所有物件
+        async function analyzeProperties() {
+            if (!supabaseClient) {
+                showAlert('error', '請先連接 Supabase');
+                return;
+            }
+            
+            try {
+                showAlert('info', '🔍 正在分析物件編號...');
+                
+                const { data, error } = await supabaseClient
+                    .from('properties')
+                    .select('id, number, type, is_external, title')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allProperties = data || [];
+                
+                // 分類物件
+                const oldFormatProps = [];
+                const newFormatProps = [];
+                const noNumberProps = [];
+                
+                allProperties.forEach(prop => {
+                    if (!prop.number || prop.number.trim() === '') {
+                        noNumberProps.push(prop);
+                    } else if (isOldFormat(prop.number)) {
+                        oldFormatProps.push(prop);
+                    } else if (isNewFormat(prop.number)) {
+                        newFormatProps.push(prop);
+                    } else {
+                        // 其他格式也視為舊格式
+                        oldFormatProps.push(prop);
+                    }
+                });
+                
+                propertiesToMigrate = oldFormatProps;
+                
+                // 顯示統計
+                updateStats({
+                    total: allProperties.length,
+                    oldFormat: oldFormatProps.length,
+                    newFormat: newFormatProps.length,
+                    noNumber: noNumberProps.length
+                });
+                
+                if (oldFormatProps.length > 0) {
+                    document.getElementById('preview-btn').disabled = false;
+                    showAlert('warning', `發現 ${oldFormatProps.length} 個使用舊格式編號的物件，請點擊「預覽遷移」查看轉換計劃`);
+                    // 自動預覽遷移（如果發現舊格式編號）
+                    setTimeout(() => {
+                        if (confirm(`發現 ${oldFormatProps.length} 個舊格式編號，是否立即預覽遷移計劃？`)) {
+                            previewMigration();
+                        }
+                    }, 1000);
+                } else {
+                    showAlert('success', '✅ 所有物件都使用新格式編號，無需遷移');
+                    document.getElementById('preview-btn').disabled = true;
+                }
+                
+            } catch (error) {
+                console.error('分析失敗:', error);
+                showAlert('error', '❌ 分析失敗：' + error.message);
+            }
+        }
+        
+        // 更新統計資訊
+        function updateStats(stats) {
+            const container = document.getElementById('stats-container');
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="number">${stats.total}</div>
+                    <div class="label">總物件數</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" style="color: #dc3545;">${stats.oldFormat}</div>
+                    <div class="label">舊格式編號</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" style="color: #28a745;">${stats.newFormat}</div>
+                    <div class="label">新格式編號</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" style="color: #ffc107;">${stats.noNumber}</div>
+                    <div class="label">無編號物件</div>
+                </div>
+            `;
+        }
+        
+        // 生成新編號
+        function generateNewNumber(type, isExternal, existingNewNumbers, usedNumbersInPlan) {
+            const prefix = getTypePrefix(type);
+            if (!prefix || prefix === 'XX') {
+                return null; // 無法識別的房型
+            }
+            
+            // 合併現有新格式編號和計畫中已使用的編號
+            const allUsedNumbers = new Set([...existingNewNumbers, ...(usedNumbersInPlan || [])]);
+            
+            // 找出同類型的所有新格式編號
+            const typeNumbers = Array.from(allUsedNumbers)
+                .filter(num => {
+                    if (!num || typeof num !== 'string') return false;
+                    if (isExternal) {
+                        // 店外物件：EX{prefix}{4位數字}
+                        const pattern = new RegExp(`^EX${prefix}\\d{4}$`);
+                        return pattern.test(num);
+                    } else {
+                        // 店內物件：{prefix}{5位數字}，排除以EX開頭的
+                        if (num.startsWith('EX')) return false;
+                        const pattern = new RegExp(`^${prefix}\\d{5}$`);
+                        return pattern.test(num);
+                    }
+                })
+                .map(num => {
+                    let match;
+                    if (isExternal) {
+                        match = num.match(new RegExp(`^EX${prefix}(\\d+)$`));
+                        return match ? parseInt(match[1], 10) : 0;
+                    } else {
+                        match = num.match(new RegExp(`^${prefix}(\\d+)$`));
+                        return match ? parseInt(match[1], 10) : 0;
+                    }
+                })
+                .filter(num => !isNaN(num) && num > 0)
+                .sort((a, b) => b - a);
+            
+            // 計算下一個序號
+            const nextSeq = typeNumbers.length > 0 ? typeNumbers[0] + 1 : 1;
+            
+            // 格式化編號
+            if (isExternal) {
+                return `EX${prefix}${String(nextSeq).padStart(4, '0')}`;
+            } else {
+                return `${prefix}${String(nextSeq).padStart(5, '0')}`;
+            }
+        }
+        
+        // 預覽遷移
+        async function previewMigration() {
+            if (propertiesToMigrate.length === 0) {
+                showAlert('warning', '沒有需要遷移的物件');
+                return;
+            }
+            
+            try {
+                showAlert('info', '🔄 正在生成遷移預覽...');
+                
+                // 獲取所有現有的新格式編號
+                const existingNewNumbers = allProperties
+                    .filter(prop => prop.number && isNewFormat(prop.number))
+                    .map(prop => prop.number);
+                
+                // 為每個需要遷移的物件生成新編號
+                migrationPlan = [];
+                const usedNumbersInPlan = [];
+                
+                for (const prop of propertiesToMigrate) {
+                    const type = prop.type;
+                    const isExternal = prop.is_external === true || prop.is_external === 'true';
+                    
+                    if (!type) {
+                        migrationPlan.push({
+                            id: prop.id,
+                            title: prop.title || '無標題',
+                            oldNumber: prop.number,
+                            newNumber: null,
+                            type: type || '未知',
+                            isExternal: isExternal,
+                            error: '缺少房型資訊'
+                        });
+                        continue;
+                    }
+                    
+                    // 生成新編號（考慮現有編號和計畫中已使用的編號）
+                    const newNumber = generateNewNumber(type, isExternal, existingNewNumbers, usedNumbersInPlan);
+                    
+                    if (newNumber) {
+                        usedNumbersInPlan.push(newNumber);
+                    }
+                    
+                    migrationPlan.push({
+                        id: prop.id,
+                        title: prop.title || '無標題',
+                        oldNumber: prop.number,
+                        newNumber: newNumber,
+                        type: type,
+                        isExternal: isExternal,
+                        error: newNumber ? null : '無法生成新編號（房型無法識別）'
+                    });
+                }
+                
+                // 顯示預覽表格
+                displayPreview();
+                
+                document.getElementById('execute-btn').disabled = false;
+                showAlert('success', `✅ 已生成 ${migrationPlan.length} 個物件的遷移預覽`);
+                
+            } catch (error) {
+                console.error('預覽失敗:', error);
+                showAlert('error', '❌ 預覽失敗：' + error.message);
+            }
+        }
+        
+        // 顯示預覽表格
+        function displayPreview() {
+            const container = document.getElementById('preview-container');
+            
+            const successCount = migrationPlan.filter(p => p.newNumber && !p.error).length;
+            const errorCount = migrationPlan.filter(p => !p.newNumber || p.error).length;
+            
+            let html = `
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">📋 遷移預覽</h3>
+                <p style="color: #666; margin-bottom: 1rem;">
+                    共 ${migrationPlan.length} 個物件，${successCount} 個可遷移，${errorCount} 個有問題
+                </p>
+                <div style="max-height: 500px; overflow-y: auto;">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>物件標題</th>
+                                <th>房型</th>
+                                <th>來源</th>
+                                <th>舊編號</th>
+                                <th>新編號</th>
+                                <th>狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            migrationPlan.forEach(plan => {
+                const status = plan.newNumber && !plan.error ? 'success' : 'error';
+                const statusText = plan.newNumber && !plan.error ? '✅ 可遷移' : `❌ ${plan.error || '無法遷移'}`;
+                
+                html += `
+                    <tr>
+                        <td>${plan.title}</td>
+                        <td><span class="type-badge">${plan.type || '未知'}</span></td>
+                        <td>${plan.isExternal ? '店外' : '店內'}</td>
+                        <td><span class="old-number">${plan.oldNumber}</span></td>
+                        <td><span class="new-number">${plan.newNumber || '-'}</span></td>
+                        <td><span class="status-badge ${status}">${statusText}</span></td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // 執行遷移
+        async function executeMigration() {
+            if (migrationPlan.length === 0) {
+                showAlert('warning', '沒有遷移計畫，請先預覽');
+                return;
+            }
+            
+            const successPlans = migrationPlan.filter(p => p.newNumber && !p.error);
+            
+            if (successPlans.length === 0) {
+                showAlert('error', '沒有可遷移的物件');
+                return;
+            }
+            
+            const confirmed = confirm(`確定要將 ${successPlans.length} 個物件的編號從舊格式轉換為新格式嗎？\n\n此操作無法撤銷，建議先備份資料！`);
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            try {
+                showAlert('info', '🚀 正在執行遷移...');
+                
+                let successCount = 0;
+                let errorCount = 0;
+                const errors = [];
+                
+                for (const plan of successPlans) {
+                    try {
+                        const { error } = await supabaseClient
+                            .from('properties')
+                            .update({ number: plan.newNumber })
+                            .eq('id', plan.id);
+                        
+                        if (error) throw error;
+                        
+                        successCount++;
+                        
+                        // 更新顯示
+                        const progress = Math.round((successCount / successPlans.length) * 100);
+                        showAlert('info', `遷移中... ${successCount}/${successPlans.length} (${progress}%)`);
+                        
+                    } catch (error) {
+                        errorCount++;
+                        errors.push({
+                            id: plan.id,
+                            title: plan.title,
+                            error: error.message
+                        });
+                        console.error(`遷移失敗 (${plan.id}):`, error);
+                    }
+                }
+                
+                // 顯示結果
+                let resultMessage = `✅ 遷移完成！成功：${successCount}，失敗：${errorCount}`;
+                
+                if (errors.length > 0) {
+                    resultMessage += '\n\n失敗的物件：\n';
+                    errors.forEach(e => {
+                        resultMessage += `- ${e.title} (ID: ${e.id}): ${e.error}\n`;
+                    });
+                }
+                
+                showAlert('success', resultMessage);
+                
+                // 重新分析
+                await analyzeProperties();
+                
+                // 清空預覽
+                document.getElementById('preview-container').innerHTML = '';
+                document.getElementById('execute-btn').disabled = true;
+                
+            } catch (error) {
+                console.error('遷移失敗:', error);
+                showAlert('error', '❌ 遷移失敗：' + error.message);
+            }
+        }
+        
+        // 頁面載入時自動初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以從 localStorage 載入之前的設定
+            const savedUrl = localStorage.getItem('supabase_url');
+            const savedKey = localStorage.getItem('supabase_anon_key');
+            
+            const urlInput = document.getElementById('supabase-url');
+            const keyInput = document.getElementById('supabase-anon-key');
+            
+            if (savedUrl && savedKey) {
+                urlInput.value = savedUrl;
+                keyInput.value = savedKey;
+            }
+            
+            // 如果已填寫 Supabase 設定，自動連接並分析
+            if (urlInput.value && keyInput.value) {
+                console.log('自動連接 Supabase 並開始分析...');
+                // 延遲一點執行，確保頁面完全載入
+                setTimeout(() => {
+                    initSupabase();
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>

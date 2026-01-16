@@ -1,0 +1,32 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 資料庫
+*.db
+*.db-journal
+properties.db*
+
+# 上傳的圖片
+uploads/
+uploads_backup/
+
+# 環境變數
+.env
+.env.local
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 備份檔案
+*.backup
+*.bak

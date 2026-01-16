@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>油漆粉刷廠商 - 濬瑒房產生活平台</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --grad:linear-gradient(135deg,#f59e0b,#f97316);
+  --glass-bg:rgba(255,255,255,0.6);
+  --glass-dark:rgba(30,30,30,0.6);
+  --shadow-light:0 4px 12px rgba(0,0,0,.1);
+  --border-radius:1rem;
+  --transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body{
+  background:linear-gradient(to bottom,#fef3c7,#fff);
+  transition:var(--transition);
+  font-family:system-ui,-apple-system,sans-serif;
+  line-height:1.6;
+}
+
+.glass-card{
+  background:var(--glass-bg);
+  backdrop-filter:blur(10px);
+  border-radius:var(--border-radius);
+  border:1px solid rgba(255,255,255,0.2);
+}
+
+.contractor-card{
+  background:rgba(255,255,255,0.9);
+  border-radius:0.75rem;
+  padding:1.5rem;
+  margin-bottom:1rem;
+  transition:var(--transition);
+  border-left:4px solid #f59e0b;
+}
+
+.contractor-card:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-light);
+}
+
+.contact-btn{
+  background:var(--grad);
+  color:white;
+  padding:0.5rem 1rem;
+  border-radius:9999px;
+  text-decoration:none;
+  font-weight:600;
+  transition:var(--transition);
+  display:inline-block;
+}
+
+.contact-btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 4px 15px rgba(245,158,11,0.3);
+}
+
+#themeToggle{
+  position:fixed;
+  top:1rem;
+  right:1rem;
+  background:var(--grad);
+  color:#fff;
+  border:none;
+  padding:.5rem .75rem;
+  border-radius:9999px;
+  z-index:50;
+  transition:var(--transition);
+  cursor:pointer;
+  font-size:1.2rem;
+}
+</style>
+</head>
+<body>
+<!-- 主題切換 -->
+<button id="themeToggle" aria-label="切換主題模式">🌞</button>
+
+<!-- 返回按鈕 -->
+<button onclick="history.back()" class="fixed top-4 left-4 bg-white shadow-lg rounded-full p-3 z-50 hover:scale-105 transition">
+  ←
+</button>
+
+<!-- 標題區 -->
+<header class="text-center py-8" style="background:var(--grad);color:white;">
+  <h1 class="text-3xl font-bold">🎨 油漆粉刷廠商</h1>
+  <p class="text-sm opacity-90 mt-2">美化空間，專業施工</p>
+</header>
+
+<main class="px-4 py-6 space-y-6">
+  <!-- 待新增廠商 -->
+  <div class="contractor-card">
+    <div class="text-center py-8">
+      <div class="text-6xl mb-4">🎨</div>
+      <h3 class="text-xl font-bold text-gray-600 mb-2">油漆粉刷廠商</h3>
+      <p class="text-gray-500 mb-4">廠商資訊待新增中...</p>
+      <div class="bg-gray-100 rounded-lg p-4 mb-4">
+        <p class="text-sm text-gray-600 mb-2">我們正在積極尋找優質的油漆粉刷廠商</p>
+        <p class="text-sm text-gray-600">如有推薦或想加入我們的廠商，歡迎聯繫</p>
+      </div>
+      <a href="https://lin.ee/Ij6z94H" class="contact-btn">💬 推薦廠商</a>
+    </div>
+  </div>
+</main>
+
+<script>
+// 主題切換
+document.getElementById('themeToggle').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '🌙' : '🌞';
+});
+</script>
+</body>
+</html>

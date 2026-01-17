@@ -560,6 +560,92 @@
             color: white;
             border-color: #667eea;
         }
+        
+        /* 卡片網格佈局 */
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .property-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .property-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .property-card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: #f0f0f0;
+        }
+        
+        .property-card-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 2rem;
+        }
+        
+        .property-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .property-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        
+        .property-card-meta {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+        
+        .property-card-status {
+            margin-bottom: 1rem;
+        }
+        
+        .property-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .property-card-actions .btn {
+            flex: 1;
+            padding: 0.6rem;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -571,7 +657,6 @@
     <div class="nav">
         <div class="nav-item active" onclick="switchTab('dashboard', this)">📊 儀表板</div>
         <div class="nav-item" onclick="switchTab('properties', this)">🏘️ 物件管理</div>
-        <div class="nav-item" onclick="switchTab('publish', this)">⬆️ 上下架管理</div>
         <div class="nav-item" onclick="switchTab('duplicates', this)">🔍 重複物件檢測</div>
         <div class="nav-item" onclick="switchTab('links', this)">🔗 連結管理</div>
     </div>
@@ -604,7 +689,7 @@
                     <button class="btn btn-primary" onclick="switchTab('properties', document.querySelector('.nav-item:nth-child(2)'))">
                         ➕ 新增物件
                     </button>
-                    <button class="btn btn-success" onclick="switchTab('publish', document.querySelector('.nav-item:nth-child(3)'))">
+                    <button class="btn btn-success" onclick="switchTab('properties', document.querySelector('.nav-item:nth-child(2)'))">
                         ⬆️ 管理上下架
                     </button>
                     <a href="index.html" target="_blank" class="btn btn-secondary">
@@ -661,13 +746,24 @@
                         </select>
                     </div>
                     
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" onclick="setFilter('all', this)">全部</button>
-                        <button class="filter-btn" onclick="setFilter('published', this)">已上架</button>
-                        <button class="filter-btn" onclick="setFilter('unpublished', this)">已下架</button>
-                        <button class="filter-btn" onclick="setFilter('sold', this)">已售出</button>
-                        <button class="filter-btn" onclick="setFilter('internal', this)">🏠 本店物件</button>
-                        <button class="filter-btn" onclick="setFilter('external', this)">🏢 非本店物件</button>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div class="filter-buttons" style="margin: 0;">
+                            <button class="filter-btn active" onclick="setFilter('all', this)">全部</button>
+                            <button class="filter-btn" onclick="setFilter('published', this)">已上架</button>
+                            <button class="filter-btn" onclick="setFilter('unpublished', this)">已下架</button>
+                            <button class="filter-btn" onclick="setFilter('sold', this)">已售出</button>
+                            <button class="filter-btn" onclick="setFilter('internal', this)">🏠 本店物件</button>
+                            <button class="filter-btn" onclick="setFilter('external', this)">🏢 非本店物件</button>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <span style="color: #666; font-size: 0.9rem; margin-right: 0.5rem;">檢視模式：</span>
+                            <button class="filter-btn active" id="view-table-btn" onclick="setViewMode('table', this)" style="padding: 0.4rem 0.8rem;">
+                                📋 表格
+                            </button>
+                            <button class="filter-btn" id="view-grid-btn" onclick="setViewMode('grid', this)" style="padding: 0.4rem 0.8rem;">
+                                🎴 網格
+                            </button>
+                        </div>
                     </div>
                     
                     <div id="properties-list">
@@ -713,20 +809,6 @@
             </div>
         </div>
         
-        <!-- 上下架管理 -->
-        <div id="publish-tab" class="tab-content">
-            <div class="content-card">
-                <h2>上下架管理</h2>
-                <p style="color: #666; margin-bottom: 1rem;">
-                    快速管理物件的上架狀態。已上架的物件會顯示在前台首頁。
-                </p>
-                
-                <div id="publish-list">
-                    <p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>
-                </div>
-            </div>
-        </div>
-        
         <!-- 連結管理 -->
         <div id="links-tab" class="tab-content">
             <div class="content-card">
@@ -752,6 +834,14 @@
     </div>
     
     <script>
+        // HTML 轉義函數（防止 XSS）
+        function escapeHtml(text) {
+            if (text == null) return '';
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+        
         // Supabase 設定
         const SUPABASE_URL = 'https://cnzqtuuegdqwkgvletaa.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE';
@@ -759,11 +849,89 @@
         let supabaseClient = null;
         let allProperties = [];
         let currentFilter = 'all';
+        let viewMode = 'table'; // 'table' 或 'grid'
+        
+        // 背景刷新間隔（30分鐘）
+        const REFRESH_INTERVAL = 30 * 60 * 1000; // 30分鐘 = 1800000 毫秒
+        let refreshTimer = null;
+        
+        // 背景自動刷新函數
+        function startBackgroundRefresh() {
+            // 清除現有的定時器
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+            }
+            
+            // 設置新的定時器：每30分鐘刷新一次
+            refreshTimer = setInterval(() => {
+                // 只在頁面可見時才刷新（使用 Page Visibility API）
+                if (!document.hidden) {
+                    refreshCurrentTab();
+                }
+            }, REFRESH_INTERVAL);
+            
+            console.log('✅ 背景自動刷新已啟動（每30分鐘）');
+        }
+        
+        // 刷新當前活動的標籤頁
+        function refreshCurrentTab() {
+            const activeTab = document.querySelector('.tab-content.active');
+            if (!activeTab) return;
+            
+            const tabId = activeTab.id;
+            console.log('🔄 背景刷新：', tabId);
+            
+            if (tabId === 'dashboard-tab') {
+                // 刷新儀表板
+                loadDashboard();
+            } else if (tabId === 'properties-tab') {
+                // 刷新物件管理（如果列表子標籤是活動的）
+                if (document.getElementById('property-list-subtab')?.classList.contains('active')) {
+                    loadProperties();
+                }
+            }
+            // 其他標籤頁不需要自動刷新
+        }
         
         // 初始化
         function init() {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             loadDashboard();
+            
+            // 啟動背景自動刷新
+            startBackgroundRefresh();
+            
+            // 監聽頁面可見性變化（當用戶切換標籤頁時）
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    // 頁面變為可見時，立即刷新一次
+                    refreshCurrentTab();
+                }
+            });
+            
+            // 事件委派：處理動態生成的按鈕點擊
+            document.addEventListener('click', function(e) {
+                const button = e.target.closest('[data-action]');
+                if (!button) return;
+                
+                const action = button.dataset.action;
+                const propertyId = button.dataset.propertyId;
+                
+                if (!propertyId) return;
+                
+                switch (action) {
+                    case 'toggle':
+                        const newStatus = button.dataset.status === 'true';
+                        togglePublish(propertyId, newStatus);
+                        break;
+                    case 'edit':
+                        editProperty(propertyId);
+                        break;
+                    case 'delete':
+                        deleteProperty(propertyId);
+                        break;
+                }
+            });
         }
         
         // 切換標籤
@@ -790,8 +958,6 @@
                 } else {
                     loadPropertyAddForm();
                 }
-            } else if (tabName === 'publish') {
-                loadPublishList();
             } else if (tabName === 'duplicates') {
                 // 重複物件檢測頁面已載入，等待用戶點擊檢測
             }
@@ -1013,6 +1179,22 @@
                 filtered = filtered.filter(p => p.type === typeFilter);
             }
             
+            // 排序：優先顯示已上架的物件，然後是已下架的物件
+            // 在相同狀態內，按更新時間排序（最新的在前）
+            filtered.sort((a, b) => {
+                // 先按上架狀態排序：已上架（true）在前，已下架（false）在後
+                if (a.is_published !== b.is_published) {
+                    // 如果 a 已上架且 b 已下架，a 排前面（返回負數）
+                    // 如果 a 已下架且 b 已上架，a 排後面（返回正數）
+                    return (b.is_published ? 1 : 0) - (a.is_published ? 1 : 0);
+                }
+                
+                // 相同狀態內，按更新時間排序（最新的在前）
+                const dateA = a.updated_at ? new Date(a.updated_at) : new Date(a.created_at || 0);
+                const dateB = b.updated_at ? new Date(b.updated_at) : new Date(b.created_at || 0);
+                return dateB - dateA;
+            });
+            
             const listDiv = document.getElementById('properties-list');
             
             if (filtered.length === 0) {
@@ -1020,67 +1202,159 @@
                 return;
             }
             
-            listDiv.innerHTML = `
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>物件</th>
-                            <th>來源</th>
-                            <th>房型</th>
-                            <th>價格</th>
-                            <th>上架狀態</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            // 根據視圖模式顯示
+            if (viewMode === 'grid') {
+                // 網格模式
+                listDiv.innerHTML = `
+                    <div class="property-grid">
                         ${filtered.map(prop => {
                             const images = Array.isArray(prop.images) ? prop.images : [];
                             const imgUrl = images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0].url) : '';
                             const publishedBadge = prop.is_published 
-                                ? '<span class="badge badge-success">已上架</span>' 
-                                : '<span class="badge badge-danger">已下架</span>';
+                                ? '<span class="badge badge-success">✅ 已上架</span>' 
+                                : '<span class="badge badge-danger">❌ 已下架</span>';
                             
-                            // 物件來源標籤
                             const isExternal = prop.is_external === true || prop.is_external === 'true';
                             const sourceBadge = isExternal 
-                                ? '<span class="badge" style="background: #ff9800; color: white;">🏢 非本店</span>' 
-                                : '<span class="badge" style="background: #28a745; color: white;">🏠 本店</span>';
+                                ? '<span class="badge" style="background: #ff9800; color: white; margin-bottom: 0.5rem; display: inline-block;">🏢 非本店</span>' 
+                                : '<span class="badge" style="background: #28a745; color: white; margin-bottom: 0.5rem; display: inline-block;">🏠 本店</span>';
+                            
+                            const isPublished = prop.is_published;
+                            
+                            // 轉義 HTML 以防止 XSS
+                            const safeTitle = escapeHtml(prop.title || '未命名物件');
+                            const safeNumber = escapeHtml(prop.number || 'N/A');
+                            const safeType = escapeHtml(prop.type || 'N/A');
+                            const safePrice = escapeHtml(prop.price || 'N/A');
+                            const safeAddress = prop.address ? escapeHtml(prop.address.substring(0, 30)) + (prop.address.length > 30 ? '...' : '') : '';
+                            const safeId = escapeHtml(prop.id);
+                            const safeImgUrl = imgUrl ? escapeHtml(imgUrl) : '';
                             
                             return `
-                                <tr>
-                                    <td>
-                                        <div class="property-preview">
-                                            ${imgUrl ? `<img src="${imgUrl}" alt="${prop.title}">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
-                                            <div class="property-preview-info">
-                                                <h4>${prop.title || '未命名'}</h4>
-                                                <p>${prop.number || 'N/A'} | ${prop.address || 'N/A'}</p>
-                                            </div>
+                                <div class="property-card">
+                                    ${safeImgUrl 
+                                        ? `<img src="${safeImgUrl}" alt="${safeTitle}" class="property-card-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                                        : ''
+                                    }
+                                    <div class="property-card-placeholder" ${imgUrl ? 'style="display:none;"' : ''}>
+                                        🏠
+                                    </div>
+                                    <div class="property-card-content">
+                                        <h3 class="property-card-title">${safeTitle}</h3>
+                                        <div class="property-card-meta">
+                                            <div><strong>編號：</strong>${safeNumber}</div>
+                                            <div><strong>房型：</strong>${safeType}</div>
+                                            <div><strong>價格：</strong>${safePrice}</div>
+                                            ${safeAddress ? `<div><strong>地址：</strong>${safeAddress}</div>` : ''}
                                         </div>
-                                    </td>
-                                    <td>${sourceBadge}</td>
-                                    <td>${prop.type || 'N/A'}</td>
-                                    <td>${prop.price || 'N/A'}</td>
-                                    <td>${publishedBadge}</td>
-                                    <td>
-                                        <button class="btn btn-small ${prop.is_published ? 'btn-danger' : 'btn-success'}" 
-                                                onclick="togglePublish('${prop.id}', ${!prop.is_published})">
-                                            ${prop.is_published ? '⬇️ 下架' : '⬆️ 上架'}
-                                        </button>
-                                        <button class="btn btn-secondary btn-small" 
-                                                onclick="editProperty('${prop.id}')">
-                                            ✏️ 編輯
-                                        </button>
-                                        <button class="btn btn-danger btn-small" 
-                                                onclick="deleteProperty('${prop.id}')">
-                                            🗑️ 刪除
-                                        </button>
-                                    </td>
-                                </tr>
+                                        <div class="property-card-status" style="margin-bottom: 0.75rem;">
+                                            ${sourceBadge} ${publishedBadge}
+                                        </div>
+                                        <div class="property-card-actions">
+                                            <button class="btn ${isPublished ? 'btn-danger' : 'btn-success'}" 
+                                                    data-property-id="${safeId}" 
+                                                    data-action="toggle" 
+                                                    data-status="${!isPublished}"
+                                                    style="font-size: 0.85rem;">
+                                                ${isPublished ? '⬇️ 下架' : '⬆️ 上架'}
+                                            </button>
+                                            <button class="btn btn-secondary" 
+                                                    data-property-id="${safeId}" 
+                                                    data-action="edit"
+                                                    style="font-size: 0.85rem;">
+                                                ✏️ 編輯
+                                            </button>
+                                            <button class="btn btn-danger" 
+                                                    data-property-id="${safeId}" 
+                                                    data-action="delete"
+                                                    style="font-size: 0.85rem;">
+                                                🗑️ 刪除
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             `;
                         }).join('')}
-                    </tbody>
-                </table>
-            `;
+                    </div>
+                `;
+            } else {
+                // 表格模式
+                listDiv.innerHTML = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>物件</th>
+                                <th>來源</th>
+                                <th>房型</th>
+                                <th>價格</th>
+                                <th>上架狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered.map(prop => {
+                                const images = Array.isArray(prop.images) ? prop.images : [];
+                                const imgUrl = images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0].url) : '';
+                                const publishedBadge = prop.is_published 
+                                    ? '<span class="badge badge-success">已上架</span>' 
+                                    : '<span class="badge badge-danger">已下架</span>';
+                                
+                                // 物件來源標籤
+                                const isExternal = prop.is_external === true || prop.is_external === 'true';
+                                const sourceBadge = isExternal 
+                                    ? '<span class="badge" style="background: #ff9800; color: white;">🏢 非本店</span>' 
+                                    : '<span class="badge" style="background: #28a745; color: white;">🏠 本店</span>';
+                                
+                                // 轉義 HTML 以防止 XSS
+                                const safeTitle = escapeHtml(prop.title || '未命名');
+                                const safeNumber = escapeHtml(prop.number || 'N/A');
+                                const safeAddress = escapeHtml(prop.address || 'N/A');
+                                const safeType = escapeHtml(prop.type || 'N/A');
+                                const safePrice = escapeHtml(prop.price || 'N/A');
+                                const safeId = escapeHtml(prop.id);
+                                const safeImgUrl = imgUrl ? escapeHtml(imgUrl) : '';
+                                const isPublished = prop.is_published;
+                                
+                                return `
+                                    <tr>
+                                        <td>
+                                            <div class="property-preview">
+                                                ${safeImgUrl ? `<img src="${safeImgUrl}" alt="${safeTitle}">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
+                                                <div class="property-preview-info">
+                                                    <h4>${safeTitle}</h4>
+                                                    <p>${safeNumber} | ${safeAddress}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>${sourceBadge}</td>
+                                        <td>${safeType}</td>
+                                        <td>${safePrice}</td>
+                                        <td>${publishedBadge}</td>
+                                        <td>
+                                            <button class="btn btn-small ${isPublished ? 'btn-danger' : 'btn-success'}" 
+                                                    data-property-id="${safeId}" 
+                                                    data-action="toggle" 
+                                                    data-status="${!isPublished}">
+                                                ${isPublished ? '⬇️ 下架' : '⬆️ 上架'}
+                                            </button>
+                                            <button class="btn btn-secondary btn-small" 
+                                                    data-property-id="${safeId}" 
+                                                    data-action="edit">
+                                                ✏️ 編輯
+                                            </button>
+                                            <button class="btn btn-danger btn-small" 
+                                                    data-property-id="${safeId}" 
+                                                    data-action="delete">
+                                                🗑️ 刪除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
         }
         
         // 設定篩選
@@ -1090,6 +1364,21 @@
                 btn.classList.remove('active');
             });
             element.classList.add('active');
+            renderProperties();
+        }
+        
+        // 設定視圖模式
+        function setViewMode(mode, element) {
+            viewMode = mode;
+            
+            // 更新按鈕狀態
+            const tableBtn = document.getElementById('view-table-btn');
+            const gridBtn = document.getElementById('view-grid-btn');
+            if (tableBtn) tableBtn.classList.remove('active');
+            if (gridBtn) gridBtn.classList.remove('active');
+            if (element) element.classList.add('active');
+            
+            // 重新渲染
             renderProperties();
         }
         
@@ -1135,70 +1424,6 @@
             }
         }
         
-        // 載入上下架列表
-        async function loadPublishList() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('properties')
-                    .select('*')
-                    .order('updated_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                const listDiv = document.getElementById('publish-list');
-                
-                if (!data || data.length === 0) {
-                    listDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">目前沒有物件</p>';
-                    return;
-                }
-                
-                listDiv.innerHTML = `
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>物件</th>
-                                <th>目前狀態</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.map(prop => {
-                                const images = Array.isArray(prop.images) ? prop.images : [];
-                                const imgUrl = images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0].url) : '';
-                                const publishedBadge = prop.is_published 
-                                    ? '<span class="badge badge-success">✅ 已上架（顯示在前台）</span>' 
-                                    : '<span class="badge badge-danger">❌ 已下架（不顯示在前台）</span>';
-                                
-                                return `
-                                    <tr>
-                                        <td>
-                                            <div class="property-preview">
-                                                ${imgUrl ? `<img src="${imgUrl}" alt="${prop.title}">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
-                                                <div class="property-preview-info">
-                                                    <h4>${prop.title || '未命名'}</h4>
-                                                    <p>${prop.number || 'N/A'} | ${prop.type || 'N/A'} | ${prop.price || 'N/A'}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>${publishedBadge}</td>
-                                        <td>
-                                            <button class="btn btn-small ${prop.is_published ? 'btn-danger' : 'btn-success'}" 
-                                                    onclick="togglePublish('${prop.id}', ${!prop.is_published}); loadPublishList();">
-                                                ${prop.is_published ? '⬇️ 下架' : '⬆️ 上架'}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } catch (error) {
-                console.error('載入上下架列表失敗:', error);
-                document.getElementById('publish-list').innerHTML = 
-                    `<div class="alert alert-error">載入失敗：${error.message}</div>`;
-            }
-        }
         
         // 顯示提示訊息
         function showAlert(type, message) {

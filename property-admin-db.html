@@ -2885,6 +2885,13 @@
                     throw new Error('編輯模式必須有物件編號，請檢查表單資料');
                 }
                 
+                // 驗證並轉換編號格式（確保符合「兩個英文字母+五個數字」的格式）
+                if (propertyNumber) {
+                    propertyNumber = normalizePropertyNumber(propertyNumber, document.getElementById('type').value.trim(), document.getElementById('is_external')?.value === 'true');
+                    // 更新輸入框中的編號
+                    document.getElementById('number').value = propertyNumber;
+                }
+                
                 // 優化：只檢查特定編號是否已存在（而不是獲取所有編號）
                 saveBtn.textContent = '⏳ 檢查編號中...';
                 const currentEditId = editingPropertyId || urlId;
@@ -4594,6 +4601,51 @@
         // 格式化序號（店內：5位數，店外：4位數）
         function formatSequenceNumber(seq, digits) {
             return String(seq).padStart(digits, '0');
+        }
+        
+        // 標準化物件編號格式（將舊格式轉換為新格式）
+        function normalizePropertyNumber(number, type, isExternal) {
+            if (!number || typeof number !== 'string') {
+                return number;
+            }
+            
+            const trimmedNumber = number.trim();
+            
+            // 檢查是否已經是正確的新格式
+            // 店內物件：{2字母}{5數字}，例如 TT00012
+            // 店外物件：EX{2字母}{4數字}，例如 EXTT0001
+            if (isExternal) {
+                const newFormatPattern = /^EX[A-Z]{2}\d{4}$/;
+                if (newFormatPattern.test(trimmedNumber)) {
+                    return trimmedNumber; // 已經是正確格式
+                }
+            } else {
+                const newFormatPattern = /^[A-Z]{2}\d{5}$/;
+                if (newFormatPattern.test(trimmedNumber)) {
+                    return trimmedNumber; // 已經是正確格式
+                }
+            }
+            
+            // 嘗試轉換舊格式（例如：TT-012 → TT00012）
+            // 匹配模式：{字母}-{數字} 或 {字母}{數字}
+            const oldFormatMatch = trimmedNumber.match(/^([A-Z]{2})[-]?(\d+)$/i);
+            if (oldFormatMatch) {
+                const prefix = oldFormatMatch[1].toUpperCase();
+                const seq = parseInt(oldFormatMatch[2], 10);
+                
+                if (!isNaN(seq) && seq > 0) {
+                    if (isExternal) {
+                        // 店外物件：EX{2字母}{4數字}
+                        return `EX${prefix}${formatSequenceNumber(seq, 4)}`;
+                    } else {
+                        // 店內物件：{2字母}{5數字}
+                        return `${prefix}${formatSequenceNumber(seq, 5)}`;
+                    }
+                }
+            }
+            
+            // 如果無法轉換，返回原值（讓後續驗證處理）
+            return trimmedNumber;
         }
         
         // 生成物件編號（支援店內/店外物件）

@@ -7,19 +7,34 @@
 (function() {
     'use strict';
     
-    // 初始化 Supabase 客戶端
+    // 初始化 Supabase 客戶端（單例模式，避免多個實例）
     function initSupabaseClient() {
         if (typeof supabase === 'undefined') {
             console.error('❌ Supabase SDK 未載入');
             return null;
         }
         
-        if (typeof SUPABASE_CONFIG === 'undefined') {
+        // 檢查是否已經有全域的 Supabase 客戶端
+        if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient) {
+            console.log('🔄 使用現有的 Supabase 客戶端（避免多個實例）');
+            return window.supabaseClient;
+        }
+        
+        // 優先使用統一配置函數
+        let client = null;
+        if (typeof createSupabaseClient === 'function') {
+            client = createSupabaseClient();
+        } else if (typeof SUPABASE_CONFIG !== 'undefined') {
+            client = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        } else {
             console.error('❌ Supabase 配置未載入，請確認 supabase-config.js 已載入');
             return null;
         }
         
-        return supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        // 儲存到全域，供其他模組使用
+        window.supabaseClient = client;
+        console.log('✅ 創建新的 Supabase 客戶端（單例模式）');
+        return client;
     }
     
     // 載入相關連結（直接從 Supabase）

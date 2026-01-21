@@ -559,8 +559,24 @@
                     throw new Error('請提供物件編號或 ID');
                 }
                 
-                // 使用 Supabase 設定值
-                const supabaseClient = supabase.createClient(SUPABASE_URL_VALUE, SUPABASE_ANON_KEY_VALUE);
+                // 使用 Supabase 設定值（單例模式，避免多個實例）
+                let supabaseClient = null;
+                if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient) {
+                    console.log('🔄 使用現有的 Supabase 客戶端（避免多個實例）');
+                    supabaseClient = window.supabaseClient;
+                } else {
+                    // 優先使用統一配置函數
+                    if (typeof createSupabaseClient === 'function') {
+                        supabaseClient = createSupabaseClient();
+                    } else if (typeof SUPABASE_CONFIG !== 'undefined') {
+                        supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                    } else {
+                        supabaseClient = supabase.createClient(SUPABASE_URL_VALUE, SUPABASE_ANON_KEY_VALUE);
+                    }
+                    // 儲存到全域，供其他模組使用
+                    window.supabaseClient = supabaseClient;
+                    console.log('✅ 創建新的 Supabase 客戶端（單例模式）');
+                }
                 
                 let query = supabaseClient
                     .from('properties')

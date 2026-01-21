@@ -332,24 +332,23 @@ const MIN_LOAD_INTERVAL = 1000; // 最小載入間隔 1 秒
         });
     }
     
+    // 🔥 防止重複初始化：使用標記確保只初始化一次
+    if (window.supabaseDataLoaderInitialized) {
+        console.log('⏭️ Supabase 資料載入器已初始化，跳過重複初始化');
+        return;
+    }
+    window.supabaseDataLoaderInitialized = true;
+    
     // 如果 DOM 已經載入完成，立即執行
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         console.log('📦 DOM 已準備好，立即載入資料');
         initDataLoader();
     } else {
-        // 等待 DOM 載入完成，但也要設置立即執行的備用
+        // 等待 DOM 載入完成
         console.log('📦 等待 DOM 載入完成...');
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📦 DOM 載入完成，開始載入資料');
             initDataLoader();
-        });
-        
-        // 備用：如果 DOMContentLoaded 已經觸發，立即執行
-        setTimeout(() => {
-            if (document.readyState !== 'loading') {
-                console.log('📦 DOM 已載入（備用檢查），開始載入資料');
-                initDataLoader();
-            }
-        }, 100);
+        }, { once: true }); // 🔥 使用 once: true 防止重複觸發
     }
 })();

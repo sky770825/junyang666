@@ -78,15 +78,32 @@ class EmbeddedPropertyPaginationSystem {
             }
             
             // 如果資料還沒載入，等待一下再檢查（多次檢查確保資料載入）
-            const checkData = (attempt = 1, maxAttempts = 5) => {
+            const checkData = (attempt = 1, maxAttempts = 10) => {
                 if (attempt > maxAttempts) {
                     console.warn('⚠️ 資料載入超時，請檢查 Supabase 連接');
+                    const container = document.getElementById('properties-container');
+                    if (container) {
+                        container.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #dc3545;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                                <h3>資料載入失敗</h3>
+                                <p>請檢查 Supabase 連接或重新整理頁面</p>
+                            </div>
+                        `;
+                    }
                     return;
                 }
                 
                 setTimeout(() => {
                     // 再次檢查資料是否已載入
                     if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
+                        console.log(`✅ 資料已載入（第 ${attempt} 次檢查），開始渲染`);
+                        // 更新資料
+                        this.allProperties = embeddedPropertiesData.properties || [];
+                        this.properties = this.allProperties.filter(p => p.status !== 'sold');
+                        this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
+                        // 重新渲染
+                        this.renderProperties();
                         console.log(`🔄 資料已載入（嘗試 ${attempt}），更新並渲染`);
                         this.allProperties = embeddedPropertiesData.properties;
                         this.properties = this.allProperties.filter(p => p.status !== 'sold');
@@ -203,7 +220,7 @@ class EmbeddedPropertyPaginationSystem {
             return;
         }
 
-        // 檢查是否有資料
+        // 檢查是否有資料，如果沒有則嘗試從 embeddedPropertiesData 更新
         if (!this.properties || this.properties.length === 0) {
             // 檢查是否正在載入資料
             if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
@@ -211,35 +228,25 @@ class EmbeddedPropertyPaginationSystem {
                 const oldCount = this.allProperties ? this.allProperties.length : 0;
                 const newCount = embeddedPropertiesData.properties.length;
                 
-                // 🔥 只有在數量不同時才更新，避免重複更新
-                if (oldCount !== newCount) {
-                    console.log(`🔄 資料已載入，更新分頁系統資料... (舊: ${oldCount} → 新: ${newCount})`);
-                    this.allProperties = embeddedPropertiesData.properties;
-                    this.properties = this.allProperties.filter(p => p.status !== 'sold');
-                    this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
-                    // 清除緩存
-                    this.filteredCache = null;
-                    this.cacheKey = '';
-                    if (this.cardCache) {
-                        this.cardCache.clear();
-                    }
-                    
-                    console.warn(`⚠️ 物件數量變化：${oldCount} → ${newCount}`);
-                } else {
-                    // 數量相同，但可能資料內容不同，仍然更新
-                    console.log(`🔄 資料已載入，更新分頁系統資料（數量相同但內容可能不同）...`);
-                    this.allProperties = embeddedPropertiesData.properties;
-                    this.properties = this.allProperties.filter(p => p.status !== 'sold');
-                    this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
-                    // 清除緩存
-                    this.filteredCache = null;
-                    this.cacheKey = '';
-                    if (this.cardCache) {
-                        this.cardCache.clear();
-                    }
+                console.log(`🔄 資料已載入，更新分頁系統資料... (舊: ${oldCount} → 新: ${newCount})`);
+                this.allProperties = embeddedPropertiesData.properties;
+                this.properties = this.allProperties.filter(p => p.status !== 'sold');
+                this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
+                // 清除緩存
+                this.filteredCache = null;
+                this.cacheKey = '';
+                if (this.cardCache) {
+                    this.cardCache.clear();
                 }
+                
+                if (oldCount !== newCount) {
+                    console.log(`📊 物件數量變化：${oldCount} → ${newCount}`);
+                }
+                
+                // 🔥 資料已更新，繼續執行渲染邏輯（不 return）
+                console.log('✅ 資料已更新，準備渲染物件卡片');
             } else {
-                // 真的沒有資料，顯示載入中
+                // 資料尚未載入，顯示載入中訊息
                 container.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #666;">
                         <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
@@ -249,6 +256,19 @@ class EmbeddedPropertyPaginationSystem {
                 `;
                 return;
             }
+        }
+        
+        // 🔥 再次檢查：確保更新後有資料才繼續渲染
+        if (!this.properties || this.properties.length === 0) {
+            console.warn('⚠️ 沒有物件資料可顯示');
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #666;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                    <h3>目前沒有物件</h3>
+                    <p>請稍後再試或聯繫管理員</p>
+                </div>
+            `;
+            return;
         }
 
         const paginatedProperties = this.getPaginatedProperties();

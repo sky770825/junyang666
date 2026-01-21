@@ -1247,7 +1247,8 @@ window.addEventListener('supabaseDataLoaded', function(event) {
         console.warn('⚠️ Supabase 資料載入事件觸發，但 embeddedPropertiesData 不存在');
         isUpdatingPagination = false;
     }
-}, { once: false });
+    }, { once: false });
+}
 
 // 監聽 API 資料載入事件（備用）- 在 DOMContentLoaded 之前設置
 // 🔥 注意：只有在 Supabase 載入失敗時才會觸發此事件
@@ -1292,7 +1293,8 @@ window.addEventListener('apiDataLoaded', function() {
     } else {
         console.warn('⚠️ API 資料載入事件觸發，但 embeddedPropertiesData 不存在');
     }
-}, { once: false });
+    }, { once: false });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     // 等待資料載入後再初始化分頁系統
@@ -1362,11 +1364,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     initializePaginationSystem();
                 } else {
                     console.error('❌ 無法初始化：資料未載入');
-                    // 嘗試手動觸發資料載入
-                    if (typeof loadPropertiesFromSupabase === 'function') {
-                        console.log('🔄 嘗試手動觸發資料載入...');
-                        loadPropertiesFromSupabase();
-                    }
+                    // 🔥 移除手動觸發，避免無限循環
+                    // 資料載入應該由 supabase-data-loader.js 自動處理
+                    console.log('⏳ 等待 Supabase 資料載入器自動載入資料...');
                 }
             } else {
                 console.error('❌ 無法初始化：EmbeddedPropertyPaginationSystem 類別未定義');

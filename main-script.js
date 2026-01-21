@@ -1312,26 +1312,60 @@ document.addEventListener('DOMContentLoaded', function() {
         // 確保 embeddedPropertiesData 存在且有資料
         if (typeof embeddedPropertiesData === 'undefined' || !embeddedPropertiesData.properties || embeddedPropertiesData.properties.length === 0) {
             console.log('⏳ 等待資料載入...');
+            console.log('   當前狀態:', {
+                hasData: typeof embeddedPropertiesData !== 'undefined',
+                dataLength: typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties ? embeddedPropertiesData.properties.length : 0
+            });
             return false;
         }
         
         // 如果分頁系統還沒初始化，才初始化
         if (!embeddedPaginationSystem) {
             console.log('🚀 初始化分頁系統...');
-            embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
-            window.paginationSystem = embeddedPaginationSystem;
-            console.log(`✅ 分頁系統已初始化，載入 ${embeddedPropertiesData.properties.length} 個物件`);
-            return true;
+            try {
+                embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
+                window.paginationSystem = embeddedPaginationSystem;
+                console.log(`✅ 分頁系統已初始化，載入 ${embeddedPropertiesData.properties.length} 個物件`);
+                
+                // 🔥 驗證初始化是否成功
+                if (!window.paginationSystem) {
+                    console.error('❌ 分頁系統初始化失敗：window.paginationSystem 未設置');
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('❌ 分頁系統初始化時發生錯誤:', error);
+                return false;
+            }
+        } else {
+            console.log('⏭️ 分頁系統已存在，跳過初始化');
+            // 🔥 確保 window.paginationSystem 已設置
+            if (!window.paginationSystem) {
+                window.paginationSystem = embeddedPaginationSystem;
+                console.log('✅ 已設置 window.paginationSystem');
+            }
+            return false;
         }
-        return false;
     }
     
     // 🔥 注意：事件監聽器已在 DOMContentLoaded 之前設置，這裡不再重複設置
     
     // 立即檢查並初始化（如果資料已經載入）
+    console.log('🔍 DOMContentLoaded: 檢查資料和分頁系統狀態...');
+    console.log('- embeddedPropertiesData:', typeof embeddedPropertiesData !== 'undefined' ? '✅' : '❌');
+    console.log('- 資料數量:', typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties ? embeddedPropertiesData.properties.length : 0);
+    console.log('- embeddedPaginationSystem:', embeddedPaginationSystem ? '✅' : '❌');
+    console.log('- EmbeddedPropertyPaginationSystem:', typeof EmbeddedPropertyPaginationSystem !== 'undefined' ? '✅' : '❌');
+    
     if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
         console.log('✅ 資料已存在，立即初始化分頁系統');
-        initializePaginationSystem();
+        const initResult = initializePaginationSystem();
+        if (!initResult) {
+            console.warn('⚠️ 初始化返回 false，可能分頁系統已存在');
+        }
+    } else {
+        console.warn('⚠️ 資料尚未載入，等待資料載入事件...');
     }
     
     // 延遲初始化（給資料載入一些時間，作為備用）
@@ -1359,7 +1393,17 @@ document.addEventListener('DOMContentLoaded', function() {
             // 如果類別存在但系統未初始化，強制初始化
             if (typeof EmbeddedPropertyPaginationSystem !== 'undefined' && typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
                 console.log('🔧 強制初始化分頁系統...');
-                initializePaginationSystem();
+                const initResult = initializePaginationSystem();
+                if (initResult) {
+                    console.log('✅ 強制初始化成功');
+                } else {
+                    console.error('❌ 強制初始化失敗');
+                }
+            } else {
+                console.error('❌ 無法強制初始化：缺少必要條件');
+                console.log('   - EmbeddedPropertyPaginationSystem:', typeof EmbeddedPropertyPaginationSystem !== 'undefined' ? '✅' : '❌');
+                console.log('   - embeddedPropertiesData:', typeof embeddedPropertiesData !== 'undefined' ? '✅' : '❌');
+                console.log('   - 資料數量:', typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties ? embeddedPropertiesData.properties.length : 0);
             }
         }
     }, 2000);

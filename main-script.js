@@ -1237,6 +1237,16 @@ window.addEventListener('supabaseDataLoaded', function(event) {
             console.log('🚀 資料已載入，立即初始化分頁系統（從事件）');
             embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
             window.paginationSystem = embeddedPaginationSystem;
+            
+            // 🔥 確保初始化後立即渲染
+            if (embeddedPaginationSystem && embeddedPaginationSystem.properties && embeddedPaginationSystem.properties.length > 0) {
+                console.log('✅ 分頁系統已初始化，立即渲染物件');
+                embeddedPaginationSystem.renderProperties();
+            } else {
+                console.warn('⚠️ 分頁系統已初始化，但沒有物件資料可渲染');
+            }
+        } else {
+            console.error('❌ EmbeddedPropertyPaginationSystem 類別未定義，無法初始化分頁系統');
         }
         
         // 清除更新標記

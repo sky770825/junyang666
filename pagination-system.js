@@ -60,11 +60,20 @@ class EmbeddedPropertyPaginationSystem {
     init() {
         this.setupViewModeToggle(); // 🎨 設置預覽模式切換
         
+        // 🔥 先嘗試從 embeddedPropertiesData 更新資料（如果還沒更新）
+        if ((!this.properties || this.properties.length === 0) && typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
+            console.log('🔄 初始化時發現資料已載入，更新分頁系統資料...');
+            this.allProperties = embeddedPropertiesData.properties;
+            this.properties = this.allProperties.filter(p => p.status !== 'sold');
+            this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
+        }
+        
         // 確保有資料才渲染
         if (this.properties && this.properties.length > 0) {
+            console.log(`✅ 初始化時有 ${this.properties.length} 個物件，立即渲染`);
             this.renderProperties();
         } else {
-            console.warn('⚠️ 沒有物件資料，跳過渲染');
+            console.warn('⚠️ 初始化時沒有物件資料，顯示載入中狀態');
             // 顯示載入中狀態
             const container = document.getElementById('properties-container');
             if (container) {

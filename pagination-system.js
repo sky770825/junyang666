@@ -741,23 +741,46 @@ class EmbeddedPropertyPaginationSystem {
                         ` : ''}
                     </div>
                     
-                    <!-- 地址（網格模式顯示簡化地址） -->
+                    <!-- 地址（網格模式顯示簡化地址，只顯示到路名） -->
                     ${property.address ? `
                     <div style="margin-bottom: 0.5rem; font-size: clamp(0.75rem, 2vw, 0.85rem); color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 0.3rem;">
                         <i class="fas fa-map-marker-alt" style="color: #667eea; font-size: 0.8rem;"></i>
                         <span title="${property.address}">${(() => {
-                            // 簡化地址顯示（只顯示路名，不顯示詳細號碼）
-                            let addr = property.address || '';
+                            // 網格模式統一使用 formatAddressForDisplay 函數，但強制只顯示到路名
+                            // 對於透天、別墅、店面類型，或勾選隱藏門牌號碼的物件，使用格式化函數
                             const typesToShowOnlyRoad = ['透天', '別墅', '店面'];
                             const shouldShowOnlyRoad = property.type && typesToShowOnlyRoad.includes(property.type);
                             
-                            if ((property.hide_address_number || shouldShowOnlyRoad) && addr) {
-                                addr = addr.replace(/號[\d\w\-\s]*[樓層F]*.*$/i, '');
-                                addr = addr.replace(/[\d]+[樓層F]+.*$/i, '');
-                                if (shouldShowOnlyRoad) {
-                                    addr = addr.replace(/[巷弄][\d\w\-\s]*.*$/i, '');
+                            // 如果應該只顯示路名，使用格式化函數
+                            if (property.hide_address_number || shouldShowOnlyRoad) {
+                                if (typeof window.formatAddressForDisplay === 'function') {
+                                    return window.formatAddressForDisplay(property.address, true, property.type);
                                 }
-                                addr = addr.replace(/[\s\-]+$/, '').trim();
+                            }
+                            
+                            // 如果沒有格式化函數，使用簡化邏輯
+                            let addr = property.address || '';
+                            if (addr) {
+                                // 提取縣市區域
+                                const cityDistrictMatch = addr.match(/^([^路街道]+[市縣區鄉鎮])/i);
+                                const cityDistrict = cityDistrictMatch ? cityDistrictMatch[1] : '';
+                                
+                                // 移除縣市區域，準備提取路名
+                                let roadPart = addr.replace(/^[^路街道]+[市縣區鄉鎮]/i, '');
+                                
+                                // 匹配路名（包含「一段」、「二段」等）
+                                const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
+                                const roadMatch = roadPart.match(roadPattern);
+                                
+                                if (roadMatch) {
+                                    return (cityDistrict + roadMatch[1]).trim();
+                                } else {
+                                    // 簡單匹配第一個「XX路」、「XX街」等
+                                    const simpleRoadMatch = roadPart.match(/([^路街道]*[路街道])/);
+                                    if (simpleRoadMatch) {
+                                        return (cityDistrict + simpleRoadMatch[1]).trim();
+                                    }
+                                }
                             }
                             return addr || '地址未設定';
                         })()}</span>

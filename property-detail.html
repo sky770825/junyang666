@@ -997,7 +997,7 @@
                         </div>
                         <div class="image-main-container" id="image-main-container">
                             <div class="image-main" id="image-main-display">
-                                <img id="main-image" src="${images[0]}" alt="物件照片 1">
+                                <img id="main-image" src="${images[0]}" alt="物件照片 1" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'800\' height=\'600\'%3E%3Crect fill=\'%23ddd\' width=\'800\' height=\'600\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23999\' font-family=\'sans-serif\' font-size=\'18\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E';">
                                 ${images.length > 1 ? `
                                 <button class="image-nav-btn prev" onclick="changeImage(-1)">
                                     <i class="fas fa-chevron-left"></i>
@@ -1012,7 +1012,7 @@
                                     <div class="image-thumbnail ${index === 0 ? 'active' : ''}" 
                                          onclick="selectImage(${index})"
                                          data-index="${index}">
-                                        <img src="${img}" alt="縮圖 ${index + 1}" loading="lazy">
+                                        <img src="${img}" alt="縮圖 ${index + 1}" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\'%3E%3Crect fill=\'%23ddd\' width=\'400\' height=\'300\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23999\' font-family=\'sans-serif\' font-size=\'14\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E';">
                                     </div>
                                 `).join('')}
                             </div>
@@ -1388,6 +1388,11 @@
             const mainImage = document.getElementById('main-image');
             if (mainImage) {
                 mainImage.src = window.propertyImages[index];
+                // 🔥 添加錯誤處理，避免 404 錯誤
+                mainImage.onerror = function() {
+                    this.onerror = null;
+                    this.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'800\' height=\'600\'%3E%3Crect fill=\'%23ddd\' width=\'800\' height=\'600\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23999\' font-family=\'sans-serif\' font-size=\'18\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E';
+                };
             }
             
             // 更新縮圖活動狀態
@@ -1456,6 +1461,11 @@
             
             const img = document.createElement('img');
             img.src = window.propertyImages[index];
+            // 🔥 添加錯誤處理，避免 404 錯誤
+            img.onerror = function() {
+                this.onerror = null;
+                this.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\'%3E%3Crect fill=\'%23ddd\' width=\'400\' height=\'300\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23999\' font-family=\'sans-serif\' font-size=\'14\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E';
+            };
             img.style.cssText = `
                 max-width: 90%;
                 max-height: 90%;

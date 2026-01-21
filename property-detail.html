@@ -570,23 +570,80 @@
                 if (number) {
                     // 正規化編號（處理舊格式）
                     const normalizedNumber = normalizePropertyNumber(number);
-                    console.log('🔍 查詢物件編號:', number, '→ 正規化後:', normalizedNumber);
+                    const originalNumber = number.trim().toUpperCase();
+                    console.log('🔍 查詢物件編號:', {
+                        original: number,
+                        cleaned: originalNumber,
+                        normalized: normalizedNumber
+                    });
                     
-                    // 先嘗試正規化後的編號
-                    let queryResult = await query.eq('number', normalizedNumber).maybeSingle();
+                    let propertyData = null;
+                    let lastError = null;
                     
-                    // 如果找不到，且原始編號與正規化後不同，嘗試原始編號
-                    if (!queryResult.data && normalizedNumber !== number.trim().toUpperCase()) {
-                        console.log('🔄 正規化編號未找到，嘗試原始編號:', number.trim().toUpperCase());
-                        queryResult = await query.eq('number', number.trim().toUpperCase()).maybeSingle();
+                    // 嘗試多種編號格式查詢
+                    const numberVariants = [
+                        normalizedNumber,
+                        originalNumber
+                    ];
+                    
+                    // 如果正規化後的編號與原始不同，也嘗試原始編號
+                    if (normalizedNumber !== originalNumber) {
+                        numberVariants.push(originalNumber);
                     }
                     
-                    if (queryResult.error && queryResult.error.code !== 'PGRST116') {
-                        throw queryResult.error;
+                    // 移除重複的編號
+                    const uniqueVariants = [...new Set(numberVariants)];
+                    console.log('🔄 嘗試查詢的編號變體:', uniqueVariants);
+                    
+                    for (const numVariant of uniqueVariants) {
+                        try {
+                            console.log(`  🔎 嘗試編號: "${numVariant}"`);
+                            const { data, error } = await supabaseClient
+                                .from('properties')
+                                .select('*')
+                                .eq('number', numVariant)
+                                .maybeSingle();
+                            
+                            if (error && error.code !== 'PGRST116') {
+                                console.error(`  ❌ 查詢錯誤:`, error);
+                                lastError = error;
+                                continue;
+                            }
+                            
+                            if (data) {
+                                console.log(`  ✅ 找到物件:`, {
+                                    number: data.number,
+                                    title: data.title,
+                                    is_published: data.is_published
+                                });
+                                propertyData = data;
+                                break;
+                            } else {
+                                console.log(`  ⚠️ 編號 "${numVariant}" 未找到`);
+                            }
+                        } catch (err) {
+                            console.error(`  ❌ 查詢異常:`, err);
+                            lastError = err;
+                        }
                     }
                     
-                    if (!queryResult.data) {
-                        throw new Error(`找不到編號為 "${number}" 的物件`);
+                    if (!propertyData) {
+                        // 如果都找不到，嘗試查詢所有編號（用於調試）
+                        console.log('🔍 查詢所有物件編號（用於調試）...');
+                        const { data: allProperties, error: listError } = await supabaseClient
+                            .from('properties')
+                            .select('number, title, is_published')
+                            .limit(10);
+                        
+                        if (!listError && allProperties) {
+                            console.log('📋 資料庫中的前 10 個物件編號:', allProperties.map(p => ({
+                                number: p.number,
+                                title: p.title,
+                                is_published: p.is_published
+                            })));
+                        }
+                        
+                        throw new Error(`找不到編號為 "${number}" 的物件。已嘗試: ${uniqueVariants.join(', ')}`);
                     }
                     
                     // 隱藏載入提示，顯示頁面
@@ -594,11 +651,11 @@
                     pageEl.style.display = 'block';
                     
                     // 渲染物件詳細資訊
-                    renderProperty(queryResult.data);
+                    renderProperty(propertyData);
                     
                     // 更新頁面標題：物件標題 + 價格（如果有）
-                    const pageTitle = queryResult.data.title 
-                        ? (queryResult.data.price ? `${queryResult.data.title} - ${queryResult.data.price} | 住商不動產` : `${queryResult.data.title} | 住商不動產`)
+                    const pageTitle = propertyData.title 
+                        ? (propertyData.price ? `${propertyData.title} - ${propertyData.price} | 住商不動產` : `${propertyData.title} | 住商不動產`)
                         : '物件詳細資訊 | 住商不動產';
                     document.title = pageTitle;
                     return;

@@ -353,11 +353,12 @@ class EmbeddedPropertyPaginationSystem {
         container.innerHTML = '';
         container.appendChild(fragment);
         
-        // 重新綁定事件（確保新渲染的卡片有正確的事件處理）
+        // 重新綁定事件（確保新渲染的卡片和網格項目有正確的事件處理）
         paginatedProperties.forEach(property => {
-            const card = container.querySelector(`[data-property-id="${property.id}"]`);
-            if (card) {
-                this.rebindCardEvents(card, property);
+            const element = container.querySelector(`[data-property-id="${property.id}"]`);
+            if (element) {
+                // 🔥 同時處理卡片和網格項目
+                this.rebindCardEvents(element, property);
             }
         });
         
@@ -376,13 +377,19 @@ class EmbeddedPropertyPaginationSystem {
         const container = document.getElementById('properties-container');
         if (!container) return;
         
+        // 🔥 防止重複添加事件監聽器
+        if (container.hasAttribute('data-event-delegation-setup')) {
+            return;
+        }
+        container.setAttribute('data-event-delegation-setup', 'true');
+        
         // 使用事件委託處理所有卡片和網格項目的點擊事件
         container.addEventListener('click', (e) => {
             const target = e.target;
-            const card = target.closest('.property-card, .property-grid-item');
-            if (!card) return;
+            const element = target.closest('.property-card, .property-grid-item');
+            if (!element) return;
             
-            const propertyId = card.getAttribute('data-property-id');
+            const propertyId = element.getAttribute('data-property-id');
             if (!propertyId) return;
             
             // 處理照片點擊
@@ -404,8 +411,24 @@ class EmbeddedPropertyPaginationSystem {
                 return; // 讓連結自然跳轉，不觸發事件委託
             }
             
-            // 處理按鈕點擊
-            const action = target.getAttribute('data-action') || target.closest('[data-action]')?.getAttribute('data-action');
+            // 處理按鈕點擊或網格項目點擊
+            // 🔥 優先檢查點擊的元素，然後檢查父元素（包括網格項目本身）
+            let action = target.getAttribute('data-action');
+            if (!action) {
+                const actionElement = target.closest('[data-action]');
+                if (actionElement) {
+                    action = actionElement.getAttribute('data-action');
+                }
+            }
+            
+            // 🔥 網格項目：如果點擊的是網格項目本身（沒有其他 data-action），視為查看詳情
+            if (!action && element.classList.contains('property-grid-item')) {
+                // 檢查是否點擊在連結上
+                if (!target.closest('a')) {
+                    action = 'details';
+                }
+            }
+            
             if (action) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -444,37 +467,52 @@ class EmbeddedPropertyPaginationSystem {
         });
     }
 
-    // 🔥 新增：重新綁定事件監聽器
-    rebindCardEvents(card, property) {
+    // 🔥 新增：重新綁定事件監聽器（同時處理卡片和網格項目）
+    rebindCardEvents(element, property) {
         // 🚀 優化：使用 data 屬性而不是重新綁定事件
         // 設置 data 屬性，讓事件委託處理
-        card.setAttribute('data-property-id', property.id);
+        element.setAttribute('data-property-id', property.id);
         
-        // 為照片項目設置索引
-        const photoItems = card.querySelectorAll('.photo-item');
+        // 設置編號為 data 屬性（如果有的話）
+        if (property.number) {
+            element.setAttribute('data-property-number', property.number);
+        }
+        
+        // 為照片項目設置索引（卡片模式才有）
+        const photoItems = element.querySelectorAll('.photo-item');
         photoItems.forEach((item, index) => {
             item.setAttribute('data-photo-index', index);
         });
         
-        // 為按鈕設置 data 屬性
-        const detailBtn = card.querySelector('button[onclick*="showPropertyDetails"]');
+        // 為按鈕設置 data 屬性（卡片模式）
+        const detailBtn = element.querySelector('button[onclick*="showPropertyDetails"]');
         if (detailBtn) {
             detailBtn.setAttribute('data-action', 'details');
         }
         
-        const loanBtn = card.querySelector('button[onclick*="showLoanCalculator"]');
+        const loanBtn = element.querySelector('button[onclick*="showLoanCalculator"]');
         if (loanBtn) {
             loanBtn.setAttribute('data-action', 'loan');
         }
         
-        const mapIframe = card.querySelector('div[onclick*="showMapModal"]');
+        const mapIframe = element.querySelector('div[onclick*="showMapModal"], .map-preview-container[data-action="map"]');
         if (mapIframe) {
             mapIframe.setAttribute('data-action', 'map');
         }
         
-        const tiktokPreview = card.querySelector('div[onclick*="showTikTokModal"]');
+        const tiktokPreview = element.querySelector('div[onclick*="showTikTokModal"]');
         if (tiktokPreview) {
             tiktokPreview.setAttribute('data-action', 'tiktok');
+        }
+        
+        // 🔥 網格項目：確保整個項目可以點擊（如果沒有設置 data-action）
+        if (element.classList.contains('property-grid-item')) {
+            // 網格項目的主容器應該有 data-action="details"
+            const mainContainer = element.querySelector('[data-action="details"]');
+            if (!mainContainer && !element.hasAttribute('data-action')) {
+                // 如果網格項目的主容器沒有 data-action，設置到元素本身
+                element.setAttribute('data-action', 'details');
+            }
         }
     }
 

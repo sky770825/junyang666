@@ -2,109 +2,92 @@
 // 相關連結前端顯示模組
 // ============================================
 // 負責在前端頁面載入和顯示相關連結
-// 前端從後端 API 獲取資料，不直接連接 Supabase
+// 前端直接連接 Supabase，不經過後端 API（與物件資料一致）
 
 (function() {
     'use strict';
     
-    // 獲取後端 API 基礎網址
-    function getApiBaseUrl() {
-        // 檢查是否有手動設定的 API URL
-        const savedApiUrl = localStorage.getItem('api-url');
-        if (savedApiUrl) {
-            return savedApiUrl;
+    // 初始化 Supabase 客戶端
+    function initSupabaseClient() {
+        if (typeof supabase === 'undefined') {
+            console.error('❌ Supabase SDK 未載入');
+            return null;
         }
         
-        // 判斷環境 - 支援多種本地開發環境
-        const hostname = window.location.hostname;
-        const isLocalhost = hostname === 'localhost' || 
-                           hostname === '127.0.0.1' ||
-                           hostname === '' ||
-                           hostname.startsWith('127.');
-        
-        if (isLocalhost) {
-            // 本地開發環境 - 嘗試多個可能的端口
-            // 優先使用 3000，如果失敗會自動降級
-            return 'http://localhost:3000/api';
-        } else {
-            // 生產環境 - 使用當前網域的 API
-            return window.location.origin + '/api';
+        if (typeof SUPABASE_CONFIG === 'undefined') {
+            console.error('❌ Supabase 配置未載入，請確認 supabase-config.js 已載入');
+            return null;
         }
+        
+        return supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
     }
     
-    // 載入相關連結（從後端 API）
+    // 載入相關連結（直接從 Supabase）
     async function loadRelatedLinks() {
         try {
-            const apiBaseUrl = getApiBaseUrl();
-            const apiUrl = `${apiBaseUrl}/related-links`;
+            const client = initSupabaseClient();
+            if (!client) {
+                throw new Error('無法初始化 Supabase 客戶端');
+            }
             
-            console.log('🔄 正在從後端 API 載入相關連結...', apiUrl);
+            console.log('🔄 正在從 Supabase 載入相關連結...');
             
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                // 增加超時處理
-                signal: AbortSignal.timeout(10000) // 10 秒超時
-            }).catch(fetchError => {
-                // 處理網路錯誤
-                if (fetchError.name === 'AbortError') {
-                    throw new Error('請求超時，請檢查後端伺服器是否運行');
-                } else if (fetchError.name === 'TypeError' && fetchError.message.includes('Failed to fetch')) {
-                    throw new Error('無法連接到後端 API，請確認後端伺服器是否運行在 http://localhost:3000');
+            // 從 Supabase 載入啟用的連結
+            const { data: links, error: linksError } = await client
+                .from('related_links')
+                .select('*')
+                .eq('is_active', true)
+                .order('display_order', { ascending: true });
+            
+            if (linksError) {
+                console.warn('⚠️ Supabase 查詢失敗:', linksError);
+                throw linksError;
+            }
+            
+            // 載入下拉選單項目
+            let items = [];
+            if (links && links.length > 0) {
+                const { data: itemsData, error: itemsError } = await client
+                    .from('related_link_items')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('display_order', { ascending: true });
+                
+                if (!itemsError && itemsData) {
+                    items = itemsData;
                 }
-                throw fetchError;
+            }
+            
+            // 將項目分組到對應的連結
+            const itemsByParent = {};
+            items.forEach(item => {
+                if (!itemsByParent[item.parent_link_id]) {
+                    itemsByParent[item.parent_link_id] = [];
+                }
+                itemsByParent[item.parent_link_id].push(item);
             });
             
-            if (!response.ok) {
-                const errorText = await response.text().catch(() => '');
-                throw new Error(`HTTP ${response.status}: ${response.statusText}${errorText ? ' - ' + errorText : ''}`);
-            }
+            // 組合連結和項目
+            const result = (links || []).map(link => ({
+                ...link,
+                items: itemsByParent[link.id] || []
+            }));
             
-            // 檢查響應內容類型
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                // 如果返回的不是 JSON（可能是 HTML 404 頁面），直接使用預設資料
-                const responseText = await response.text();
-                if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
-                    console.warn('⚠️ 後端 API 返回 HTML（可能是 404 頁面），在生產環境中直接使用預設資料');
-                    if (typeof DEFAULT_RELATED_LINKS !== 'undefined') {
-                        console.log('📋 使用預設連結資料（生產環境）');
-                        return DEFAULT_RELATED_LINKS.filter(l => l.is_active !== false);
-                    }
-                    return [];
-                }
-            }
-            
-            const result = await response.json();
-            
-            if (result.success && result.data) {
-                console.log(`✅ 成功從後端 API 載入 ${result.data.length} 個連結（後台儲存的資料）`);
-                return result.data;
-            } else if (result.data && Array.isArray(result.data)) {
-                // 如果沒有 success 標記，但 data 是陣列，也接受
-                console.log(`✅ 成功從後端 API 載入 ${result.data.length} 個連結`);
-                return result.data;
+            if (result.length > 0) {
+                console.log(`✅ 成功從 Supabase 載入 ${result.length} 個連結（後台儲存的資料）`);
+                return result;
             } else {
-                console.warn('⚠️ 後端 API 返回格式異常，使用預設資料');
+                console.warn('⚠️ Supabase 中沒有啟用的連結，使用預設資料');
                 if (typeof DEFAULT_RELATED_LINKS !== 'undefined') {
                     return DEFAULT_RELATED_LINKS.filter(l => l.is_active !== false);
                 }
                 return [];
             }
         } catch (error) {
-            console.error('❌ 從後端 API 載入連結失敗:', error);
+            console.error('❌ 從 Supabase 載入連結失敗:', error);
+            console.warn('⚠️ 使用預設資料作為備用');
             
-            // 檢查是否是 JSON 解析錯誤（通常是因為返回了 HTML）
-            if (error instanceof SyntaxError && error.message.includes('JSON')) {
-                console.warn('⚠️ API 返回了非 JSON 格式（可能是 HTML 404 頁面），在生產環境中直接使用預設資料');
-            } else {
-                console.warn('⚠️ 使用預設資料作為備用');
-            }
-            
-            // 如果後端 API 失敗，使用預設資料
+            // 如果 Supabase 失敗，使用預設資料
             if (typeof DEFAULT_RELATED_LINKS !== 'undefined') {
                 console.log('📋 使用預設連結資料');
                 return DEFAULT_RELATED_LINKS.filter(l => l.is_active !== false);

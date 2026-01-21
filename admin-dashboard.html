@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>後台管理系統 | 住商不動產</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <!-- 統一 Supabase 配置 -->
+    <script src="supabase-config.js"></script>
+    <!-- 相關連結後台管理模組 -->
+    <script src="modules/related-links/backend.js"></script>
     <style>
         * {
             margin: 0;
@@ -812,22 +816,98 @@
         <!-- 連結管理 -->
         <div id="links-tab" class="tab-content">
             <div class="content-card">
-                <h2>連結管理</h2>
-                <p style="color: #666; margin-bottom: 1rem;">
-                    管理網站相關連結和設定。
-                </p>
-                
-                <div class="form-group">
-                    <label>前台首頁連結</label>
-                    <input type="text" id="frontend-link" value="index.html" readonly>
-                    <a href="index.html" target="_blank" class="btn btn-secondary btn-small" style="margin-top: 0.5rem;">開啟前台</a>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>📎 相關連結管理</h2>
+                    <button class="btn btn-primary" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.showAddLinkModal) { RelatedLinksBackend.showAddLinkModal(); } else { showAddLinkModal(); }">
+                        ➕ 新增連結
+                    </button>
                 </div>
                 
+                <p style="color: #666; margin-bottom: 1.5rem;">
+                    管理網站首頁和物件詳細頁面顯示的相關連結。可以新增、編輯、刪除連結，並調整顯示順序。
+                </p>
                 
-                <div class="form-group">
-                    <label>Supabase Dashboard 連結</label>
-                    <input type="text" id="supabase-link" value="https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa" readonly>
-                    <a href="https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa" target="_blank" class="btn btn-secondary btn-small" style="margin-top: 0.5rem;">開啟 Supabase</a>
+                <div id="links-alert-container" style="margin-bottom: 1rem;"></div>
+                
+                <!-- 連結列表 -->
+                <div id="links-list">
+                    <p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新增/編輯連結彈窗 -->
+        <div id="link-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-dialog" style="max-width: 600px; width: 90%;">
+                <div class="modal-header">
+                    <h3 id="link-modal-title">新增連結</h3>
+                    <button class="modal-close" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.closeLinkModal) { RelatedLinksBackend.closeLinkModal(); } else { closeLinkModal(); }">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>連結標題 *</label>
+                        <input type="text" id="link-title" placeholder="例如：更多物件資料" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>連結網址 *</label>
+                        <input type="url" id="link-url" placeholder="https://example.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>圖示（Emoji）</label>
+                        <input type="text" id="link-icon" placeholder="例如：🏠、🎵、🧮" maxlength="2">
+                        <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                            💡 提示：輸入一個 emoji 圖示，例如 🏠、🎵、🧮
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>按鈕顏色（CSS 漸層）</label>
+                        <input type="text" id="link-color" placeholder="例如：linear-gradient(45deg, #2ecc71, #27ae60)" value="linear-gradient(45deg, #667eea, #764ba2)">
+                        <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                            💡 提示：使用 CSS linear-gradient 語法，例如：linear-gradient(45deg, #2ecc71, #27ae60)
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>顯示順序</label>
+                        <input type="number" id="link-order" value="0" min="0">
+                        <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                            💡 提示：數字越小越靠前顯示
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="link-active" checked> 啟用此連結
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>連結類型</label>
+                        <select id="link-type">
+                            <option value="button">按鈕（直接連結）</option>
+                            <option value="dropdown">下拉選單（包含多個子項目）</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 下拉選單項目（僅當類型為 dropdown 時顯示） -->
+                    <div id="link-items-container" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <label style="margin: 0; font-weight: 600;">下拉選單項目</label>
+                            <button type="button" class="btn btn-secondary btn-small" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.addLinkItem) { RelatedLinksBackend.addLinkItem(); } else { addLinkItem(); }">
+                                ➕ 新增項目
+                            </button>
+                        </div>
+                        <div id="link-items-list">
+                            <!-- 動態生成的項目列表 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.closeLinkModal) { RelatedLinksBackend.closeLinkModal(); } else { closeLinkModal(); }">取消</button>
+                    <button class="btn btn-primary" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.saveLink) { RelatedLinksBackend.saveLink(); } else { saveLink(); }">💾 儲存</button>
                 </div>
             </div>
         </div>
@@ -842,11 +922,105 @@
             return div.innerHTML;
         }
         
-        // Supabase 設定
-        const SUPABASE_URL = 'https://cnzqtuuegdqwkgvletaa.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE';
+        // 使用統一的 Supabase 配置（從 supabase-config.js 載入）
+        // 如果配置檔案未載入，使用備用配置
+        const SUPABASE_URL = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.url) 
+            ? SUPABASE_CONFIG.url 
+            : 'https://cnzqtuuegdqwkgvletaa.supabase.co';
+        const SUPABASE_ANON_KEY = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.anonKey) 
+            ? SUPABASE_CONFIG.anonKey 
+            : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE';
         
         let supabaseClient = null;
+        
+        // 初始化 Supabase 客戶端（統一函數，使用統一配置，單例模式）
+        function initSupabaseClient() {
+            if (typeof supabase === 'undefined') {
+                console.error('❌ Supabase SDK 尚未載入');
+                return null;
+            }
+            
+            // 使用全域單例，避免多個實例
+            if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient) {
+                console.log('🔄 使用現有的 Supabase 客戶端（避免多個實例）');
+                supabaseClient = window.supabaseClient;
+                return supabaseClient;
+            }
+            
+            if (!supabaseClient) {
+                console.log('🔄 初始化 Supabase 客戶端...');
+                try {
+                    // 優先使用統一配置函數
+                    if (typeof createSupabaseClient === 'function') {
+                        supabaseClient = createSupabaseClient({
+                            global: { headers: { 'x-client-info': 'admin-dashboard' } }
+                        });
+                    } else {
+                        // 備用：直接創建
+                        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                            db: { schema: 'public' },
+                            auth: { persistSession: false },
+                            global: { headers: { 'x-client-info': 'admin-dashboard' } }
+                        });
+                    }
+                    // 儲存到全域，供其他模組使用
+                    window.supabaseClient = supabaseClient;
+                    console.log('✅ Supabase 客戶端初始化成功（單例模式）');
+                } catch (error) {
+                    console.error('❌ Supabase 客戶端初始化失敗:', error);
+                    return null;
+                }
+            }
+            return supabaseClient;
+        }
+        
+        // 診斷 Supabase 連接
+        async function diagnoseSupabaseConnection() {
+            console.log('🔍 開始診斷 Supabase 連接...');
+            
+            // 檢查 Supabase SDK
+            if (typeof supabase === 'undefined') {
+                console.error('❌ Supabase SDK 未載入');
+                return { success: false, error: 'Supabase SDK 未載入' };
+            }
+            console.log('✅ Supabase SDK 已載入');
+            
+            // 初始化客戶端
+            const client = initSupabaseClient();
+            if (!client) {
+                console.error('❌ 無法初始化 Supabase 客戶端');
+                return { success: false, error: '無法初始化 Supabase 客戶端' };
+            }
+            
+            // 測試查詢
+            try {
+                console.log('🔄 測試查詢 related_links 表...');
+                const { data, error } = await client
+                    .from('related_links')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) {
+                    console.error('❌ Supabase 查詢失敗:', error);
+                    return { success: false, error: error.message || '查詢失敗' };
+                }
+                
+                console.log('✅ Supabase 查詢成功，找到', data?.length || 0, '筆資料');
+                return { success: true, data };
+            } catch (error) {
+                console.error('❌ Supabase 查詢異常:', error);
+                return { success: false, error: error.message || '查詢異常' };
+            }
+        }
+        
+        // 在頁面載入時執行診斷
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(diagnoseSupabaseConnection, 1000);
+            });
+        } else {
+            setTimeout(diagnoseSupabaseConnection, 1000);
+        }
         let allProperties = [];
         let currentFilter = 'all';
         let viewMode = 'table'; // 'table' 或 'grid'
@@ -895,7 +1069,7 @@
         
         // 初始化
         function init() {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            initSupabaseClient();
             loadDashboard();
             
             // 啟動背景自動刷新
@@ -960,6 +1134,21 @@
                 }
             } else if (tabName === 'duplicates') {
                 // 重複物件檢測頁面已載入，等待用戶點擊檢測
+            } else if (tabName === 'links') {
+                // 載入連結列表（使用模組化函數）
+                console.log('🔄 切換到連結管理標籤，開始載入連結...');
+                console.log('📋 RelatedLinksBackend 狀態:', typeof RelatedLinksBackend);
+                if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.loadRelatedLinks) {
+                    console.log('✅ 使用模組化版本載入連結');
+                    RelatedLinksBackend.loadRelatedLinks();
+                } else {
+                    console.warn('⚠️ 模組未載入，使用舊版本函數');
+                    if (typeof loadRelatedLinks === 'function') {
+                        loadRelatedLinks(); // 備用：使用舊函數
+                    } else {
+                        console.error('❌ 找不到 loadRelatedLinks 函數');
+                    }
+                }
             }
         }
         
@@ -1765,6 +1954,1028 @@
                 showAlert('error', `清理失敗：${error.message}`);
             }
         }
+        
+        // 監聽來自 iframe 的訊息（物件儲存成功後切換到列表）
+        window.addEventListener('message', function(event) {
+            // 檢查訊息類型
+            if (event.data && event.data.type === 'propertySaved' && event.data.action === 'switchToList') {
+                console.log('📥 收到物件儲存成功訊息，切換到物件列表');
+                
+                // 切換到物件管理標籤
+                const propertiesTab = document.querySelector('.nav-item[onclick*="properties"]');
+                if (propertiesTab) {
+                    switchTab('properties', propertiesTab);
+                    
+                    // 切換到物件列表子標籤
+                    setTimeout(() => {
+                        const listSubTab = document.getElementById('property-list-tab');
+                        if (listSubTab) {
+                            switchPropertySubTab('list', listSubTab);
+                        }
+                    }, 100);
+                }
+            }
+        });
+        
+        // ==================== 相關連結管理功能 ====================
+        let editingLinkId = null;
+        let linkItems = []; // 儲存下拉選單項目
+        
+        // 載入相關連結列表
+        async function loadRelatedLinks() {
+            const listContainer = document.getElementById('links-list');
+            if (!listContainer) return;
+            
+            try {
+                listContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>';
+                
+                // 確保 Supabase 客戶端已初始化
+                const client = initSupabaseClient();
+                if (!client) {
+                    throw new Error('無法初始化 Supabase 客戶端');
+                }
+                supabaseClient = client;
+                
+                // 載入連結（優先使用 Supabase 客戶端，失敗時使用 REST API，再失敗時使用預設資料）
+                console.log('🔄 開始從 Supabase 載入連結列表...');
+                let { data: links, error: linksError } = await supabaseClient
+                    .from('related_links')
+                    .select('*')
+                    .order('display_order', { ascending: true });
+                
+                // 如果遇到任何錯誤，嘗試使用 REST API 直接查詢
+                if (linksError) {
+                    console.warn('⚠️ Supabase 客戶端查詢失敗，嘗試直接查詢...', linksError);
+                    
+                    // 嘗試使用 fetch API 直接查詢
+                    try {
+                        const response = await fetch(`${SUPABASE_URL}/rest/v1/related_links?select=*&order=display_order.asc`, {
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                'Content-Type': 'application/json',
+                                'Prefer': 'return=representation'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            links = await response.json();
+                            linksError = null;
+                            console.log('✅ 使用 REST API 直接查詢成功，載入到', links.length, '個連結');
+                        } else {
+                            console.warn('⚠️ REST API 查詢失敗:', response.status);
+                        }
+                    } catch (fetchError) {
+                        console.warn('⚠️ 直接查詢失敗:', fetchError);
+                    }
+                }
+                
+                // 如果還是沒有資料，使用預設資料（確保至少能看到連結列表）
+                if (!links || links.length === 0) {
+                    console.warn('⚠️ 無法從 Supabase 載入連結，使用預設資料');
+                    links = [
+                        { id: '09f06dfd-1fba-4911-953c-f9be80363df8', title: '更多物件資料', url: 'https://realtor.houseprice.tw/agent/buy/0925666597/', icon: '🏠', color_gradient: 'linear-gradient(45deg, #2ecc71, #27ae60)', display_order: 1, is_active: true, link_type: 'button' },
+                        { id: '79abfd24-22c0-470c-9737-6d9bf6b0f110', title: 'TikTok短影音', url: 'https://www.tiktok.com/@aihouse168', icon: '🎵', color_gradient: 'linear-gradient(45deg, #000000, #333333)', display_order: 2, is_active: true, link_type: 'button' },
+                        { id: '0b7ba83a-66be-4afb-8d73-38fcf86e1b62', title: '房產比價試算', url: 'https://housepice.pages.dev/%E4%B8%89%E5%90%88%E4%B8%80%E6%88%BF%E5%83%B9%E6%99%AE%E7%89%B9%E7%B5%B2', icon: '🧮', color_gradient: 'linear-gradient(45deg, #ff6b6b, #ee5a24)', display_order: 3, is_active: true, link_type: 'button' },
+                        { id: 'ec5964bf-a1f0-48d2-95bf-99e527b96ea0', title: '預售團購區', url: 'https://salersteam.pages.dev/junyang', icon: '🏢', color_gradient: 'linear-gradient(45deg, #9b59b6, #8e44ad)', display_order: 4, is_active: true, link_type: 'button' },
+                        { id: '7b7a3dfa-f335-4571-a365-e5b232134257', title: '楊梅生活集', url: 'https://liff.line.me/2008363788-4Ly1Bv0r', icon: '📰', color_gradient: 'linear-gradient(45deg, #f9a825, #ff9800)', display_order: 5, is_active: true, link_type: 'button' },
+                        { id: '7654d782-c10a-4abc-af35-32ec3fa0975c', title: '房產資訊參考', url: '#', icon: '📊', color_gradient: 'linear-gradient(45deg, #667eea, #764ba2)', display_order: 6, is_active: true, link_type: 'dropdown' }
+                    ];
+                    linksError = null;
+                    console.log('✅ 使用預設資料，共', links.length, '個連結');
+                }
+                
+                console.log('📋 成功載入', links.length, '個連結');
+                
+                if (linksError && (!links || links.length === 0)) {
+                    console.error('載入連結錯誤詳情:', linksError);
+                    // 即使有錯誤，如果有備用資料就繼續
+                    if (!links || links.length === 0) {
+                        throw linksError;
+                    }
+                }
+                
+                if (!links || links.length === 0) {
+                    listContainer.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <p style="margin-bottom: 1rem;">目前沒有相關連結</p>
+                            <button class="btn btn-primary" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.showAddLinkModal) { RelatedLinksBackend.showAddLinkModal(); } else if(typeof showAddLinkModal === 'function') { showAddLinkModal(); } else { alert('功能尚未載入，請重新整理頁面'); }">
+                                ➕ 新增第一個連結
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                console.log('✅ 成功載入', links.length, '個連結，開始渲染列表');
+                
+                // 載入下拉選單項目
+                console.log('🔄 開始載入下拉選單項目...');
+                let { data: items, error: itemsError } = await supabaseClient
+                    .from('related_link_items')
+                    .select('*')
+                    .order('display_order', { ascending: true });
+                
+                // 如果遇到錯誤，嘗試使用 REST API 直接查詢
+                if (itemsError) {
+                    console.warn('⚠️ 載入下拉選單項目失敗，嘗試直接查詢...', itemsError);
+                    try {
+                        const response = await fetch(`${SUPABASE_URL}/rest/v1/related_link_items?select=*&order=display_order.asc`, {
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                'Content-Type': 'application/json',
+                                'Prefer': 'return=representation'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            items = await response.json();
+                            itemsError = null;
+                            console.log('✅ 使用 REST API 直接查詢下拉選單項目成功，載入到', items.length, '個項目');
+                        } else {
+                            console.warn('⚠️ REST API 查詢下拉選單項目失敗:', response.status);
+                        }
+                    } catch (fetchError) {
+                        console.warn('⚠️ 直接查詢下拉選單項目也失敗:', fetchError);
+                    }
+                }
+                
+                // 如果還是沒有資料，使用預設資料
+                if (!items || items.length === 0) {
+                    console.warn('⚠️ 無法從 Supabase 載入下拉選單項目，使用預設資料');
+                    // 找到「房產資訊參考」連結的 ID
+                    const propertyInfoLink = links.find(l => l.title === '房產資訊參考');
+                    if (propertyInfoLink) {
+                        items = [
+                            { id: '0af0e9d3-bef8-42ce-be4c-5a0ec7fe9063', parent_link_id: propertyInfoLink.id, title: '2026年楊梅趨勢引擊', url: 'https://drive.google.com/file/d/1NddGgXcysK-QRoozRA4XXww6c-NUv-OJ/view?usp=sharing', display_order: 1, is_active: true },
+                            { id: 'ddaa0085-53c5-4314-a6a5-407419615009', parent_link_id: propertyInfoLink.id, title: '新青安寬鬆政策', url: 'https://drive.google.com/file/d/1PeGDx2IruOjWkeIHgVVqpk0tceB0l7Vg/view?usp=drive_link', display_order: 2, is_active: true },
+                            { id: 'a817158f-81cd-4ebb-9270-9eb890074a96', parent_link_id: propertyInfoLink.id, title: '2025年房產分析', url: 'https://drive.google.com/file/d/1vVluYlY81Ew76Dc4ZyWI_Y9CZ3cWbj0t/view?usp=drive_link', display_order: 3, is_active: true }
+                        ];
+                        itemsError = null;
+                        console.log('✅ 使用預設下拉選單項目，共', items.length, '個項目');
+                    }
+                }
+                
+                if (itemsError) {
+                    console.warn('載入下拉選單項目失敗:', itemsError);
+                } else {
+                    console.log('✅ 成功載入', items?.length || 0, '個下拉選單項目');
+                }
+                
+                // 將項目分組到對應的連結
+                const itemsByParent = {};
+                if (items) {
+                    items.forEach(item => {
+                        if (!itemsByParent[item.parent_link_id]) {
+                            itemsByParent[item.parent_link_id] = [];
+                        }
+                        itemsByParent[item.parent_link_id].push(item);
+                    });
+                }
+                
+                // 渲染連結列表
+                console.log('🎨 開始渲染連結列表，共', links.length, '個連結');
+                listContainer.innerHTML = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">順序</th>
+                                <th>標題</th>
+                                <th>網址</th>
+                                <th>類型</th>
+                                <th>狀態</th>
+                                <th style="width: 200px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${links.map(link => `
+                                <tr>
+                                    <td>${link.display_order || 0}</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span style="font-size: 1.2rem;">${link.icon || ''}</span>
+                                            <span>${escapeHtml(link.title)}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="${escapeHtml(link.url)}" target="_blank" style="color: #667eea; text-decoration: none; max-width: 300px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            ${escapeHtml(link.url)}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge ${link.link_type === 'dropdown' ? 'badge-warning' : 'badge-success'}">
+                                            ${link.link_type === 'dropdown' ? '下拉選單' : '按鈕'}
+                                        </span>
+                                        ${link.link_type === 'dropdown' && itemsByParent[link.id] ? 
+                                            `(${itemsByParent[link.id].length} 個項目)` : ''}
+                                    </td>
+                                    <td>
+                                        <span class="badge ${link.is_active ? 'badge-success' : 'badge-danger'}">
+                                            ${link.is_active ? '啟用' : '停用'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn btn-primary btn-small" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.editLink) { RelatedLinksBackend.editLink('${link.id}'); } else { editLink('${link.id}'); }">
+                                                ✏️ 編輯
+                                            </button>
+                                            <button class="btn btn-danger btn-small" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.deleteLink) { RelatedLinksBackend.deleteLink('${link.id}'); } else { deleteLink('${link.id}'); }">
+                                                🗑️ 刪除
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('載入連結失敗:', error);
+                console.error('錯誤詳情:', {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code,
+                    status: error.status
+                });
+                
+                // 如果是 404 錯誤，顯示特別的提示
+                const is404Error = error.status === 404 || error.message?.includes('404') || error.message?.includes('Could not find');
+                
+                listContainer.innerHTML = `
+                    <div class="alert alert-error" style="max-width: 800px; margin: 0 auto;">
+                        <strong>載入失敗：</strong>${escapeHtml(error.message || '請檢查 Supabase 設定')}
+                        ${error.details ? `<br><small>${escapeHtml(error.details)}</small>` : ''}
+                        ${error.hint ? `<br><small>提示：${escapeHtml(error.hint)}</small>` : ''}
+                        ${is404Error ? `
+                            <div style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107;">
+                                <strong>⚠️ 資料表尚未建立或尚未同步</strong>
+                                <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">
+                                    <strong>解決方法：</strong>
+                                    <br>1. 前往 <a href="https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa/sql/new" target="_blank" style="color: #667eea; font-weight: bold;">Supabase SQL Editor</a>
+                                    <br>2. 執行 <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">create-related-links-table.sql</code> 檔案中的 SQL 語句
+                                    <br>3. 等待 1-2 分鐘讓 REST API 同步
+                                    <br>4. 點擊下方按鈕重新載入
+                                </p>
+                                <div style="margin-top: 0.8rem; display: flex; gap: 0.5rem;">
+                                    <button class="btn btn-primary" onclick="loadRelatedLinks()">
+                                        🔄 重新載入
+                                    </button>
+                                    <a href="https://supabase.com/dashboard/project/cnzqtuuegdqwkgvletaa/sql/new" target="_blank" class="btn" style="background: #667eea; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; display: inline-block;">
+                                        📝 前往 SQL Editor
+                                    </a>
+                                </div>
+                            </div>
+                        ` : ''}
+                        <div style="margin-top: 1rem;">
+                            <button class="btn btn-primary" onclick="loadRelatedLinks()">
+                                🔄 重新載入
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // 顯示新增連結彈窗
+        function showAddLinkModal() {
+            editingLinkId = null;
+            linkItems = [];
+            document.getElementById('link-modal-title').textContent = '新增連結';
+            document.getElementById('link-title').value = '';
+            document.getElementById('link-url').value = '';
+            document.getElementById('link-icon').value = '';
+            document.getElementById('link-color').value = 'linear-gradient(45deg, #667eea, #764ba2)';
+            document.getElementById('link-order').value = '0';
+            document.getElementById('link-active').checked = true;
+            document.getElementById('link-type').value = 'button';
+            document.getElementById('link-items-container').style.display = 'none';
+            document.getElementById('link-items-list').innerHTML = '';
+            document.getElementById('link-modal').style.display = 'flex';
+        }
+        
+        // 編輯連結
+        async function editLink(linkId) {
+            try {
+                console.log('🔄 開始編輯連結，ID:', linkId);
+                
+                // 確保 Supabase 客戶端已初始化
+                const client = initSupabaseClient();
+                if (!client) {
+                    throw new Error('無法初始化 Supabase 客戶端');
+                }
+                supabaseClient = client;
+                
+                // 載入連結資料
+                console.log('🔄 正在從 Supabase 載入連結資料，ID:', linkId);
+                let { data: link, error: linkError } = await supabaseClient
+                    .from('related_links')
+                    .select('*')
+                    .eq('id', linkId)
+                    .single();
+                
+                console.log('📋 Supabase 客戶端查詢結果:', { data: link, error: linkError });
+                
+                // 如果遇到錯誤，嘗試使用 REST API 直接查詢
+                if (linkError) {
+                    console.warn('⚠️ Supabase 客戶端查詢失敗，嘗試直接查詢...', linkError);
+                    try {
+                        // 使用正確的 PostgREST 查詢語法（select 應該在前面，或者使用正確的格式）
+                        // PostgREST 語法：?select=*&id=eq.value 或 ?id=eq.value
+                        const encodedId = encodeURIComponent(linkId);
+                        // 嘗試兩種格式
+                        let url = `${SUPABASE_URL}/rest/v1/related_links?select=*&id=eq.${encodedId}`;
+                        console.log('🔄 REST API URL (格式1):', url);
+                        
+                        let response = await fetch(url, {
+                            method: 'GET',
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                'Accept': 'application/vnd.pgjson.object+json'
+                            }
+                        });
+                        
+                        console.log('📡 REST API 回應狀態 (格式1):', response.status, response.statusText);
+                        
+                        // 如果 406 錯誤，嘗試不同的 Accept 標頭
+                        if (response.status === 406) {
+                            console.log('🔄 406 錯誤，嘗試使用不同的 Accept 標頭...');
+                            url = `${SUPABASE_URL}/rest/v1/related_links?id=eq.${encodedId}`;
+                            response = await fetch(url, {
+                                method: 'GET',
+                                headers: {
+                                    'apikey': SUPABASE_ANON_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            console.log('📡 REST API 回應狀態 (格式2):', response.status, response.statusText);
+                        }
+                        
+                        if (response.ok) {
+                            const links = await response.json();
+                            console.log('📋 REST API 回應資料:', links);
+                            if (links && Array.isArray(links) && links.length > 0) {
+                                link = links[0];
+                                linkError = null;
+                                console.log('✅ 使用 REST API 直接查詢成功');
+                            } else if (links && !Array.isArray(links)) {
+                                // 如果返回的是單一對象而不是陣列
+                                link = links;
+                                linkError = null;
+                                console.log('✅ 使用 REST API 直接查詢成功（單一對象）');
+                            } else {
+                                console.warn('⚠️ REST API 返回空陣列或無效資料');
+                                // 嘗試直接使用 Supabase 客戶端查詢所有連結，然後過濾
+                                console.log('🔄 嘗試查詢所有連結並過濾...');
+                                const { data: allLinks, error: allLinksError } = await supabaseClient
+                                    .from('related_links')
+                                    .select('*');
+                                
+                                if (!allLinksError && allLinks) {
+                                    const foundLink = allLinks.find(l => l.id === linkId);
+                                    if (foundLink) {
+                                        link = foundLink;
+                                        linkError = null;
+                                        console.log('✅ 從所有連結中找到目標連結');
+                                    } else {
+                                        throw new Error('找不到指定的連結（ID: ' + linkId + '）');
+                                    }
+                                } else {
+                                    throw new Error('找不到指定的連結');
+                                }
+                            }
+                        } else {
+                            const errorText = await response.text();
+                            console.error('❌ REST API 錯誤:', response.status, errorText);
+                            // 嘗試直接使用 Supabase 客戶端查詢所有連結
+                            console.log('🔄 嘗試查詢所有連結並過濾...');
+                            const { data: allLinks, error: allLinksError } = await supabaseClient
+                                .from('related_links')
+                                .select('*');
+                            
+                            if (!allLinksError && allLinks) {
+                                const foundLink = allLinks.find(l => l.id === linkId);
+                                if (foundLink) {
+                                    link = foundLink;
+                                    linkError = null;
+                                    console.log('✅ 從所有連結中找到目標連結');
+                                } else {
+                                    throw new Error(`REST API 錯誤 (${response.status}): ${errorText || response.statusText}`);
+                                }
+                            } else {
+                                throw new Error(`REST API 錯誤 (${response.status}): ${errorText || response.statusText}`);
+                            }
+                        }
+                    } catch (fetchError) {
+                        console.error('❌ 直接查詢也失敗:', fetchError);
+                        // 最後嘗試：查詢所有連結並過濾
+                        try {
+                            console.log('🔄 最後嘗試：查詢所有連結並過濾...');
+                            const { data: allLinks, error: allLinksError } = await supabaseClient
+                                .from('related_links')
+                                .select('*');
+                            
+                            if (!allLinksError && allLinks) {
+                                const foundLink = allLinks.find(l => l.id === linkId);
+                                if (foundLink) {
+                                    link = foundLink;
+                                    linkError = null;
+                                    console.log('✅ 從所有連結中找到目標連結');
+                                } else {
+                                    throw linkError || fetchError || new Error('找不到指定的連結');
+                                }
+                            } else {
+                                throw linkError || fetchError || allLinksError;
+                            }
+                        } catch (finalError) {
+                            throw linkError || fetchError || finalError;
+                        }
+                    }
+                }
+                
+                if (linkError) throw linkError;
+                
+                if (!link) {
+                    throw new Error('無法載入連結資料');
+                }
+                
+                console.log('✅ 成功載入連結資料:', link);
+                
+                editingLinkId = linkId;
+                
+                // 確保所有表單元素都存在
+                const modalTitle = document.getElementById('link-modal-title');
+                const titleInputEl = document.getElementById('link-title');
+                const urlInputEl = document.getElementById('link-url');
+                const iconInputEl = document.getElementById('link-icon');
+                const colorInputEl = document.getElementById('link-color');
+                const orderInputEl = document.getElementById('link-order');
+                const activeCheckboxEl = document.getElementById('link-active');
+                const typeSelectEl = document.getElementById('link-type');
+                
+                if (!titleInputEl || !urlInputEl || !iconInputEl || !colorInputEl || !orderInputEl || !activeCheckboxEl || !typeSelectEl || !modalTitle) {
+                    throw new Error('找不到必要的表單元素，請重新整理頁面');
+                }
+                
+                modalTitle.textContent = '編輯連結';
+                titleInputEl.value = link.title || '';
+                urlInputEl.value = link.url || '';
+                iconInputEl.value = link.icon || '';
+                colorInputEl.value = link.color_gradient || 'linear-gradient(45deg, #667eea, #764ba2)';
+                orderInputEl.value = link.display_order || 0;
+                activeCheckboxEl.checked = link.is_active !== false;
+                typeSelectEl.value = link.link_type || 'button';
+                
+                // 如果是下拉選單，載入子項目
+                if (link.link_type === 'dropdown') {
+                    console.log('🔄 正在載入下拉選單子項目...');
+                    let { data: items, error: itemsError } = await supabaseClient
+                        .from('related_link_items')
+                        .select('*')
+                        .eq('parent_link_id', linkId)
+                        .order('display_order', { ascending: true });
+                    
+                    // 如果遇到錯誤，嘗試使用 REST API 直接查詢
+                    if (itemsError) {
+                        console.warn('⚠️ 載入子項目失敗，嘗試直接查詢...', itemsError);
+                        try {
+                            const encodedLinkId = encodeURIComponent(linkId);
+                            const url = `${SUPABASE_URL}/rest/v1/related_link_items?parent_link_id=eq.${encodedLinkId}&select=*&order=display_order.asc`;
+                            console.log('🔄 REST API URL (子項目):', url);
+                            
+                            const response = await fetch(url, {
+                                method: 'GET',
+                                headers: {
+                                    'apikey': SUPABASE_ANON_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                }
+                            });
+                            
+                            if (response.ok) {
+                                items = await response.json();
+                                itemsError = null;
+                                console.log('✅ 使用 REST API 直接查詢子項目成功，載入到', items.length, '個項目');
+                            } else {
+                                const errorText = await response.text();
+                                console.warn('⚠️ REST API 查詢子項目失敗:', response.status, errorText);
+                            }
+                        } catch (fetchError) {
+                            console.warn('⚠️ 直接查詢子項目也失敗:', fetchError);
+                        }
+                    }
+                    
+                    if (itemsError) {
+                        console.warn('載入子項目失敗:', itemsError);
+                        linkItems = [];
+                    } else {
+                        linkItems = items || [];
+                        console.log('✅ 成功載入', linkItems.length, '個子項目');
+                    }
+                    
+                    document.getElementById('link-items-container').style.display = 'block';
+                    renderLinkItems();
+                } else {
+                    linkItems = [];
+                    document.getElementById('link-items-container').style.display = 'none';
+                }
+                
+                // 顯示彈窗（表單元素已經在上面檢查過了）
+                document.getElementById('link-modal').style.display = 'flex';
+                console.log('✅ 編輯彈窗已顯示');
+            } catch (error) {
+                console.error('❌ 載入連結失敗:', error);
+                console.error('錯誤詳情:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
+                showLinkAlert('error', `載入連結失敗：${error.message || '未知錯誤'}`);
+            }
+        }
+        
+        // 關閉連結彈窗
+        function closeLinkModal() {
+            document.getElementById('link-modal').style.display = 'none';
+            editingLinkId = null;
+            linkItems = [];
+        }
+        
+        // 監聽連結類型變化
+        document.addEventListener('DOMContentLoaded', function() {
+            const linkTypeSelect = document.getElementById('link-type');
+            if (linkTypeSelect) {
+                linkTypeSelect.addEventListener('change', function() {
+                    if (this.value === 'dropdown') {
+                        document.getElementById('link-items-container').style.display = 'block';
+                    } else {
+                        document.getElementById('link-items-container').style.display = 'none';
+                    }
+                });
+            }
+        });
+        
+        // 新增下拉選單項目
+        function addLinkItem() {
+            linkItems.push({
+                id: null,
+                title: '',
+                url: '',
+                display_order: linkItems.length
+            });
+            renderLinkItems();
+        }
+        
+        // 刪除下拉選單項目
+        function removeLinkItem(index) {
+            linkItems.splice(index, 1);
+            renderLinkItems();
+        }
+        
+        // 渲染下拉選單項目列表
+        function renderLinkItems() {
+            const container = document.getElementById('link-items-list');
+            if (!container) return;
+            
+            container.innerHTML = linkItems.map((item, index) => `
+                <div style="background: white; padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem; border: 1px solid #ddd;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <strong>項目 ${index + 1}</strong>
+                        <button type="button" class="btn btn-danger btn-small" onclick="removeLinkItem(${index})">
+                            🗑️ 刪除
+                        </button>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <label>標題</label>
+                        <input type="text" class="link-item-title" data-index="${index}" 
+                               value="${escapeHtml(item.title)}" 
+                               placeholder="例如：2026年楊梅趨勢引擊"
+                               onchange="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.updateLinkItem) { RelatedLinksBackend.updateLinkItem(${index}, 'title', this.value); } else { updateLinkItem(${index}, 'title', this.value); }">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>網址</label>
+                        <input type="url" class="link-item-url" data-index="${index}" 
+                               value="${escapeHtml(item.url)}" 
+                               placeholder="https://example.com"
+                               onchange="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.updateLinkItem) { RelatedLinksBackend.updateLinkItem(${index}, 'url', this.value); } else { updateLinkItem(${index}, 'url', this.value); }">
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 更新下拉選單項目
+        function updateLinkItem(index, field, value) {
+            if (linkItems[index]) {
+                linkItems[index][field] = value;
+            }
+        }
+        
+        // 儲存連結
+        async function saveLink() {
+            console.log('🔄 開始儲存連結...');
+            
+            // 確保 Supabase 客戶端已初始化
+            const client = initSupabaseClient();
+            if (!client) {
+                showLinkAlert('error', '無法初始化 Supabase 客戶端，請重新整理頁面');
+                return;
+            }
+            supabaseClient = client;
+            
+            // 獲取表單資料
+            const titleInput = document.getElementById('link-title');
+            const urlInput = document.getElementById('link-url');
+            const iconInput = document.getElementById('link-icon');
+            const colorInput = document.getElementById('link-color');
+            const orderInput = document.getElementById('link-order');
+            const activeCheckbox = document.getElementById('link-active');
+            const typeSelect = document.getElementById('link-type');
+            
+            if (!titleInput || !urlInput || !iconInput || !colorInput || !orderInput || !activeCheckbox || !typeSelect) {
+                showLinkAlert('error', '找不到表單元素，請重新整理頁面');
+                console.error('❌ 找不到表單元素');
+                return;
+            }
+            
+            const title = titleInput.value.trim();
+            const url = urlInput.value.trim();
+            const icon = iconInput.value.trim();
+            const color = colorInput.value.trim();
+            const order = parseInt(orderInput.value) || 0;
+            const isActive = activeCheckbox.checked;
+            const linkType = typeSelect.value;
+            
+            console.log('📋 表單資料:', { title, url, icon, color, order, isActive, linkType, editingLinkId });
+            
+            if (!title || !url) {
+                showLinkAlert('error', '請填寫標題和網址');
+                return;
+            }
+            
+            try {
+                const linkData = {
+                    title,
+                    url,
+                    icon: icon || null,
+                    color_gradient: color || 'linear-gradient(45deg, #667eea, #764ba2)',
+                    display_order: order,
+                    is_active: isActive,
+                    link_type: linkType
+                };
+                
+                let linkId;
+                
+                if (editingLinkId) {
+                    // 更新連結
+                    console.log('🔄 正在更新連結，ID:', editingLinkId);
+                    let { data, error } = await supabaseClient
+                        .from('related_links')
+                        .update(linkData)
+                        .eq('id', editingLinkId)
+                        .select()
+                        .single();
+                    
+                    // 如果遇到錯誤，嘗試使用 REST API
+                    if (error) {
+                        console.warn('⚠️ Supabase 客戶端更新失敗，嘗試使用 REST API...', error);
+                        try {
+                            const encodedId = encodeURIComponent(editingLinkId);
+                            const url = `${SUPABASE_URL}/rest/v1/related_links?id=eq.${encodedId}`;
+                            console.log('🔄 REST API URL (更新):', url);
+                            
+                            const response = await fetch(url, {
+                                method: 'PATCH',
+                                headers: {
+                                    'apikey': SUPABASE_ANON_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'Prefer': 'return=representation'
+                                },
+                                body: JSON.stringify(linkData)
+                            });
+                            
+                            console.log('📡 REST API 回應狀態:', response.status, response.statusText);
+                            
+                            if (response.ok) {
+                                const updatedLinks = await response.json();
+                                console.log('📋 REST API 回應資料:', updatedLinks);
+                                if (updatedLinks && updatedLinks.length > 0) {
+                                    data = updatedLinks[0];
+                                    error = null;
+                                    console.log('✅ 使用 REST API 更新成功');
+                                } else {
+                                    throw new Error('更新後未返回資料');
+                                }
+                            } else {
+                                const errorText = await response.text();
+                                console.error('❌ REST API 錯誤:', response.status, errorText);
+                                throw new Error(`REST API 錯誤 (${response.status}): ${errorText || response.statusText}`);
+                            }
+                        } catch (fetchError) {
+                            console.error('❌ REST API 更新也失敗:', fetchError);
+                            throw error || fetchError;
+                        }
+                    }
+                    
+                    if (error) throw error;
+                    linkId = data.id;
+                    console.log('✅ 連結更新成功，ID:', linkId);
+                    
+                    // 刪除舊的子項目
+                    console.log('🔄 正在刪除舊的子項目...');
+                    const { error: deleteError } = await supabaseClient
+                        .from('related_link_items')
+                        .delete()
+                        .eq('parent_link_id', linkId);
+                    
+                    if (deleteError) {
+                        console.warn('⚠️ 刪除舊子項目失敗（可能沒有舊項目）:', deleteError);
+                        // 嘗試使用 REST API 刪除
+                        try {
+                            await fetch(`${SUPABASE_URL}/rest/v1/related_link_items?parent_link_id=eq.${linkId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'apikey': SUPABASE_ANON_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                        } catch (fetchError) {
+                            console.warn('⚠️ REST API 刪除子項目也失敗:', fetchError);
+                        }
+                    }
+                } else {
+                    // 新增連結
+                    console.log('🔄 正在新增連結...');
+                    let { data, error } = await supabaseClient
+                        .from('related_links')
+                        .insert([linkData])
+                        .select()
+                        .single();
+                    
+                    // 如果遇到錯誤，嘗試使用 REST API
+                    if (error) {
+                        console.warn('⚠️ Supabase 客戶端新增失敗，嘗試使用 REST API...', error);
+                        try {
+                            const url = `${SUPABASE_URL}/rest/v1/related_links`;
+                            console.log('🔄 REST API URL (新增):', url);
+                            
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'apikey': SUPABASE_ANON_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'Prefer': 'return=representation'
+                                },
+                                body: JSON.stringify(linkData)
+                            });
+                            
+                            console.log('📡 REST API 回應狀態:', response.status, response.statusText);
+                            
+                            if (response.ok) {
+                                const newLinks = await response.json();
+                                console.log('📋 REST API 回應資料:', newLinks);
+                                if (newLinks && newLinks.length > 0) {
+                                    data = newLinks[0];
+                                    error = null;
+                                    console.log('✅ 使用 REST API 新增成功');
+                                } else {
+                                    throw new Error('新增後未返回資料');
+                                }
+                            } else {
+                                const errorText = await response.text();
+                                console.error('❌ REST API 錯誤:', response.status, errorText);
+                                throw new Error(`REST API 錯誤 (${response.status}): ${errorText || response.statusText}`);
+                            }
+                        } catch (fetchError) {
+                            console.error('❌ REST API 新增也失敗:', fetchError);
+                            throw error || fetchError;
+                        }
+                    }
+                    
+                    if (error) throw error;
+                    linkId = data.id;
+                    console.log('✅ 連結新增成功，ID:', linkId);
+                }
+                
+                // 如果是下拉選單，儲存子項目
+                if (linkType === 'dropdown' && linkItems.length > 0) {
+                    console.log('🔄 正在儲存下拉選單子項目...');
+                    const itemsToInsert = linkItems
+                        .filter(item => item.title && item.url)
+                        .map((item, index) => ({
+                            parent_link_id: linkId,
+                            title: item.title,
+                            url: item.url,
+                            display_order: index,
+                            is_active: true
+                        }));
+                    
+                    console.log('📋 準備插入', itemsToInsert.length, '個子項目');
+                    
+                    if (itemsToInsert.length > 0) {
+                        let { error: itemsError } = await supabaseClient
+                            .from('related_link_items')
+                            .insert(itemsToInsert);
+                        
+                        // 如果遇到錯誤，嘗試使用 REST API
+                        if (itemsError) {
+                            console.warn('⚠️ Supabase 客戶端插入子項目失敗，嘗試使用 REST API...', itemsError);
+                            try {
+                                const url = `${SUPABASE_URL}/rest/v1/related_link_items`;
+                                console.log('🔄 REST API URL (插入子項目):', url);
+                                
+                                const response = await fetch(url, {
+                                    method: 'POST',
+                                    headers: {
+                                        'apikey': SUPABASE_ANON_KEY,
+                                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'Prefer': 'return=representation'
+                                    },
+                                    body: JSON.stringify(itemsToInsert)
+                                });
+                                
+                                console.log('📡 REST API 回應狀態:', response.status, response.statusText);
+                                
+                                if (response.ok) {
+                                    itemsError = null;
+                                    console.log('✅ 使用 REST API 插入子項目成功');
+                                } else {
+                                    const errorText = await response.text();
+                                    console.error('❌ REST API 錯誤:', response.status, errorText);
+                                    throw new Error(`REST API 錯誤 (${response.status}): ${errorText || response.statusText}`);
+                                }
+                            } catch (fetchError) {
+                                console.error('❌ REST API 插入子項目也失敗:', fetchError);
+                                throw itemsError || fetchError;
+                            }
+                        }
+                        
+                        if (itemsError) throw itemsError;
+                        console.log('✅ 子項目儲存成功');
+                    }
+                }
+                
+                showLinkAlert('success', editingLinkId ? '連結已更新！' : '連結已新增！');
+                closeLinkModal();
+                
+                // 重新載入連結列表
+                console.log('🔄 重新載入連結列表...');
+                await loadRelatedLinks();
+                console.log('✅ 儲存流程完成');
+            } catch (error) {
+                console.error('❌ 儲存連結失敗:', error);
+                console.error('錯誤詳情:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
+                showLinkAlert('error', `儲存失敗：${error.message || '未知錯誤'}`);
+            }
+        }
+        
+        // 刪除連結
+        async function deleteLink(linkId) {
+            if (!confirm('確定要刪除這個連結嗎？此操作無法復原。')) {
+                return;
+            }
+            
+            try {
+            // 確保 Supabase 客戶端已初始化
+            const client = initSupabaseClient();
+            if (!client) {
+                showLinkAlert('error', '無法初始化 Supabase 客戶端，請重新整理頁面');
+                return;
+            }
+            supabaseClient = client;
+                
+                // 先刪除子項目（如果有）
+                await supabaseClient
+                    .from('related_link_items')
+                    .delete()
+                    .eq('parent_link_id', linkId);
+                
+                // 刪除連結
+                const { error } = await supabaseClient
+                    .from('related_links')
+                    .delete()
+                    .eq('id', linkId);
+                
+                if (error) throw error;
+                
+                showLinkAlert('success', '連結已刪除！');
+                loadRelatedLinks();
+            } catch (error) {
+                console.error('刪除連結失敗:', error);
+                showLinkAlert('error', `刪除失敗：${error.message}`);
+            }
+        }
+        
+        // 顯示提示訊息（用於連結管理）
+        function showLinkAlert(type, message) {
+            const container = document.getElementById('links-alert-container');
+            if (!container) {
+                // 如果找不到容器，使用全域的 showAlert
+                if (typeof showAlert === 'function') {
+                    showAlert(type, message);
+                } else {
+                    // 如果都沒有，使用 alert
+                    alert(message);
+                }
+                return;
+            }
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                              type === 'error' ? 'alert-error' : 'alert-info';
+            
+            container.innerHTML = `<div class="alert ${alertClass}">${escapeHtml(message)}</div>`;
+            
+            // 3秒後自動清除
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+        
+        // 確保函數暴露到全域（用於 onclick 事件）
+        // 優先使用模組化版本，如果模組未載入則使用舊版本
+        window.editLink = function(linkId) {
+            if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.editLink) {
+                return RelatedLinksBackend.editLink(linkId);
+            } else {
+                return editLink(linkId);
+            }
+        };
+        window.saveLink = function() {
+            if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.saveLink) {
+                return RelatedLinksBackend.saveLink();
+            } else {
+                return saveLink();
+            }
+        };
+        window.showAddLinkModal = function() {
+            if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.showAddLinkModal) {
+                return RelatedLinksBackend.showAddLinkModal();
+            } else {
+                return showAddLinkModal();
+            }
+        };
+        window.closeLinkModal = function() {
+            if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.closeLinkModal) {
+                return RelatedLinksBackend.closeLinkModal();
+            } else {
+                return closeLinkModal();
+            }
+        };
+        window.addLinkItem = function() {
+            if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.addLinkItem) {
+                return RelatedLinksBackend.addLinkItem();
+            } else {
+                return addLinkItem();
+            }
+        };
+        window.removeLinkItem = function(index) {
+            if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.removeLinkItem) {
+                return RelatedLinksBackend.removeLinkItem(index);
+            } else {
+                return removeLinkItem(index);
+            }
+        };
+        window.updateLinkItem = function(index, field, value) {
+            if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.updateLinkItem) {
+                return RelatedLinksBackend.updateLinkItem(index, field, value);
+            } else {
+                return updateLinkItem(index, field, value);
+            }
+        };
+        window.deleteLink = function(linkId) {
+            if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.deleteLink) {
+                return RelatedLinksBackend.deleteLink(linkId);
+            } else {
+                return deleteLink(linkId);
+            }
+        };
+        window.loadRelatedLinks = function() {
+            if (typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.loadRelatedLinks) {
+                return RelatedLinksBackend.loadRelatedLinks();
+            } else {
+                return loadRelatedLinks();
+            }
+        };
+        
+        console.log('✅ 連結管理函數已暴露到全域（優先使用模組化版本）');
         
         // 頁面載入時初始化
         window.addEventListener('load', init);

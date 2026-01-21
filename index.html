@@ -6,6 +6,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- Permissions Policy: 允許 Google Maps 使用感測器功能 -->
+    <meta http-equiv="Permissions-Policy" content="accelerometer=*, gyroscope=*, geolocation=*">
     <title>住商不動產濬瑒、子菲 | 精選物件 | 專業服務</title>
     
     <!-- Meta 標籤 -->
@@ -2416,11 +2418,11 @@
                     }
                 }
                 
-                /* 手機版網格優化 */
+                /* 手機版網格優化 - 改為 2 列網格 */
                 @media (max-width: 480px) {
                     .properties-grid-view {
-                        grid-template-columns: 1fr !important;
-                        gap: 1rem !important;
+                        grid-template-columns: repeat(2, 1fr) !important;
+                        gap: 0.6rem !important;
                         padding: 0.5rem !important;
                     }
                 }
@@ -2438,58 +2440,65 @@
                     }
                 }
                 
-                /* 極小視窗（小於600px）強制單欄 */
+                /* 極小視窗（小於600px）改為 2 列網格 */
                 @media (max-width: 600px) {
                     .properties-grid-view {
-                        grid-template-columns: 1fr !important;
+                        grid-template-columns: repeat(2, 1fr) !important;
+                        gap: 0.6rem !important;
                     }
                     
-                    /* 單欄時照片更小 */
+                    /* 網格模式照片調整 */
+                    .grid-item-image-container {
+                        padding-top: 50% !important;
+                    }
+                    
+                    /* 網格模式標題調整 */
+                    .property-grid-item h4,
+                    .grid-item-title {
+                        font-size: 0.95rem !important;
+                        line-height: 1.4 !important;
+                        margin-bottom: 0.5rem !important;
+                    }
+                }
+                
+                /* 小螢幕（寬度小於500px）保持 2 列網格，調整間距和字體 */
+                @media (max-width: 500px) {
+                    .properties-grid-view {
+                        grid-template-columns: repeat(2, 1fr) !important;
+                        gap: 0.5rem !important;
+                    }
+                    
+                    /* 照片區域調整 */
+                    .grid-item-image-container {
+                        padding-top: 48% !important;
+                    }
+                    
+                    /* 標題調整 */
+                    .property-grid-item h4,
+                    .grid-item-title {
+                        font-size: 0.9rem !important;
+                        line-height: 1.3 !important;
+                        margin-bottom: 0.4rem !important;
+                    }
+                }
+                
+                /* 超小視窗（小於400px）保持 2 列網格，調整照片和字體 */
+                @media (max-width: 400px) {
+                    .properties-grid-view {
+                        grid-template-columns: repeat(2, 1fr) !important;
+                        gap: 0.4rem !important;
+                    }
+                    
                     .grid-item-image-container {
                         padding-top: 45% !important;
                     }
                     
-                    /* 單欄時標題更大 */
+                    /* 超小螢幕標題調整 */
                     .property-grid-item h4,
                     .grid-item-title {
-                        font-size: 1.2rem !important;
-                        line-height: 1.5 !important;
-                        margin-bottom: 0.75rem !important;
-                    }
-                }
-                
-                /* 單欄顯示時（寬度小於500px）照片進一步縮小，標題更大 */
-                @media (max-width: 500px) {
-                    .properties-grid-view {
-                        grid-template-columns: 1fr !important;
-                    }
-                    
-                    /* 照片區域進一步縮小 */
-                    .grid-item-image-container {
-                        padding-top: 38% !important;
-                    }
-                    
-                    /* 單欄時標題更大 */
-                    .property-grid-item h4,
-                    .grid-item-title {
-                        font-size: 1.25rem !important;
-                        line-height: 1.5 !important;
-                        margin-bottom: 0.8rem !important;
-                    }
-                }
-                
-                /* 超小視窗（小於400px）照片最小化，標題更大 */
-                @media (max-width: 400px) {
-                    .grid-item-image-container {
-                        padding-top: 35% !important;
-                    }
-                    
-                    /* 超小螢幕標題還要更大 */
-                    .property-grid-item h4,
-                    .grid-item-title {
-                        font-size: 1.3rem !important;
-                        line-height: 1.5 !important;
-                        margin-bottom: 0.8rem !important;
+                        font-size: 0.85rem !important;
+                        line-height: 1.3 !important;
+                        margin-bottom: 0.3rem !important;
                     }
                 }
                 
@@ -2531,33 +2540,11 @@
         </section>
         
         
-        <!-- 相關資料連結 -->
+        <!-- 相關資料連結（從 Supabase 動態載入） -->
         <section class="related-links-section" style="background: #f8f9fa; padding: 1.2rem 0; margin: 1rem 0; text-align: center;">
             <h2 style="color: #2c3e50; margin-bottom: 0.8rem;">📎 相關資料連結</h2>
-            <div class="related-links-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: none; margin: 0 auto;">
-                <a href="https://realtor.houseprice.tw/agent/buy/0925666597/" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(46, 204, 113, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🏠 更多物件資料</a>
-                <a href="https://www.tiktok.com/@aihouse168" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #000000, #333333); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🎵 TikTok短影音</a>
-                <a href="https://housepice.pages.dev/%E4%B8%89%E5%90%88%E4%B8%80%E6%88%BF%E5%83%B9%E6%99%AE%E7%89%B9%E7%B5%B2" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🧮 房產比價試算</a>
-                <a href="https://salersteam.pages.dev/junyang" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #9b59b6, #8e44ad); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(155, 89, 182, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">🏢 預售團購區</a>
-                <a href="https://liff.line.me/2008363788-4Ly1Bv0r" class="contact-button" target="_blank" style="background: linear-gradient(45deg, #f9a825, #ff9800); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 152, 0, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem;">📰 楊梅生活集</a>
-                
-                <!-- 房產資訊參考下拉選單 -->
-                <div style="position: relative; display: inline-block;">
-                    <button id="propertyInfoDropdown" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; border: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3); min-width: 180px; text-align: center; justify-content: center; font-size: 0.9rem; cursor: pointer;">
-                        📊 房產資訊參考 <span style="font-size: 0.8rem;">▼</span>
-                    </button>
-                    <div id="propertyInfoMenu" style="position: absolute; top: 100%; left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); min-width: 250px; z-index: 1000; display: none; margin-top: 0.5rem; overflow: hidden;">
-                        <a href="https://drive.google.com/file/d/1NddGgXcysK-QRoozRA4XXww6c-NUv-OJ/view?usp=sharing" target="_blank" style="display: block; padding: 0.8rem 1rem; color: #2c3e50; text-decoration: none; border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease; font-size: 0.9rem;">
-                            📈 2026年楊梅趨勢引擊
-                        </a>
-                        <a href="https://drive.google.com/file/d/1PeGDx2IruOjWkeIHgVVqpk0tceB0l7Vg/view?usp=drive_link" target="_blank" style="display: block; padding: 0.8rem 1rem; color: #2c3e50; text-decoration: none; border-bottom: 1px solid #f0f0f0; transition: all 0.3s ease; font-size: 0.9rem;">
-                            🏦 新青安寬鬆政策
-                        </a>
-                        <a href="https://drive.google.com/file/d/1vVluYlY81Ew76Dc4ZyWI_Y9CZ3cWbj0t/view?usp=drive_link" target="_blank" style="display: block; padding: 0.8rem 1rem; color: #2c3e50; text-decoration: none; transition: all 0.3s ease; font-size: 0.9rem;">
-                            📊 2025年房產分析
-                        </a>
-                    </div>
-                </div>
+            <div id="related-links-container" class="related-links-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: none; margin: 0 auto;">
+                <p style="text-align: center; color: #666; padding: 1rem; width: 100%;">載入中...</p>
             </div>
         </section>
         
@@ -2673,7 +2660,7 @@
                         </p>
                         <p style="margin-bottom: 0.6rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 6px;">
                             <i class="bi bi-person-badge-fill" style="color: #667eea; font-size: 1rem;"></i>
-                            <span style="font-weight: 600;">營業員：蔡文豪（112）桃市字第432900號</span>
+                            <span style="font-weight: 600;">營業員：蔡濬瑒（112）桃市字第432900號</span>
                         </p>
                         <p style="margin-bottom: 0.6rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 6px;">
                             <i class="bi bi-person-badge-fill" style="color: #667eea; font-size: 1rem;"></i>
@@ -2826,6 +2813,12 @@
     <!-- 載入 Supabase 資料（已上架物件） -->
     <script src="supabase-data-loader.js"></script>
     
+    <!-- Supabase 配置（包含預設連結資料） -->
+    <script src="supabase-config.js"></script>
+    
+    <!-- 相關連結前端顯示模組（從後端 API 載入） -->
+    <script src="modules/related-links/frontend.js"></script>
+    
     <!-- 載入 API 資料（從資料庫，作為備用） -->
     <script src="api-data-loader.js"></script>
     
@@ -2834,6 +2827,9 @@
     
     <!-- 載入分頁系統 -->
     <script src="pagination-system.js"></script>
+    
+    <!-- 載入圖片載入優化器（在主要腳本之前） -->
+    <script src="image-loader-optimizer.js"></script>
     
     <!-- 載入主要功能 -->
     <script src="main-script.js"></script>
@@ -2869,6 +2865,70 @@
                     }
                 }
             }, 3000);
+            
+            // 載入相關連結（從後端 API，使用與備份檔案一致的樣式）
+            function loadRelatedLinksOnPage() {
+                const maxRetries = 30; // 最多重試 15 秒
+                let retries = 0;
+                
+                function tryLoad() {
+                    // 檢查新模組是否已載入
+                    const hasModule = typeof RelatedLinksFrontend !== 'undefined' && 
+                                     typeof RelatedLinksFrontend.renderRelatedLinks === 'function';
+                    
+                    if (hasModule) {
+                        console.log('✅ 開始載入相關連結（從後端 API，使用 contact-button 樣式）');
+                        RelatedLinksFrontend.renderRelatedLinks('related-links-container').catch(error => {
+                            console.error('❌ 載入相關連結失敗:', error);
+                            const container = document.getElementById('related-links-container');
+                            if (container) {
+                                container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 1rem;">載入連結失敗</p>';
+                            }
+                        });
+                    } else if (retries < maxRetries) {
+                        retries++;
+                        if (retries % 5 === 0) {
+                            console.warn(`⚠️ RelatedLinksFrontend 尚未載入 (${retries}/${maxRetries})`, {
+                                RelatedLinksFrontend: typeof RelatedLinksFrontend,
+                                renderRelatedLinks: typeof RelatedLinksFrontend?.renderRelatedLinks
+                            });
+                        }
+                        setTimeout(tryLoad, 500);
+                    } else {
+                        console.error('❌ 載入相關連結超時');
+                        const container = document.getElementById('related-links-container');
+                        if (container) {
+                            container.innerHTML = `
+                                <div style="text-align: center; color: #dc3545; padding: 1rem;">
+                                    <p>載入連結失敗，請重新整理頁面</p>
+                                    <button onclick="location.reload()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">重新整理</button>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+                
+                // 監聽自定義事件（優先使用）
+                window.addEventListener('relatedLinksFrontendReady', function handler() {
+                    console.log('📢 收到 relatedLinksFrontendReady 事件');
+                    window.removeEventListener('relatedLinksFrontendReady', handler); // 只執行一次
+                    setTimeout(tryLoad, 100);
+                }, { once: true });
+                
+                // 立即檢查一次（腳本可能已經載入）
+                setTimeout(tryLoad, 100);
+                
+                // 頁面載入完成後也嘗試載入
+                if (document.readyState === 'complete') {
+                    setTimeout(tryLoad, 500);
+                } else {
+                    window.addEventListener('load', () => {
+                        setTimeout(tryLoad, 500);
+                    });
+                }
+            }
+            
+            loadRelatedLinksOnPage();
         });
         
         // 🔍 開發模式調試（生產環境可移除）

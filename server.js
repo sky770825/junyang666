@@ -7,12 +7,26 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Supabase 配置（從 supabase-config.js 讀取或直接設定）
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://cnzqtuuegdqwkgvletaa.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE';
+
+// 初始化 Supabase 客戶端
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // 中間件
-app.use(cors());
+// CORS 設定（允許所有來源，包括 127.0.0.1 和 localhost）
+app.use(cors({
+    origin: '*', // 允許所有來源（開發環境）
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    credentials: true
+}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 // 提供靜態文件（HTML、CSS、JS等）
@@ -55,14 +69,18 @@ const upload = multer({
 });
 
 // 初始化資料庫
-const db = new sqlite3.Database('properties.db', (err) => {
-    if (err) {
-        console.error('資料庫連接錯誤:', err);
-    } else {
-        console.log('✅ 已連接到 SQLite 資料庫');
-        
-        // 建立物件表
-        db.run(`CREATE TABLE IF NOT EXISTS properties (
+let db = null;
+
+try {
+    db = new sqlite3.Database('properties.db', (err) => {
+        if (err) {
+            console.error('❌ 資料庫連接錯誤:', err);
+            console.warn('⚠️ 將繼續運行，但物件 API 可能無法使用');
+        } else {
+            console.log('✅ 已連接到 SQLite 資料庫');
+            
+            // 建立物件表
+            db.run(`CREATE TABLE IF NOT EXISTS properties (
             id TEXT PRIMARY KEY,
             number TEXT,
             title TEXT NOT NULL,
@@ -98,14 +116,18 @@ const db = new sqlite3.Database('properties.db', (err) => {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`, (err) => {
-            if (err) {
-                console.error('建立資料表錯誤:', err);
-            } else {
-                console.log('✅ 資料表已準備就緒');
-            }
-        });
-    }
-});
+                if (err) {
+                    console.error('建立資料表錯誤:', err);
+                } else {
+                    console.log('✅ 資料表已準備就緒');
+                }
+            });
+        }
+    });
+} catch (dbError) {
+    console.error('❌ 資料庫初始化失敗:', dbError);
+    console.warn('⚠️ 將繼續運行，但物件 API 可能無法使用');
+}
 
 // 生成物件 ID
 function generatePropertyId() {
@@ -130,41 +152,78 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 
 // 獲取所有物件
 app.get('/api/properties', (req, res) => {
-    db.all('SELECT * FROM properties ORDER BY created_at DESC', [], (err, rows) => {
-        if (err) {
-            console.error('查詢錯誤:', err);
-            return res.status(500).json({ error: '查詢失敗' });
-        }
-        
-        // 解析 JSON 欄位
-        const properties = rows.map(row => {
-            const property = { ...row };
-            if (property.images) {
-                try {
-                    property.images = JSON.parse(property.images);
-                } catch (e) {
-                    property.images = [];
-                }
-            }
-            if (property.transportation) {
-                try {
-                    property.transportation = JSON.parse(property.transportation);
-                } catch (e) {
-                    property.transportation = {};
-                }
-            }
-            if (property.features) {
-                try {
-                    property.features = JSON.parse(property.features);
-                } catch (e) {
-                    property.features = [];
-                }
-            }
-            return property;
+    // 檢查資料庫連接
+    if (!db) {
+        console.error('❌ API: 資料庫未連接');
+        return res.status(503).json({ 
+            error: '資料庫未連接',
+            message: 'SQLite 資料庫尚未初始化，請檢查 server.js 日誌'
         });
-        
-        res.json(properties);
-    });
+    }
+    
+    console.log('🔄 API: 正在查詢所有物件...');
+    
+    try {
+        db.all('SELECT * FROM properties ORDER BY created_at DESC', [], (err, rows) => {
+            if (err) {
+                console.error('❌ API: 查詢錯誤:', err);
+                return res.status(500).json({ 
+                    error: '查詢失敗',
+                    message: err.message,
+                    details: err.toString()
+                });
+            }
+            
+            // 如果沒有資料，返回空陣列（不是錯誤）
+            if (!rows || rows.length === 0) {
+                console.log('ℹ️ API: 資料庫中沒有物件資料，返回空陣列');
+                return res.json([]);
+            }
+            
+            // 解析 JSON 欄位
+            const properties = rows.map(row => {
+                const property = { ...row };
+                if (property.images) {
+                    try {
+                        property.images = JSON.parse(property.images);
+                    } catch (e) {
+                        property.images = [];
+                    }
+                }
+                if (property.transportation) {
+                    try {
+                        property.transportation = JSON.parse(property.transportation);
+                    } catch (e) {
+                        property.transportation = {};
+                    }
+                }
+                if (property.features) {
+                    try {
+                        property.features = JSON.parse(property.features);
+                    } catch (e) {
+                        property.features = [];
+                    }
+                }
+                return property;
+            });
+            
+            console.log(`✅ API: 成功返回 ${properties.length} 個物件`);
+            res.json(properties);
+        });
+    } catch (error) {
+        console.error('❌ API: 處理錯誤:', error);
+        return res.status(500).json({
+            error: '伺服器錯誤',
+            message: error.message
+        });
+    }
+    } catch (error) {
+        console.error('❌ API 處理錯誤:', error);
+        return res.status(500).json({
+            error: '伺服器錯誤',
+            message: error.message
+        });
+    }
 });
 
 // 獲取單一物件
@@ -398,21 +457,96 @@ app.delete('/api/properties/:id', (req, res) => {
     });
 });
 
+// ============================================
+// 相關連結 API 端點
+// ============================================
+
+// 獲取所有啟用的相關連結（前端使用）
+app.get('/api/related-links', async (req, res) => {
+    try {
+        console.log('🔄 後端 API: 正在從 Supabase 載入相關連結...');
+        
+        // 從 Supabase 載入啟用的連結
+        const { data: links, error: linksError } = await supabase
+            .from('related_links')
+            .select('*')
+            .eq('is_active', true)
+            .order('display_order', { ascending: true });
+        
+        if (linksError) {
+            console.error('❌ Supabase 查詢失敗:', linksError);
+            return res.status(500).json({ 
+                error: '載入連結失敗',
+                message: linksError.message 
+            });
+        }
+        
+        // 載入下拉選單項目
+        let items = [];
+        if (links && links.length > 0) {
+            const { data: itemsData, error: itemsError } = await supabase
+                .from('related_link_items')
+                .select('*')
+                .eq('is_active', true)
+                .order('display_order', { ascending: true });
+            
+            if (!itemsError && itemsData) {
+                items = itemsData;
+            }
+        }
+        
+        // 將項目分組到對應的連結
+        const itemsByParent = {};
+        items.forEach(item => {
+            if (!itemsByParent[item.parent_link_id]) {
+                itemsByParent[item.parent_link_id] = [];
+            }
+            itemsByParent[item.parent_link_id].push(item);
+        });
+        
+        // 組合連結和項目
+        const result = links.map(link => ({
+            ...link,
+            items: itemsByParent[link.id] || []
+        }));
+        
+        console.log(`✅ 後端 API: 成功載入 ${result.length} 個連結`);
+        res.json({
+            success: true,
+            data: result,
+            count: result.length
+        });
+    } catch (error) {
+        console.error('❌ 後端 API 錯誤:', error);
+        res.status(500).json({
+            error: '伺服器錯誤',
+            message: error.message
+        });
+    }
+});
+
 // 啟動伺服器
 app.listen(PORT, () => {
     console.log(`🚀 伺服器運行在 http://localhost:${PORT}`);
     console.log(`📝 API 端點: http://localhost:${PORT}/api`);
     console.log(`📸 圖片上傳: http://localhost:${PORT}/api/upload`);
+    console.log(`🔗 相關連結: http://localhost:${PORT}/api/related-links`);
+    console.log(`📊 資料庫狀態: ${db ? '✅ 已連接' : '❌ 未連接'}`);
 });
 
 // 優雅關閉
 process.on('SIGINT', () => {
-    db.close((err) => {
-        if (err) {
-            console.error('關閉資料庫錯誤:', err);
-        } else {
-            console.log('✅ 資料庫連接已關閉');
-        }
+    if (db) {
+        db.close((err) => {
+            if (err) {
+                console.error('關閉資料庫錯誤:', err);
+            } else {
+                console.log('✅ 資料庫連接已關閉');
+            }
+            process.exit(0);
+        });
+    } else {
+        console.log('✅ 伺服器已關閉');
         process.exit(0);
-    });
+    }
 });

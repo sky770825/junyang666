@@ -22,9 +22,10 @@ function formatAddressForDisplay(address, hideAddressNumber, propertyType) {
     }
     
     // 需要隱藏門牌號碼的情況（勾選隱藏 或 透天/別墅/店面類型）
-    // 提取地址：保留縣市區域，只顯示到路名
+    // 提取地址：保留縣市區域、路名，以及樓層資訊（如果有的話）
     // 例如：「桃園市楊梅區永美路445巷144弄20號」→「桃園市楊梅區永美路」
-    // 例如：「新北市板橋區文化路一段123號」→「新北市板橋區文化路一段」
+    // 例如：「新北市板橋區文化路一段123號3F」→「新北市板橋區文化路一段3F」
+    // 例如：「永美路15號3樓」→「永美路3樓」
     
     let displayAddress = address;
     
@@ -41,21 +42,47 @@ function formatAddressForDisplay(address, hideAddressNumber, propertyType) {
     const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
     const roadMatch = roadPart.match(roadPattern);
     
+    let roadName = '';
     if (roadMatch) {
-        // 組合：縣市區域 + 路名
-        displayAddress = (cityDistrict + roadMatch[1]).trim();
+        roadName = roadMatch[1];
     } else {
         // 方法4：如果方法3失敗，使用更簡單的匹配
         // 匹配第一個「XX路」、「XX街」、「XX道」等
         const simpleRoadMatch = roadPart.match(/([^路街道]*[路街道])/);
         if (simpleRoadMatch) {
-            displayAddress = (cityDistrict + simpleRoadMatch[1]).trim();
-        } else {
-            // 方法5：如果還是找不到，移除所有數字和巷弄號碼
-            roadPart = roadPart.replace(/[\d]+[巷弄號].*$/i, '');
-            roadPart = roadPart.replace(/[巷弄號][\d\w\-\s]*.*$/i, '');
-            displayAddress = (cityDistrict + roadPart).trim();
+            roadName = simpleRoadMatch[1];
         }
+    }
+    
+    // 方法5：提取樓層資訊（在門牌號碼之後）
+    // 匹配模式：在路名之後，找到「號」後面的樓層資訊
+    // 例如：「永美路15號3F」→「3F」
+    // 例如：「永美路15號3樓」→「3樓」
+    // 例如：「永美路15號3樓F」→「3樓F」
+    let floorInfo = '';
+    if (roadName) {
+        // 找到路名在原始地址中的位置
+        const roadIndex = displayAddress.indexOf(roadName);
+        if (roadIndex !== -1) {
+            // 從路名之後開始查找樓層資訊
+            const afterRoad = displayAddress.substring(roadIndex + roadName.length);
+            // 匹配：號 + 數字 + 可選的「樓」或「F」或「樓F」
+            const floorMatch = afterRoad.match(/號[\d\w\-\s]*?([\d]+[樓層F]+)/i);
+            if (floorMatch) {
+                floorInfo = floorMatch[1];
+            }
+        }
+    }
+    
+    // 組合：縣市區域 + 路名 + 樓層資訊（如果有）
+    if (roadName) {
+        displayAddress = (cityDistrict + roadName + (floorInfo ? floorInfo : '')).trim();
+    } else {
+        // 如果找不到路名，使用備用方法
+        roadPart = roadPart.replace(/號[\d\w\-\s]*?([\d]+[樓層F]+)/i, floorInfo || '');
+        roadPart = roadPart.replace(/[\d]+[巷弄號].*$/i, '');
+        roadPart = roadPart.replace(/[巷弄號][\d\w\-\s]*.*$/i, '');
+        displayAddress = (cityDistrict + roadPart).trim();
     }
     
     // 清理多餘空格和結尾符號

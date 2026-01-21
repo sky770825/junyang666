@@ -741,24 +741,30 @@ class EmbeddedPropertyPaginationSystem {
                         ` : ''}
                     </div>
                     
-                    <!-- 地址（網格模式顯示簡化地址，只顯示到路名） -->
+                    <!-- 地址（網格模式顯示簡化地址，保留樓層資訊） -->
                     ${property.address ? `
                     <div style="margin-bottom: 0.5rem; font-size: clamp(0.75rem, 2vw, 0.85rem); color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 0.3rem;">
                         <i class="fas fa-map-marker-alt" style="color: #667eea; font-size: 0.8rem;"></i>
                         <span title="${property.address}">${(() => {
-                            // 網格模式統一使用 formatAddressForDisplay 函數，但強制只顯示到路名
-                            // 對於透天、別墅、店面類型，或勾選隱藏門牌號碼的物件，使用格式化函數
+                            // 網格模式統一使用 formatAddressForDisplay 函數
+                            // 對於透天、別墅、店面類型，或勾選隱藏門牌號碼的物件，使用格式化函數（會保留樓層資訊）
                             const typesToShowOnlyRoad = ['透天', '別墅', '店面'];
                             const shouldShowOnlyRoad = property.type && typesToShowOnlyRoad.includes(property.type);
                             
-                            // 如果應該只顯示路名，使用格式化函數
+                            // 如果應該只顯示路名（隱藏門牌號碼），使用格式化函數
                             if (property.hide_address_number || shouldShowOnlyRoad) {
                                 if (typeof window.formatAddressForDisplay === 'function') {
+                                    // 傳入 true 表示隱藏門牌號碼，函數會自動保留樓層資訊
                                     return window.formatAddressForDisplay(property.address, true, property.type);
                                 }
                             }
                             
-                            // 如果沒有格式化函數，使用簡化邏輯
+                            // 如果沒有勾選隱藏門牌號碼，且不是透天/別墅/店面，顯示完整地址
+                            if (!property.hide_address_number && !shouldShowOnlyRoad) {
+                                return property.address;
+                            }
+                            
+                            // 如果沒有格式化函數，使用簡化邏輯（備用方案）
                             let addr = property.address || '';
                             if (addr) {
                                 // 提取縣市區域
@@ -772,15 +778,31 @@ class EmbeddedPropertyPaginationSystem {
                                 const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
                                 const roadMatch = roadPart.match(roadPattern);
                                 
+                                let roadName = '';
                                 if (roadMatch) {
-                                    return (cityDistrict + roadMatch[1]).trim();
+                                    roadName = roadMatch[1];
                                 } else {
                                     // 簡單匹配第一個「XX路」、「XX街」等
                                     const simpleRoadMatch = roadPart.match(/([^路街道]*[路街道])/);
                                     if (simpleRoadMatch) {
-                                        return (cityDistrict + simpleRoadMatch[1]).trim();
+                                        roadName = simpleRoadMatch[1];
                                     }
                                 }
+                                
+                                // 提取樓層資訊（備用邏輯）
+                                let floorInfo = '';
+                                if (roadName) {
+                                    const roadIndex = addr.indexOf(roadName);
+                                    if (roadIndex !== -1) {
+                                        const afterRoad = addr.substring(roadIndex + roadName.length);
+                                        const floorMatch = afterRoad.match(/號[\d\w\-\s]*?([\d]+[樓層F]+)/i);
+                                        if (floorMatch) {
+                                            floorInfo = floorMatch[1];
+                                        }
+                                    }
+                                }
+                                
+                                return (cityDistrict + roadName + (floorInfo ? floorInfo : '')).trim();
                             }
                             return addr || '地址未設定';
                         })()}</span>

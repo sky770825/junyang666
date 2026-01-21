@@ -185,6 +185,15 @@
             background: #5a6268;
         }
         
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+        }
+        
         .btn-small {
             padding: 0.4rem 0.8rem;
             font-size: 0.85rem;
@@ -1025,6 +1034,66 @@
         let currentFilter = 'all';
         let viewMode = 'table'; // 'table' 或 'grid'
         
+        // 生成物件獨立網頁的 URL
+        function getPropertyDetailUrl(property) {
+            const baseUrl = window.location.origin + window.location.pathname.replace(/admin-dashboard\.html$/, '');
+            if (property && property.number && property.number !== 'N/A' && property.number !== '') {
+                return `${baseUrl}property-detail.html?number=${encodeURIComponent(property.number)}`;
+            } else if (property && property.id) {
+                return `${baseUrl}property-detail.html?id=${property.id}`;
+            }
+            return '#';
+        }
+        
+        // 複製物件獨立網頁連結
+        function copyPropertyLink(property) {
+            const url = getPropertyDetailUrl(property);
+            if (url === '#') {
+                alert('無法生成連結：缺少物件編號或 ID');
+                return;
+            }
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('✅ 連結已複製到剪貼簿！\n\n' + url);
+                }).catch(err => {
+                    console.error('複製失敗:', err);
+                    fallbackCopy(url);
+                });
+            } else {
+                fallbackCopy(url);
+            }
+        }
+        
+        // 備用複製方法
+        function fallbackCopy(url) {
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert('✅ 連結已複製到剪貼簿！\n\n' + url);
+            } catch (err) {
+                console.error('複製失敗:', err);
+                alert('❌ 複製失敗，請手動複製：\n\n' + url);
+            }
+            document.body.removeChild(textarea);
+        }
+        
+        // 打開物件獨立網頁
+        function openPropertyDetail(property) {
+            const url = getPropertyDetailUrl(property);
+            if (url === '#') {
+                alert('無法開啟連結：缺少物件編號或 ID');
+                return;
+            }
+            window.open(url, '_blank');
+        }
+        
         // 背景刷新間隔（30分鐘）
         const REFRESH_INTERVAL = 30 * 60 * 1000; // 30分鐘 = 1800000 毫秒
         let refreshTimer = null;
@@ -1254,7 +1323,15 @@
                                                 <div class="property-preview">
                                                     ${imgUrl ? `<img src="${imgUrl}" alt="${prop.title}">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
                                                     <div class="property-preview-info">
-                                                        <h4>${prop.title || '未命名'}</h4>
+                                                        <h4>
+                                                            <a href="${getPropertyDetailUrl(prop)}" 
+                                                               target="_blank" 
+                                                               style="color: #667eea; text-decoration: none; cursor: pointer;"
+                                                               onmouseover="this.style.textDecoration='underline'"
+                                                               onmouseout="this.style.textDecoration='none'">
+                                                                ${prop.title || '未命名'}
+                                                            </a>
+                                                        </h4>
                                                         <p>${prop.number || 'N/A'}</p>
                                                     </div>
                                                 </div>
@@ -1429,7 +1506,15 @@
                                         🏠
                                     </div>
                                     <div class="property-card-content">
-                                        <h3 class="property-card-title">${safeTitle}</h3>
+                                        <h3 class="property-card-title">
+                                            <a href="${getPropertyDetailUrl(prop)}" 
+                                               target="_blank" 
+                                               style="color: #2c3e50; text-decoration: none; cursor: pointer;"
+                                               onmouseover="this.style.color='#667eea'; this.style.textDecoration='underline'"
+                                               onmouseout="this.style.color='#2c3e50'; this.style.textDecoration='none'">
+                                                ${safeTitle}
+                                            </a>
+                                        </h3>
                                         <div class="property-card-meta">
                                             <div><strong>編號：</strong>${safeNumber}</div>
                                             <div><strong>房型：</strong>${safeType}</div>
@@ -1440,6 +1525,16 @@
                                             ${sourceBadge} ${publishedBadge}
                                         </div>
                                         <div class="property-card-actions">
+                                            <button class="btn btn-primary" 
+                                                    onclick="openPropertyDetail({id: '${safeId}', number: '${safeNumber || ''}'})"
+                                                    style="font-size: 0.85rem;">
+                                                👁️ 查看
+                                            </button>
+                                            <button class="btn btn-info" 
+                                                    onclick="copyPropertyLink({id: '${safeId}', number: '${safeNumber || ''}'})"
+                                                    style="font-size: 0.85rem;">
+                                                📋 複製連結
+                                            </button>
                                             <button class="btn ${isPublished ? 'btn-danger' : 'btn-success'}" 
                                                     data-property-id="${safeId}" 
                                                     data-action="toggle" 
@@ -1510,7 +1605,15 @@
                                             <div class="property-preview">
                                                 ${safeImgUrl ? `<img src="${safeImgUrl}" alt="${safeTitle}">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
                                                 <div class="property-preview-info">
-                                                    <h4>${safeTitle}</h4>
+                                                    <h4>
+                                                        <a href="${getPropertyDetailUrl(prop)}" 
+                                                           target="_blank" 
+                                                           style="color: #667eea; text-decoration: none; cursor: pointer;"
+                                                           onmouseover="this.style.textDecoration='underline'"
+                                                           onmouseout="this.style.textDecoration='none'">
+                                                            ${safeTitle}
+                                                        </a>
+                                                    </h4>
                                                     <p>${safeNumber} | ${safeAddress}</p>
                                                 </div>
                                             </div>
@@ -1520,6 +1623,16 @@
                                         <td>${safePrice}</td>
                                         <td>${publishedBadge}</td>
                                         <td>
+                                            <button class="btn btn-primary btn-small" 
+                                                    onclick="openPropertyDetail({id: '${safeId}', number: '${safeNumber || ''}'})"
+                                                    title="在新分頁開啟物件獨立網頁">
+                                                👁️ 查看
+                                            </button>
+                                            <button class="btn btn-info btn-small" 
+                                                    onclick="copyPropertyLink({id: '${safeId}', number: '${safeNumber || ''}'})"
+                                                    title="複製物件獨立網頁連結">
+                                                📋 複製連結
+                                            </button>
                                             <button class="btn btn-small ${isPublished ? 'btn-danger' : 'btn-success'}" 
                                                     data-property-id="${safeId}" 
                                                     data-action="toggle" 

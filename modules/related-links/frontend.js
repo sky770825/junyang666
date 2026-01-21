@@ -63,6 +63,21 @@
                 throw new Error(`HTTP ${response.status}: ${response.statusText}${errorText ? ' - ' + errorText : ''}`);
             }
             
+            // 檢查響應內容類型
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                // 如果返回的不是 JSON（可能是 HTML 404 頁面），直接使用預設資料
+                const responseText = await response.text();
+                if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+                    console.warn('⚠️ 後端 API 返回 HTML（可能是 404 頁面），在生產環境中直接使用預設資料');
+                    if (typeof DEFAULT_RELATED_LINKS !== 'undefined') {
+                        console.log('📋 使用預設連結資料（生產環境）');
+                        return DEFAULT_RELATED_LINKS.filter(l => l.is_active !== false);
+                    }
+                    return [];
+                }
+            }
+            
             const result = await response.json();
             
             if (result.success && result.data) {
@@ -81,7 +96,14 @@
             }
         } catch (error) {
             console.error('❌ 從後端 API 載入連結失敗:', error);
-            console.warn('⚠️ 使用預設資料作為備用');
+            
+            // 檢查是否是 JSON 解析錯誤（通常是因為返回了 HTML）
+            if (error instanceof SyntaxError && error.message.includes('JSON')) {
+                console.warn('⚠️ API 返回了非 JSON 格式（可能是 HTML 404 頁面），在生產環境中直接使用預設資料');
+            } else {
+                console.warn('⚠️ 使用預設資料作為備用');
+            }
+            
             // 如果後端 API 失敗，使用預設資料
             if (typeof DEFAULT_RELATED_LINKS !== 'undefined') {
                 console.log('📋 使用預設連結資料');

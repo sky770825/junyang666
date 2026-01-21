@@ -533,7 +533,7 @@ class EmbeddedPropertyPaginationSystem {
                 <div style="display: flex; gap: 0.3rem; margin-bottom: 0.6rem;">
                     <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 4px; font-weight: 600;">
                         <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem; color: white;">售價</div>
-                        <div style="font-size: 1.2rem; color: #e74c3c; font-weight: 700;">${property.price}</div>
+                        <div style="font-size: 1.2rem; color: #DAA520; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">${property.price}</div>
                     </div>
                     <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-radius: 4px; font-weight: 600;">
                         <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">坪數</div>
@@ -715,7 +715,7 @@ class EmbeddedPropertyPaginationSystem {
                     <!-- 價格和坪數（參考591設計：同一行，緊湊排列） -->
                     <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.6rem; gap: 0.5rem;">
                         <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: clamp(1.2rem, 4vw, 1.4rem); font-weight: 700; color: #e74c3c; line-height: 1.2; margin-bottom: 0.25rem;">
+                            <div style="font-size: clamp(1.2rem, 4vw, 1.4rem); font-weight: 700; color: #DAA520; line-height: 1.2; margin-bottom: 0.25rem; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
                                 ${property.price}
                             </div>
                             ${property.total_area || property.area ? `

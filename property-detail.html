@@ -7,6 +7,22 @@
     <meta http-equiv="Permissions-Policy" content="accelerometer=*, gyroscope=*, geolocation=*">
     <title>物件詳細資訊 | 住商不動產</title>
     
+    <!-- Open Graph / Facebook / LINE 連結預覽 -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:title" content="物件詳細資訊 | 住商不動產">
+    <meta property="og:description" content="查看物件詳細資訊">
+    <meta property="og:image" content="">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="物件詳細資訊 | 住商不動產">
+    <meta name="twitter:description" content="查看物件詳細資訊">
+    <meta name="twitter:image" content="">
+    
+    <!-- 標準描述 -->
+    <meta name="description" content="查看物件詳細資訊">
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Bootstrap Icons -->
@@ -537,6 +553,93 @@
             return trimmedNumber;
         }
         
+        // 更新連結預覽的 meta 標籤（Open Graph, Twitter Card 等）
+        function updateMetaTags(property) {
+            if (!property) return;
+            
+            const title = property.title || '未命名物件';
+            const price = property.price || '';
+            const address = property.address || '';
+            const displayAddress = formatAddressForDisplay(
+                property.address, 
+                property.hide_address_number, 
+                property.type
+            ) || address;
+            
+            // 構建標題和描述
+            const pageTitle = price 
+                ? `${title} - ${price} | 住商不動產`
+                : `${title} | 住商不動產`;
+            
+            const description = price && displayAddress
+                ? `${title} | ${price} | ${displayAddress}`
+                : price
+                ? `${title} | ${price}`
+                : displayAddress
+                ? `${title} | ${displayAddress}`
+                : title;
+            
+            // 更新頁面標題
+            document.title = pageTitle;
+            
+            // 更新 Open Graph 標籤
+            updateMetaTag('og:title', pageTitle);
+            updateMetaTag('og:description', description);
+            updateMetaTag('og:url', window.location.href);
+            
+            // 如果有圖片，設置 og:image
+            if (property.images && Array.isArray(property.images) && property.images.length > 0) {
+                const firstImage = typeof property.images[0] === 'string' 
+                    ? property.images[0] 
+                    : property.images[0].url || property.images[0];
+                if (firstImage) {
+                    updateMetaTag('og:image', firstImage);
+                }
+            }
+            
+            // 更新 Twitter Card 標籤
+            updateMetaTag('twitter:title', pageTitle);
+            updateMetaTag('twitter:description', description);
+            if (property.images && Array.isArray(property.images) && property.images.length > 0) {
+                const firstImage = typeof property.images[0] === 'string' 
+                    ? property.images[0] 
+                    : property.images[0].url || property.images[0];
+                if (firstImage) {
+                    updateMetaTag('twitter:image', firstImage);
+                }
+            }
+            
+            // 更新標準描述
+            updateMetaTag('description', description);
+        }
+        
+        // 更新或創建 meta 標籤的輔助函數
+        function updateMetaTag(propertyOrName, content) {
+            let selector, attribute;
+            
+            if (propertyOrName.startsWith('og:') || propertyOrName.startsWith('twitter:')) {
+                // Open Graph 或 Twitter Card
+                selector = `meta[property="${propertyOrName}"], meta[name="${propertyOrName}"]`;
+                attribute = propertyOrName.startsWith('og:') ? 'property' : 'name';
+            } else {
+                // 標準 meta 標籤
+                selector = `meta[name="${propertyOrName}"]`;
+                attribute = 'name';
+            }
+            
+            let meta = document.querySelector(selector);
+            if (!meta) {
+                meta = document.createElement('meta');
+                if (propertyOrName.startsWith('og:')) {
+                    meta.setAttribute('property', propertyOrName);
+                } else {
+                    meta.setAttribute('name', propertyOrName);
+                }
+                document.head.appendChild(meta);
+            }
+            meta.setAttribute('content', content);
+        }
+        
         // 從 URL 參數獲取物件編號或 ID（優先使用編號）
         function getPropertyIdentifier() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -671,11 +774,8 @@
                     // 渲染物件詳細資訊
                     renderProperty(propertyData);
                     
-                    // 更新頁面標題：物件標題 + 價格（如果有）
-                    const pageTitle = propertyData.title 
-                        ? (propertyData.price ? `${propertyData.title} - ${propertyData.price} | 住商不動產` : `${propertyData.title} | 住商不動產`)
-                        : '物件詳細資訊 | 住商不動產';
-                    document.title = pageTitle;
+                    // 更新頁面標題和連結預覽 meta 標籤
+                    updateMetaTags(propertyData);
                     return;
                 } else if (id) {
                     console.log('🔍 查詢物件 ID:', id);
@@ -700,11 +800,8 @@
                         loadingEl.style.display = 'none';
                         pageEl.style.display = 'block';
                         renderProperty(propertyData);
-                        // 設置吸引人的標題：物件標題 + 價格（如果有）
-                        const pageTitle = propertyData.title 
-                            ? (propertyData.price ? `${propertyData.title} - ${propertyData.price} | 住商不動產` : `${propertyData.title} | 住商不動產`)
-                            : '物件詳細資訊 | 住商不動產';
-                        document.title = pageTitle;
+                        // 更新頁面標題和連結預覽 meta 標籤
+                        updateMetaTags(propertyData);
                         return;
                     }
                     throw error;
@@ -720,11 +817,8 @@
                 // 渲染物件詳細資訊
                 renderProperty(data);
                 
-                // 更新頁面標題：物件標題 + 價格（如果有），讓標題更吸引人
-                const pageTitle = data.title 
-                    ? (data.price ? `${data.title} - ${data.price} | 住商不動產` : `${data.title} | 住商不動產`)
-                    : '物件詳細資訊 | 住商不動產';
-                document.title = pageTitle;
+                // 更新頁面標題和連結預覽 meta 標籤
+                updateMetaTags(data);
                 
             } catch (error) {
                 console.error('❌ 載入物件失敗:', error);

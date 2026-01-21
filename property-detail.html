@@ -918,17 +918,9 @@
             
             pageEl.innerHTML = `
                 <div class="property-header">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-                        <div style="flex: 1; min-width: 200px;">
-                            <h1 class="property-title">${property.title || '未命名物件'}</h1>
-                            ${displayAddress ? `<p class="property-address">📍 ${displayAddress}</p>` : property.address ? `<p class="property-address">📍 ${property.address}</p>` : ''}
-                        </div>
-                        ${property.price ? `
-                        <div style="text-align: right; min-width: 150px;">
-                            <div style="font-size: 0.9rem; color: #333; font-weight: 600; margin-bottom: 0.5rem;">售價</div>
-                            <div style="font-size: 2rem; font-weight: bold; color: #e74c3c; line-height: 1.2;">${property.price}</div>
-                        </div>
-                        ` : ''}
+                    <div>
+                        <h1 class="property-title">${property.title || '未命名物件'}</h1>
+                        ${displayAddress ? `<p class="property-address">📍 ${displayAddress}</p>` : property.address ? `<p class="property-address">📍 ${property.address}</p>` : ''}
                     </div>
                     <div class="property-meta">
                         <div class="meta-item">

@@ -386,7 +386,13 @@ class EmbeddedPropertyPaginationSystem {
                 e.stopPropagation();
                 switch (action) {
                     case 'details':
-                        if (typeof showPropertyDetails === 'function') {
+                        // 直接導航到獨立頁面
+                        const property = this.allProperties.find(p => p.id === propertyId);
+                        if (property) {
+                            const url = `property-detail.html?${property.number ? 'number=' + encodeURIComponent(property.number) : 'id=' + property.id}`;
+                            window.open(url, '_blank');
+                        } else if (typeof showPropertyDetails === 'function') {
+                            // 備用方案：使用舊的函數
                             showPropertyDetails(propertyId);
                         }
                         break;
@@ -455,6 +461,8 @@ class EmbeddedPropertyPaginationSystem {
         if (property.number) {
             card.setAttribute('data-property-number', property.number);
         }
+        // 讓整個卡片可以點擊（除了按鈕和照片）
+        card.style.cursor = 'default'; // 預設不顯示手型，只有特定區域可點擊
         
         // 處理 Google Maps URL
         let mapUrl = property.google_maps || '';
@@ -656,11 +664,18 @@ class EmbeddedPropertyPaginationSystem {
         gridItem.className = 'property-grid-item';
         gridItem.setAttribute('data-property-id', property.id);
         
+        // 設置編號為 data 屬性
+        if (property.number) {
+            gridItem.setAttribute('data-property-number', property.number);
+        }
+        
         const mainImage = property.images && property.images.length > 0 ? property.images[0] : 'https://via.placeholder.com/300x200?text=No+Image';
+        const detailUrl = `property-detail.html?${property.number ? 'number=' + encodeURIComponent(property.number) : 'id=' + property.id}`;
         
         gridItem.innerHTML = `
             <div style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease; background: white;"
-                 data-action="details">
+                 data-action="details"
+                 onclick="window.open('${detailUrl}', '_blank')">
                 ${property.status && property.statusText ? `
                     <div class="property-status-tag status-${property.status}" style="position: absolute; top: 8px; right: 8px; z-index: 5; padding: 4px 10px; font-size: 0.7rem;">
                         ${property.statusText}
@@ -1586,6 +1601,10 @@ class SoldPropertyPaginationSystem {
     createSoldPropertyCard(property) {
         const card = document.createElement('div');
         card.className = 'property-card sold-property-card';
+        card.setAttribute('data-property-id', property.id);
+        if (property.number) {
+            card.setAttribute('data-property-number', property.number);
+        }
         card.style.cssText = `
             background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 12px;
@@ -1721,21 +1740,59 @@ class SoldPropertyPaginationSystem {
         infoContainer.appendChild(infoGrid);
         card.appendChild(infoContainer);
 
+        // 已售出提示和查看詳情按鈕
+        const actionContainer = document.createElement('div');
+        actionContainer.style.cssText = `
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        `;
+        
         // 已售出提示
         const soldNotice = document.createElement('div');
         soldNotice.className = 'sold-notice';
         soldNotice.style.cssText = `
+            flex: 1;
             text-align: center;
             padding: 0.4rem;
             background: linear-gradient(135deg, #6c757d, #495057);
             color: white;
             border-radius: 4px;
             font-weight: 600;
-            margin-top: 0.3rem;
             font-size: 0.75rem;
         `;
         soldNotice.innerHTML = '✅ 已售出';
-        card.appendChild(soldNotice);
+        actionContainer.appendChild(soldNotice);
+        
+        // 查看詳情按鈕
+        const detailLink = document.createElement('a');
+        detailLink.href = `property-detail.html?${property.number ? 'number=' + encodeURIComponent(property.number) : 'id=' + property.id}`;
+        detailLink.target = '_blank';
+        detailLink.style.cssText = `
+            flex: 1;
+            text-align: center;
+            padding: 0.4rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        `;
+        detailLink.innerHTML = '<i class="fas fa-info-circle"></i> 查看詳情';
+        detailLink.onmouseover = function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 8px rgba(102,126,234,0.4)';
+        };
+        detailLink.onmouseout = function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 2px 4px rgba(102, 126, 234, 0.3)';
+        };
+        actionContainer.appendChild(detailLink);
+        
+        card.appendChild(actionContainer);
 
         return card;
     }
@@ -1787,6 +1844,10 @@ class SoldPropertyPaginationSystem {
     createMobileSoldPropertyCard(property) {
         const card = document.createElement('div');
         card.className = 'property-card sold-property-card mobile-sold-card';
+        card.setAttribute('data-property-id', property.id);
+        if (property.number) {
+            card.setAttribute('data-property-number', property.number);
+        }
         card.style.cssText = `
             background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 10px;
@@ -1925,21 +1986,59 @@ class SoldPropertyPaginationSystem {
         infoContainer.appendChild(infoGrid);
         card.appendChild(infoContainer);
 
-        // 已售出提示（手機版更小）
+        // 已售出提示和查看詳情按鈕（手機版）
+        const actionContainer = document.createElement('div');
+        actionContainer.style.cssText = `
+            display: flex;
+            gap: 0.3rem;
+            margin-top: 0.2rem;
+        `;
+        
+        // 已售出提示
         const soldNotice = document.createElement('div');
         soldNotice.className = 'sold-notice';
         soldNotice.style.cssText = `
+            flex: 1;
             text-align: center;
             padding: 0.2rem;
             background: linear-gradient(135deg, #6c757d, #495057);
             color: white;
             border-radius: 2px;
             font-weight: 600;
-            margin-top: 0.1rem;
             font-size: 0.6rem;
         `;
         soldNotice.innerHTML = '✅ 已售出';
-        card.appendChild(soldNotice);
+        actionContainer.appendChild(soldNotice);
+        
+        // 查看詳情按鈕
+        const detailLink = document.createElement('a');
+        detailLink.href = `property-detail.html?${property.number ? 'number=' + encodeURIComponent(property.number) : 'id=' + property.id}`;
+        detailLink.target = '_blank';
+        detailLink.style.cssText = `
+            flex: 1;
+            text-align: center;
+            padding: 0.2rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 2px;
+            font-weight: 600;
+            font-size: 0.6rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
+        `;
+        detailLink.innerHTML = '<i class="fas fa-info-circle"></i> 詳情';
+        detailLink.onmouseover = function() {
+            this.style.transform = 'translateY(-1px)';
+            this.style.boxShadow = '0 2px 6px rgba(102,126,234,0.4)';
+        };
+        detailLink.onmouseout = function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 1px 3px rgba(102, 126, 234, 0.3)';
+        };
+        actionContainer.appendChild(detailLink);
+        
+        card.appendChild(actionContainer);
 
         return card;
     }

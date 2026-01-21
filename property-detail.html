@@ -548,12 +548,14 @@
         
         // 載入物件資料
         async function loadProperty() {
+            console.log('🚀 開始載入物件資料...');
             const loadingEl = document.getElementById('loading');
             const errorEl = document.getElementById('error');
             const pageEl = document.getElementById('property-page');
             
             try {
                 const { number, id } = getPropertyIdentifier();
+                console.log('📋 URL 參數:', { number, id, fullUrl: window.location.href });
                 
                 if (!number && !id) {
                     throw new Error('請提供物件編號或 ID');

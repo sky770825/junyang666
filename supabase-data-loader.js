@@ -132,6 +132,11 @@ async function loadPropertiesFromSupabase() {
         
         console.log(`📥 從 Supabase 收到 ${data ? data.length : 0} 筆資料`);
         
+        if (!data) {
+            console.error('❌ Supabase 返回 null 或 undefined');
+            throw new Error('Supabase 返回 null 或 undefined');
+        }
+        
         if (!Array.isArray(data)) {
             console.error('❌ Supabase 返回的資料格式不正確，data 類型:', typeof data, data);
             throw new Error('Supabase 返回的資料格式不正確');
@@ -139,6 +144,27 @@ async function loadPropertiesFromSupabase() {
         
         if (data.length === 0) {
             console.warn('⚠️ Supabase 返回空陣列，沒有找到已上架的物件');
+            // 🔥 即使沒有資料，也要設置空的 embeddedPropertiesData，避免其他模組等待
+            window.embeddedPropertiesData = {
+                properties: [],
+                settings: {
+                    itemsPerPage: 8,
+                    maxPages: 10,
+                    enableSearch: true,
+                    enableFilter: true
+                }
+            };
+            console.log('✅ 已設置空的 embeddedPropertiesData（沒有物件資料）');
+            // 仍然觸發事件，讓分頁系統知道資料已載入（即使是空的）
+            const event = new CustomEvent('supabaseDataLoaded', {
+                detail: { 
+                    properties: [],
+                    count: 0,
+                    timestamp: new Date().toISOString()
+                }
+            });
+            window.dispatchEvent(event);
+            return; // 提前返回，不繼續處理
         }
         
         const loadEndTime = Date.now();
@@ -372,12 +398,25 @@ const MIN_LOAD_INTERVAL = 1000; // 最小載入間隔 1 秒
     window.supabaseDataLoaderInitialized = true;
     
     // 🔥 確保 Supabase SDK 已載入後再執行
+    let supabaseWaitRetries = 0;
+    const MAX_SUPABASE_WAIT_RETRIES = 50; // 最多等待 5 秒（50 * 100ms）
+    
     function waitForSupabaseAndInit() {
         if (typeof supabase === 'undefined') {
-            console.warn('⏳ Supabase SDK 尚未載入，等待載入...');
+            supabaseWaitRetries++;
+            if (supabaseWaitRetries >= MAX_SUPABASE_WAIT_RETRIES) {
+                console.error('❌ Supabase SDK 載入超時，已重試 ' + MAX_SUPABASE_WAIT_RETRIES + ' 次');
+                console.error('   請檢查網路連接或 Supabase SDK CDN 是否可訪問');
+                return;
+            }
+            if (supabaseWaitRetries % 10 === 0) {
+                console.warn(`⏳ Supabase SDK 尚未載入，等待載入... (${supabaseWaitRetries}/${MAX_SUPABASE_WAIT_RETRIES})`);
+            }
             setTimeout(waitForSupabaseAndInit, 100);
             return;
         }
+        
+        console.log('✅ Supabase SDK 已載入，準備開始載入資料');
         
         // 如果 DOM 已經載入完成，立即執行
         if (document.readyState === 'complete' || document.readyState === 'interactive') {

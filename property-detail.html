@@ -641,7 +641,7 @@
             pageEl.innerHTML = `
                 <div class="property-header">
                     <h1 class="property-title">${property.title || '未命名物件'}</h1>
-                    <p class="property-address">📍 ${displayAddress}</p>
+                    ${displayAddress ? `<p class="property-address">📍 ${displayAddress}</p>` : property.address ? `<p class="property-address">📍 ${property.address}</p>` : ''}
                     <div class="property-meta">
                         <div class="meta-item">
                             <i class="fas fa-tag"></i>

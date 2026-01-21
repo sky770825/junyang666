@@ -379,6 +379,11 @@ class EmbeddedPropertyPaginationSystem {
                 return;
             }
             
+            // 如果點擊的是連結（<a> 標籤），不處理 data-action，讓連結自然跳轉
+            if (target.tagName === 'A' || target.closest('a')) {
+                return; // 讓連結自然跳轉，不觸發事件委託
+            }
+            
             // 處理按鈕點擊
             const action = target.getAttribute('data-action') || target.closest('[data-action]')?.getAttribute('data-action');
             if (action) {
@@ -674,8 +679,7 @@ class EmbeddedPropertyPaginationSystem {
         
         gridItem.innerHTML = `
             <div style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease; background: white;"
-                 data-action="details"
-                 onclick="window.open('${detailUrl}', '_blank')">
+                 data-action="details">
                 ${property.status && property.statusText ? `
                     <div class="property-status-tag status-${property.status}" style="position: absolute; top: 8px; right: 8px; z-index: 5; padding: 4px 10px; font-size: 0.7rem;">
                         ${property.statusText}
@@ -737,10 +741,32 @@ class EmbeddedPropertyPaginationSystem {
                         ` : ''}
                     </div>
                     
-                    <!-- 地址（簡潔設計，參考主流網站）- 網格模式不顯示地址 -->
+                    <!-- 地址（網格模式顯示簡化地址） -->
+                    ${property.address ? `
+                    <div style="margin-bottom: 0.5rem; font-size: clamp(0.75rem, 2vw, 0.85rem); color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="fas fa-map-marker-alt" style="color: #667eea; font-size: 0.8rem;"></i>
+                        <span title="${property.address}">${(() => {
+                            // 簡化地址顯示（只顯示路名，不顯示詳細號碼）
+                            let addr = property.address || '';
+                            const typesToShowOnlyRoad = ['透天', '別墅', '店面'];
+                            const shouldShowOnlyRoad = property.type && typesToShowOnlyRoad.includes(property.type);
+                            
+                            if ((property.hide_address_number || shouldShowOnlyRoad) && addr) {
+                                addr = addr.replace(/號[\d\w\-\s]*[樓層F]*.*$/i, '');
+                                addr = addr.replace(/[\d]+[樓層F]+.*$/i, '');
+                                if (shouldShowOnlyRoad) {
+                                    addr = addr.replace(/[巷弄][\d\w\-\s]*.*$/i, '');
+                                }
+                                addr = addr.replace(/[\s\-]+$/, '').trim();
+                            }
+                            return addr || '地址未設定';
+                        })()}</span>
+                    </div>
+                    ` : ''}
                     
                     <a href="property-detail.html?${property.number ? 'number=' + encodeURIComponent(property.number) : 'id=' + property.id}" 
                        target="_blank"
+                       onclick="event.stopPropagation();"
                        style="width: 100%; background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: clamp(0.55rem, 2.2vw, 0.65rem); border-radius: 8px; font-weight: 600; cursor: pointer; font-size: clamp(0.9rem, 2.5vw, 1rem); transition: all 0.3s ease; margin-top: 0.5rem; white-space: nowrap; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;"
                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)'"
                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">

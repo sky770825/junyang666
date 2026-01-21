@@ -111,18 +111,17 @@ class EmbeddedPropertyPaginationSystem {
                         this.allProperties = embeddedPropertiesData.properties || [];
                         this.properties = this.allProperties.filter(p => p.status !== 'sold');
                         this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
-                        // 重新渲染
-                        this.renderProperties();
-                        console.log(`🔄 資料已載入（嘗試 ${attempt}），更新並渲染`);
-                        this.allProperties = embeddedPropertiesData.properties;
-                        this.properties = this.allProperties.filter(p => p.status !== 'sold');
-                        this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
+                        
+                        // 清除緩存
                         this.filteredCache = null;
                         this.cacheKey = '';
                         if (this.cardCache) {
                             this.cardCache.clear();
                         }
+                        
+                        // 重新渲染
                         this.renderProperties();
+                        console.log(`✅ 資料已載入並渲染完成（${this.properties.length} 個物件）`);
                     } else {
                         // 繼續檢查
                         checkData(attempt + 1, maxAttempts);

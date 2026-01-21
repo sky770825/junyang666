@@ -39,7 +39,9 @@ function createPropertyCard(property) {
             </div>
             
             <div style="margin-bottom: 0.6rem;">
-                <strong>📍 地址：</strong>${property.address}
+                <strong>📍 地址：</strong>${(typeof window.formatAddressForDisplay === 'function' 
+                    ? window.formatAddressForDisplay(property.address, property.hide_address_number, property.type)
+                    : property.address || '')}
             </div>
             
             ${property.layout ? `

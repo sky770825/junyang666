@@ -8,6 +8,65 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // 初始化 Supabase 客戶端
 let supabaseClient = null;
 
+// 處理地址顯示的輔助函數（根據 hide_address_number 和物件類型決定是否隱藏門牌號碼）
+function formatAddressForDisplay(address, hideAddressNumber, propertyType) {
+    if (!address) return '';
+    
+    // 透天、別墅、店面類型：前端只顯示到路名（例如「永美路」）
+    const typesToShowOnlyRoad = ['透天', '別墅', '店面'];
+    const shouldShowOnlyRoad = propertyType && typesToShowOnlyRoad.includes(propertyType);
+    
+    // 如果不需要隱藏門牌號碼，且不是透天/別墅/店面，直接返回完整地址
+    if (!hideAddressNumber && !shouldShowOnlyRoad) {
+        return address;
+    }
+    
+    // 需要隱藏門牌號碼的情況（勾選隱藏 或 透天/別墅/店面類型）
+    // 提取地址：保留縣市區域，只顯示到路名
+    // 例如：「桃園市楊梅區永美路445巷144弄20號」→「桃園市楊梅區永美路」
+    // 例如：「新北市板橋區文化路一段123號」→「新北市板橋區文化路一段」
+    
+    let displayAddress = address;
+    
+    // 方法1：提取縣市區域前綴（例如「桃園市」、「楊梅區」）
+    const cityDistrictMatch = displayAddress.match(/^([^路街道]+[市縣區鄉鎮])/i);
+    const cityDistrict = cityDistrictMatch ? cityDistrictMatch[1] : '';
+    
+    // 方法2：移除縣市區域前綴，準備提取路名
+    let roadPart = displayAddress.replace(/^[^路街道]+[市縣區鄉鎮]/i, '');
+    
+    // 方法3：匹配路名模式（包含「一段」、「二段」等）
+    // 匹配：路名 + 可選的「一段」、「二段」等 + 「路/街/道/大道」
+    // 例如：「永美路」或「文化路一段」
+    const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
+    const roadMatch = roadPart.match(roadPattern);
+    
+    if (roadMatch) {
+        // 組合：縣市區域 + 路名
+        displayAddress = (cityDistrict + roadMatch[1]).trim();
+    } else {
+        // 方法4：如果方法3失敗，使用更簡單的匹配
+        // 匹配第一個「XX路」、「XX街」、「XX道」等
+        const simpleRoadMatch = roadPart.match(/([^路街道]*[路街道])/);
+        if (simpleRoadMatch) {
+            displayAddress = (cityDistrict + simpleRoadMatch[1]).trim();
+        } else {
+            // 方法5：如果還是找不到，移除所有數字和巷弄號碼
+            roadPart = roadPart.replace(/[\d]+[巷弄號].*$/i, '');
+            roadPart = roadPart.replace(/[巷弄號][\d\w\-\s]*.*$/i, '');
+            displayAddress = (cityDistrict + roadPart).trim();
+        }
+    }
+    
+    // 清理多餘空格和結尾符號
+    displayAddress = displayAddress.replace(/[\s\-]+$/, '').trim();
+    
+    return displayAddress;
+}
+
+// 將輔助函數暴露到全域，供其他模組使用
+window.formatAddressForDisplay = formatAddressForDisplay;
+
 // 從 Supabase 載入已上架的物件資料
 async function loadPropertiesFromSupabase() {
     try {

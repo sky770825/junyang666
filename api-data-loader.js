@@ -31,10 +31,19 @@ async function loadPropertiesFromAPI() {
     try {
         console.log('🔄 正在從 API 載入物件資料...');
         
-        const response = await fetch(`${API_BASE_URL}/properties`);
+        const response = await fetch(`${API_BASE_URL}/properties`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            mode: 'cors' // 明確指定 CORS 模式
+        });
         
         if (!response.ok) {
-            throw new Error(`HTTP 錯誤! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error(`❌ API 錯誤 (${response.status}):`, errorText);
+            throw new Error(`HTTP 錯誤! status: ${response.status}, message: ${errorText}`);
         }
         
         const apiProperties = await response.json();

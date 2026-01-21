@@ -83,7 +83,9 @@ function showPropertyDetails(propertyId) {
                 </p>
                 ` : ''}
                 <p style="margin: 6px 0 0 0; opacity: 0.9; font-size: 0.9rem; line-height: 1.4;">
-                    📍 ${property.address}
+                    📍 ${(typeof window.formatAddressForDisplay === 'function' 
+                        ? window.formatAddressForDisplay(property.address, property.hide_address_number, property.type)
+                        : property.address || '')}
                 </p>
             </div>
             
@@ -150,7 +152,18 @@ function showPropertyDetails(propertyId) {
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 3px 0; align-items: center; min-height: 24px;">
                             <span style="color: #666; font-weight: 500; font-size: 0.85rem;">樓層：</span>
-                            <span style="color: #2c3e50; font-weight: 600; font-size: 0.85rem;">${property.floor || '未設定'}</span>
+                            <span style="color: #2c3e50; font-weight: 600; font-size: 0.85rem;">${(() => {
+                                if (!property.floor) return '未設定';
+                                let floorDisplay = property.floor;
+                                // 如果有增建資訊，特別標示
+                                if (floorDisplay.includes('（增建') || floorDisplay.includes('(增建')) {
+                                    floorDisplay = floorDisplay.replace(
+                                        /[（(]增建(.+?)[）)]/g, 
+                                        '<span style="color: #e74c3c; font-weight: 600;">（增建$1）</span>'
+                                    );
+                                }
+                                return floorDisplay;
+                            })()}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 3px 0; align-items: center; min-height: 24px;">
                             <span style="color: #666; font-weight: 500; font-size: 0.85rem;">車位：</span>
@@ -181,7 +194,11 @@ function showPropertyDetails(propertyId) {
                         ${(property.building_type && property.building_type.includes('別墅') && (property.land_area || property.land_share)) ? `
                         <div style="display: flex; justify-content: space-between; padding: 3px 0; align-items: center; min-height: 24px;">
                             <span style="color: #666; font-weight: 500; font-size: 0.85rem;">地坪：</span>
-                            <span style="color: #e74c3c; font-weight: 600; font-size: 0.85rem;">${property.land_area || property.land_share || '未設定'}</span>
+                            <span style="color: #e74c3c; font-weight: 600; font-size: 0.85rem;">${(() => {
+                                const landArea = property.land_area || property.land_share;
+                                if (!landArea) return '未設定';
+                                return landArea.includes('坪') ? landArea : landArea + '坪';
+                            })()}</span>
                         </div>
                         ` : ''}
                         <div style="display: flex; justify-content: space-between; padding: 3px 0; align-items: center; min-height: 24px;">

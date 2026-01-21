@@ -1113,7 +1113,7 @@
                         </div>
                         <div class="form-group">
                             <label>房型 *</label>
-                            <select id="type" required onchange="onTypeChange()">
+                            <select id="type" required onchange="onTypeChange(); checkAndShowExtensionFloor();">
                                 <option value="">請選擇</option>
                                 <option value="套房">套房</option>
                                 <option value="2房">2房</option>
@@ -1240,61 +1240,69 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>格局 *</label>
-                            <input type="text" id="layout" placeholder="例如: 2房2廳1衛" required>
+                            <input type="text" id="layout" placeholder="例如: 3/2/2 或 3房2廳2衛" required onblur="formatLayoutInput(this)">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：可輸入「3/2/2」自動轉換為「3房2廳2衛」
+                            </small>
                         </div>
                         <div class="form-group">
                             <label>總坪數 *</label>
-                            <input type="text" id="total_area" placeholder="例如: 40.08坪" required>
+                            <input type="text" id="total_area" placeholder="例如: 40.08（輸入數字即可，系統會自動加上「坪」）" required onblur="formatAreaInput(this)">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：輸入數字即可，系統會自動加上「坪」字
+                            </small>
                         </div>
                         <div class="form-group">
                             <label>主建物坪數</label>
-                            <input type="text" id="main_area" placeholder="例如: 18.17坪">
+                            <input type="text" id="main_area" placeholder="例如: 18.17（輸入數字即可）" onblur="formatAreaInput(this)">
                         </div>
                         <div class="form-group">
                             <label>附屬建物坪數</label>
-                            <input type="text" id="auxiliary_area" placeholder="例如: 1.63坪">
+                            <input type="text" id="auxiliary_area" placeholder="例如: 1.63（輸入數字即可）" onblur="formatAreaInput(this)">
                         </div>
                         <div class="form-group">
                             <label>公設坪數</label>
-                            <input type="text" id="common_area" placeholder="例如: 9.07坪">
+                            <input type="text" id="common_area" placeholder="例如: 9.07（輸入數字即可）" onblur="formatAreaInput(this)">
                         </div>
                         <div class="form-group">
                             <label>土地坪數</label>
-                            <input type="text" id="land_area" placeholder="例如: 5.22坪">
+                            <input type="text" id="land_area" placeholder="例如: 5.22（輸入數字即可）" onblur="formatAreaInput(this)">
                         </div>
                         <div class="form-group">
                             <label>車位坪數</label>
-                            <input type="text" id="parking_area" placeholder="例如: 8.5坪">
+                            <input type="text" id="parking_area" placeholder="例如: 8.5（輸入數字即可）" onblur="formatAreaInput(this)">
                         </div>
                         <div class="form-group">
                             <label>屋齡</label>
-                            <input type="text" id="age" placeholder="例如: 11年">
+                            <input type="text" id="age" placeholder="例如: 11（輸入數字即可，系統會自動加上「年」）" onblur="formatAgeInput(this)">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：輸入數字即可，系統會自動加上「年」字
+                            </small>
                         </div>
                         <div class="form-group">
                             <label>樓層</label>
-                            <input type="text" id="floor" placeholder="例如: 10/14樓">
+                            <input type="text" id="floor" placeholder="例如: 1-2樓 或 10/14樓" onchange="onFloorChange()">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：透天可輸入「1-2樓」，大樓可輸入「10/14樓」
+                            </small>
+                        </div>
+                        <div class="form-group" id="extension-floor-group" style="display: none;">
+                            <label>增建樓層 <span style="color: #e74c3c; font-size: 0.8rem;">（僅透天）</span></label>
+                            <input type="text" id="extension_floor" placeholder="例如: 3-4樓">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：如有增建樓層，請在此輸入（例如：3-4樓、5樓等）
+                            </small>
                         </div>
                         <div class="form-group">
                             <label>建築類型</label>
                             <select id="building_type">
                                 <option value="">請選擇</option>
                                 <option value="電梯大樓">電梯大樓</option>
-                                <option value="華廈公寓">華廈公寓</option>
+                                <option value="華廈">華廈</option>
                                 <option value="公寓">公寓</option>
-                                <option value="透天別墅">透天別墅</option>
-                                <option value="透天厝">透天厝</option>
-                                <option value="大樓">大樓</option>
-                                <option value="住宅大樓">住宅大樓</option>
-                                <option value="商業大樓">商業大樓</option>
-                                <option value="住商大樓">住商大樓</option>
+                                <option value="透天">透天</option>
                                 <option value="別墅">別墅</option>
-                                <option value="農舍">農舍</option>
-                                <option value="廠房">廠房</option>
-                                <option value="倉庫">倉庫</option>
                                 <option value="店面">店面</option>
-                                <option value="住辦">住辦</option>
-                                <option value="其他">其他</option>
-                                <option value="大廈">大廈</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1325,6 +1333,8 @@
                                 <option value="">請選擇</option>
                                 <option value="平面車位">平面車位</option>
                                 <option value="機械車位">機械車位</option>
+                                <option value="門口停車">門口停車</option>
+                                <option value="室外停車">室外停車</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -2466,7 +2476,7 @@
         }
         
         // 上傳並整理圖片：將本地預覽的圖片上傳到正確的物件資料夾
-        async function uploadAndOrganizeImages(propertyNumber) {
+        async function uploadAndOrganizeImages(propertyNumber, progressCallback = null) {
             console.log('📁 開始上傳並整理圖片，物件編號:', propertyNumber);
             console.log('📊 目前 uploadedImages:', uploadedImages);
             
@@ -2706,6 +2716,12 @@
             
             for (let i = 0; i < uploadedImages.length; i++) {
                 const img = uploadedImages[i];
+                
+                // 更新進度
+                if (progressCallback) {
+                    progressCallback(i + 1, uploadedImages.length);
+                }
+                
                 try {
                     if (img.tempKey) {
                         // 圖片在臨時位置，需要移動到正確位置（使用 Supabase Storage）
@@ -2835,29 +2851,26 @@
                 return;
             }
             
-            // 測試 Supabase 連接
-            try {
-                const { error } = await supabaseClient
-                    .from('properties')
-                    .select('id')
-                    .limit(1);
-                
-                if (error) throw error;
-            } catch (error) {
-                console.error('❌ Supabase 連接測試失敗:', error);
-                showAlert('error', `Supabase 連接失敗：${error.message}。請檢查 Supabase 設定。`);
-                return;
-            }
-            
             const saveBtn = document.getElementById('save-btn');
             saveBtn.disabled = true;
-            saveBtn.textContent = '⏳ 儲存中...';
+            saveBtn.textContent = '⏳ 準備中...';
             
             try {
-                // 自動生成物件編號（新增時必須生成）
+                // 檢查是否為編輯模式（從 URL 參數或 editingPropertyId 變數）
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlId = urlParams.get('id');
+                const isEditMode = editingPropertyId || urlId;
+                
+                // 如果 URL 中有 ID 但 editingPropertyId 未設置，設置它
+                if (urlId && !editingPropertyId) {
+                    editingPropertyId = urlId;
+                    console.log('🔧 從 URL 參數設置編輯模式，ID:', urlId);
+                }
+                
+                // 自動生成物件編號（僅在新增模式時生成）
                 let propertyNumber = document.getElementById('number').value.trim();
-                if (!propertyNumber || !editingPropertyId) {
-                    // 如果沒有編號或是在新增模式，強制生成新編號
+                if (!isEditMode && !propertyNumber) {
+                    // 只有在新增模式且沒有編號時，才生成新編號
                     const type = document.getElementById('type').value.trim();
                     if (!type) {
                         throw new Error('請先選擇房型以自動生成物件編號');
@@ -2867,40 +2880,64 @@
                     if (!propertyNumber) {
                         throw new Error('無法生成物件編號，請稍後再試');
                     }
+                } else if (isEditMode && !propertyNumber) {
+                    // 編輯模式必須有編號
+                    throw new Error('編輯模式必須有物件編號，請檢查表單資料');
                 }
                 
-                // 檢查編號是否重複（編輯時排除自己）
-                const existingNumbers = await getAllPropertyNumbers();
-                if (editingPropertyId) {
+                // 優化：只檢查特定編號是否已存在（而不是獲取所有編號）
+                saveBtn.textContent = '⏳ 檢查編號中...';
+                const currentEditId = editingPropertyId || urlId;
+                
+                // 只在新增模式或編號改變時檢查
+                let needCheckNumber = true;
+                if (currentEditId) {
+                    // 編輯模式：檢查編號是否改變
                     try {
                         const { data: currentData, error } = await supabaseClient
                             .from('properties')
                             .select('number')
-                            .eq('id', editingPropertyId)
+                            .eq('id', currentEditId)
                             .single();
                         
-                        if (!error && currentData && currentData.number) {
-                            const index = existingNumbers.indexOf(currentData.number);
-                            if (index > -1) {
-                                existingNumbers.splice(index, 1);
-                            }
+                        if (!error && currentData && currentData.number === propertyNumber) {
+                            // 編號沒有改變，不需要檢查
+                            needCheckNumber = false;
                         }
                     } catch (error) {
-                        console.warn('⚠️ 無法獲取當前物件編號:', error);
+                        console.warn('⚠️ 無法獲取當前物件編號，將進行編號檢查:', error);
                     }
                 }
                 
-                if (existingNumbers.includes(propertyNumber)) {
-                    throw new Error(`物件編號 "${propertyNumber}" 已存在，請使用其他編號`);
+                if (needCheckNumber) {
+                    // 只查詢特定編號是否存在
+                    const { data: existingProperty, error: checkError } = await supabaseClient
+                        .from('properties')
+                        .select('id, number')
+                        .eq('number', propertyNumber)
+                        .limit(1);
+                    
+                    if (checkError) {
+                        console.warn('⚠️ 檢查編號時發生錯誤:', checkError);
+                        // 不阻止儲存，繼續執行
+                    } else if (existingProperty && existingProperty.length > 0) {
+                        // 如果是編輯模式，檢查是否為當前物件
+                        if (currentEditId && existingProperty[0].id === currentEditId) {
+                            // 是當前物件，允許使用相同編號
+                        } else {
+                            throw new Error(`物件編號 "${propertyNumber}" 已存在，請使用其他編號`);
+                        }
+                    }
                 }
                 
                 // 獲取縣市和區域
                 const city = document.getElementById('city').value.trim();
                 const district = document.getElementById('district').value.trim();
-                let address = document.getElementById('address').value.trim();
+                const address = document.getElementById('address').value.trim();
                 const hideAddressNumber = document.getElementById('hide_address_number').checked;
                 
-                // 組合完整地址
+                // 組合完整地址（儲存完整地址，不處理隱藏門牌號碼）
+                // 前端會根據 hide_address_number 來決定是否顯示門牌號碼
                 let fullAddress = '';
                 if (city && district) {
                     fullAddress = city + district;
@@ -2911,33 +2948,6 @@
                     fullAddress = address;
                 }
                 
-                // 處理地址（隱藏門牌號碼）
-                if (hideAddressNumber && address) {
-                    // 隱藏門牌號碼：移除「號」、「樓」等後面的部分
-                    // 例如：
-                    // 「梅獅路二段232巷10號10樓」->「梅獅路二段232巷」
-                    // 「XX路123號」->「XX路」
-                    // 「XX路123號10樓」->「XX路」
-                    // 「XX路123號10F」->「XX路」
-                    
-                    // 匹配「號」後面可能跟著的數字、字母、F、樓等，直到結尾
-                    // 但要保留「巷」、「弄」等
-                    address = address.replace(/號[\d\w\-\s]*[樓層F]*.*$/i, '');
-                    
-                    // 也處理直接以數字+「樓」結尾的情況（如「XX路123樓」）
-                    address = address.replace(/[\d]+[樓層F]+.*$/i, '');
-                    
-                    // 清理多餘空格和結尾符號
-                    address = address.replace(/[\s\-]+$/, '').trim();
-                    
-                    // 重新組合完整地址
-                    if (city && district) {
-                        fullAddress = city + district + address;
-                    } else {
-                        fullAddress = address;
-                    }
-                }
-                
                 // 收集表單資料
                 const propertyData = {
                     number: propertyNumber,
@@ -2945,12 +2955,44 @@
                     type: document.getElementById('type').value.trim(),
                     city: city,
                     district: district,
-                    address: fullAddress,
-                    address_detail: address, // 儲存詳細地址（不含縣市區域）
+                    address: fullAddress, // 儲存完整地址（包含門牌號碼）
+                    address_detail: address, // 儲存詳細地址（不含縣市區域，包含門牌號碼）
                     hide_address_number: hideAddressNumber,
                     price: document.getElementById('price').value.trim(),
-                    layout: document.getElementById('layout').value.trim(),
-                    total_area: document.getElementById('total_area').value.trim(),
+                    layout: (() => {
+                        let layoutValue = document.getElementById('layout').value.trim();
+                        // 如果輸入的是 3/2/2 格式，轉換為 3房2廳2衛
+                        const layoutPattern = /^(\d+)\/(\d+)\/(\d+)$/;
+                        const match = layoutValue.match(layoutPattern);
+                        if (match) {
+                            layoutValue = `${match[1]}房${match[2]}廳${match[3]}衛`;
+                        }
+                        return layoutValue;
+                    })(),
+                    total_area: (() => {
+                        let areaValue = document.getElementById('total_area').value.trim();
+                        if (!areaValue) return '';
+                        // 如果已經有「坪」字，先移除所有「坪」字，然後只加一個
+                        if (areaValue.includes('坪')) {
+                            areaValue = areaValue.replace(/坪+/g, '');
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        // 如果沒有「坪」字，且是純數字，加上「坪」
+                        else if (/^[\d.]+$/.test(areaValue)) {
+                            areaValue = areaValue + '坪';
+                        }
+                        // 如果有數字但沒有「坪」字，提取數字並加上「坪」
+                        else if (/^[\d.]+/.test(areaValue)) {
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        return areaValue;
+                    })(),
                     is_published: document.getElementById('is_published').value === 'true',
                     is_external: document.getElementById('is_external').value === 'true',
                     status: document.getElementById('status').value.trim() || null,
@@ -2970,21 +3012,186 @@
                         return null;
                     })(),
                     community: document.getElementById('community').value.trim(),
-                    main_area: document.getElementById('main_area').value.trim(),
-                    auxiliary_area: document.getElementById('auxiliary_area').value.trim(),
-                    common_area: document.getElementById('common_area').value.trim(),
-                    land_area: document.getElementById('land_area').value.trim(),
-                    parking_area: document.getElementById('parking_area').value.trim(),
-                    age: document.getElementById('age').value.trim(),
-                    floor: document.getElementById('floor').value.trim(),
-                    building_type: document.getElementById('building_type').value.trim(),
+                    main_area: (() => {
+                        let areaValue = document.getElementById('main_area').value.trim();
+                        if (!areaValue) return '';
+                        // 如果已經有「坪」字，先移除所有「坪」字，然後只加一個
+                        if (areaValue.includes('坪')) {
+                            areaValue = areaValue.replace(/坪+/g, '');
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        // 如果沒有「坪」字，且是純數字，加上「坪」
+                        else if (/^[\d.]+$/.test(areaValue)) {
+                            areaValue = areaValue + '坪';
+                        }
+                        // 如果有數字但沒有「坪」字，提取數字並加上「坪」
+                        else if (/^[\d.]+/.test(areaValue)) {
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        return areaValue;
+                    })(),
+                    auxiliary_area: (() => {
+                        let areaValue = document.getElementById('auxiliary_area').value.trim();
+                        if (!areaValue) return '';
+                        // 如果已經有「坪」字，先移除所有「坪」字，然後只加一個
+                        if (areaValue.includes('坪')) {
+                            areaValue = areaValue.replace(/坪+/g, '');
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        // 如果沒有「坪」字，且是純數字，加上「坪」
+                        else if (/^[\d.]+$/.test(areaValue)) {
+                            areaValue = areaValue + '坪';
+                        }
+                        // 如果有數字但沒有「坪」字，提取數字並加上「坪」
+                        else if (/^[\d.]+/.test(areaValue)) {
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        return areaValue;
+                    })(),
+                    common_area: (() => {
+                        let areaValue = document.getElementById('common_area').value.trim();
+                        if (!areaValue) return '';
+                        // 如果已經有「坪」字，先移除所有「坪」字，然後只加一個
+                        if (areaValue.includes('坪')) {
+                            areaValue = areaValue.replace(/坪+/g, '');
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        // 如果沒有「坪」字，且是純數字，加上「坪」
+                        else if (/^[\d.]+$/.test(areaValue)) {
+                            areaValue = areaValue + '坪';
+                        }
+                        // 如果有數字但沒有「坪」字，提取數字並加上「坪」
+                        else if (/^[\d.]+/.test(areaValue)) {
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        return areaValue;
+                    })(),
+                    land_area: (() => {
+                        let areaValue = document.getElementById('land_area').value.trim();
+                        if (!areaValue) return '';
+                        // 如果已經有「坪」字，先移除所有「坪」字，然後只加一個
+                        if (areaValue.includes('坪')) {
+                            areaValue = areaValue.replace(/坪+/g, '');
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        // 如果沒有「坪」字，且是純數字，加上「坪」
+                        else if (/^[\d.]+$/.test(areaValue)) {
+                            areaValue = areaValue + '坪';
+                        }
+                        // 如果有數字但沒有「坪」字，提取數字並加上「坪」
+                        else if (/^[\d.]+/.test(areaValue)) {
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        return areaValue;
+                    })(),
+                    parking_area: (() => {
+                        let areaValue = document.getElementById('parking_area').value.trim();
+                        if (!areaValue) return '';
+                        // 如果已經有「坪」字，先移除所有「坪」字，然後只加一個
+                        if (areaValue.includes('坪')) {
+                            areaValue = areaValue.replace(/坪+/g, '');
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        // 如果沒有「坪」字，且是純數字，加上「坪」
+                        else if (/^[\d.]+$/.test(areaValue)) {
+                            areaValue = areaValue + '坪';
+                        }
+                        // 如果有數字但沒有「坪」字，提取數字並加上「坪」
+                        else if (/^[\d.]+/.test(areaValue)) {
+                            const numberMatch = areaValue.match(/^[\d.]+/);
+                            if (numberMatch) {
+                                areaValue = numberMatch[0] + '坪';
+                            }
+                        }
+                        return areaValue;
+                    })(),
+                    age: (() => {
+                        let ageValue = document.getElementById('age').value.trim();
+                        // 如果輸入的是純數字，自動加上「年」（但不要重複加上）
+                        if (ageValue && /^\d+$/.test(ageValue)) {
+                            ageValue = ageValue + '年';
+                        }
+                        // 如果已經有「年」字，確保只有一個（移除多餘的「年」）
+                        else if (ageValue && ageValue.includes('年')) {
+                            // 移除所有「年」字，然後只加一個
+                            ageValue = ageValue.replace(/年+/g, '');
+                            const numberMatch = ageValue.match(/^\d+/);
+                            if (numberMatch) {
+                                ageValue = numberMatch[0] + '年';
+                            }
+                        }
+                        return ageValue;
+                    })(),
+                    floor: (() => {
+                        const floor = document.getElementById('floor').value.trim();
+                        const extensionFloor = document.getElementById('extension_floor').value.trim();
+                        if (extensionFloor) {
+                            // 如果有增建樓層，組合顯示：原始樓層（增建樓層）
+                            return `${floor}（增建${extensionFloor}）`;
+                        }
+                        return floor;
+                    })(),
+                    building_type: (() => {
+                        let buildingType = document.getElementById('building_type').value.trim();
+                        // 對應舊值到新值（確保一致性）
+                        const buildingTypeMap = {
+                            '華廈公寓': '華廈',
+                            '透天別墅': '透天',
+                            '透天厝': '透天',
+                            '大樓': '電梯大樓',
+                            '住宅大樓': '電梯大樓',
+                            '商業大樓': '電梯大樓',
+                            '住商大樓': '電梯大樓',
+                            '大廈': '電梯大樓'
+                        };
+                        return buildingTypeMap[buildingType] || buildingType;
+                    })(),
                     orientation: document.getElementById('orientation').value.trim(),
                     management_fee: document.getElementById('management_fee').value.trim(),
                     parking_type: document.getElementById('parking_type').value.trim(),
                     parking_space: document.getElementById('parking_space').value.trim(),
                     current_status: document.getElementById('current_status').value.trim(),
                     description: document.getElementById('description').value.trim(),
-                    google_maps: document.getElementById('google_maps').value.trim(),
+                    google_maps: (() => {
+                        let googleMapsValue = document.getElementById('google_maps').value.trim();
+                        // 如果輸入的是完整的 iframe HTML，提取 src 屬性值
+                        if (googleMapsValue && googleMapsValue.includes('<iframe')) {
+                            const srcMatch = googleMapsValue.match(/src=["']([^"']+)["']/i);
+                            if (srcMatch && srcMatch[1]) {
+                                googleMapsValue = srcMatch[1];
+                            } else {
+                                googleMapsValue = ''; // 如果無法提取，設為空
+                            }
+                        }
+                        return googleMapsValue;
+                    })(),
                     tiktok_video_id: document.getElementById('tiktok_video_id').value.trim(),
                     tiktok_username: document.getElementById('tiktok_username').value.trim(),
                     reference_link: document.getElementById('reference_link').value.trim()
@@ -3032,20 +3239,32 @@
                 }
                 
                 // 整理圖片：將本地預覽的圖片上傳到正確的物件資料夾
-                saveBtn.textContent = '⏳ 上傳圖片中...';
-                console.log('📤 開始上傳圖片，物件編號:', propertyNumber);
-                console.log('📊 待上傳圖片數量:', uploadedImages.length);
-                
                 let organizedImageUrls = [];
-                try {
-                    organizedImageUrls = await uploadAndOrganizeImages(propertyNumber);
-                    console.log('✅ 圖片上傳完成，成功上傳:', organizedImageUrls.length, '張');
-                    propertyData.images = organizedImageUrls;
-                } catch (imageError) {
-                    console.error('❌ 圖片上傳過程中發生錯誤:', imageError);
-                    // 即使圖片上傳失敗，也繼續儲存其他資料（但記錄警告）
-                    propertyData.images = [];
-                    showAlert('warning', `圖片上傳失敗，但將繼續儲存物件資料。錯誤: ${imageError.message}`);
+                if (uploadedImages && uploadedImages.length > 0) {
+                    saveBtn.textContent = `⏳ 上傳圖片中 (0/${uploadedImages.length})...`;
+                    console.log('📤 開始上傳圖片，物件編號:', propertyNumber);
+                    console.log('📊 待上傳圖片數量:', uploadedImages.length);
+                    
+                    try {
+                        // 顯示上傳進度
+                        const progressCallback = (current, total) => {
+                            saveBtn.textContent = `⏳ 上傳圖片中 (${current}/${total})...`;
+                        };
+                        
+                        organizedImageUrls = await uploadAndOrganizeImages(propertyNumber, progressCallback);
+                        console.log('✅ 圖片上傳完成，成功上傳:', organizedImageUrls.length, '張');
+                        propertyData.images = organizedImageUrls;
+                    } catch (imageError) {
+                        console.error('❌ 圖片上傳過程中發生錯誤:', imageError);
+                        // 即使圖片上傳失敗，也繼續儲存其他資料（但記錄警告）
+                        propertyData.images = [];
+                        showAlert('warning', `圖片上傳失敗，但將繼續儲存物件資料。錯誤: ${imageError.message}`);
+                    }
+                } else {
+                    // 沒有新圖片，使用現有圖片或空陣列
+                    propertyData.images = uploadedImages && uploadedImages.length > 0 
+                        ? uploadedImages.map(img => img.url || img) 
+                        : [];
                 }
                 
                 // 添加時間戳
@@ -3077,13 +3296,23 @@
                 
                 saveBtn.textContent = '⏳ 儲存資料中...';
                 
+                // 確定最終的編輯 ID（優先使用 editingPropertyId，其次使用 URL 參數）
+                const finalEditId = editingPropertyId || urlId;
+                
                 // 如果有編輯 ID，執行更新
-                if (editingPropertyId) {
-                    console.log('🔄 更新物件，ID:', editingPropertyId);
+                if (finalEditId) {
+                    console.log('🔄 更新物件，ID:', finalEditId);
+                    console.log('📋 編輯模式檢查:', {
+                        editingPropertyId,
+                        urlId,
+                        finalEditId,
+                        propertyNumber
+                    });
+                    
                     const { data, error } = await supabaseClient
                         .from('properties')
                         .update(propertyData)
-                        .eq('id', editingPropertyId)
+                        .eq('id', finalEditId)
                         .select()
                         .single();
                     
@@ -3092,6 +3321,21 @@
                     result = data;
                     console.log('✅ 物件更新成功:', result.id);
                     showAlert('success', '物件已更新！');
+                    
+                    // 確保 editingPropertyId 保持設置（不要清除，因為可能還需要繼續編輯）
+                    editingPropertyId = finalEditId;
+                    
+                    // 通知父頁面切換到物件列表（縮短延遲，提升響應速度）
+                    setTimeout(() => {
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'propertySaved',
+                                action: 'switchToList',
+                                propertyId: result.id
+                            }, '*');
+                            console.log('📤 已通知父頁面切換到物件列表');
+                        }
+                    }, 800);
                 } else {
                     // 新增物件
                     console.log('➕ 新增物件到資料庫...');
@@ -3114,17 +3358,28 @@
                         number: propertyNumber
                     });
                     showAlert('success', `物件已新增！編號: ${propertyNumber}，ID: ${result.id}`);
+                    
+                    // 通知父頁面切換到物件列表（縮短延遲，提升響應速度）
+                    setTimeout(() => {
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'propertySaved',
+                                action: 'switchToList',
+                                propertyId: result.id
+                            }, '*');
+                            console.log('📤 已通知父頁面切換到物件列表');
+                        }
+                    }, 800);
                 }
                 
                 // 更新 uploadedImages 為整理後的路徑
                 uploadedImages = organizedImageUrls.map(url => ({ url, key: url }));
                 
-                // 重設表單
-                if (!editingPropertyId) {
+                // 重設表單（僅在新增模式時）
+                if (!finalEditId) {
                     resetForm();
-                } else {
-                    editingPropertyId = null;
                 }
+                // 編輯模式不重置 editingPropertyId，保持編輯狀態
                 
                 // 更新列表
                 if (document.getElementById('list-tab').classList.contains('active')) {
@@ -3494,10 +3749,99 @@
                                 }
                             }
                         } else {
-                            element.value = prop[key] || '';
+                            let value = prop[key] || '';
+                            // 特殊處理 google_maps：如果是完整的 iframe HTML，提取 src 屬性值
+                            if (key === 'google_maps' && value && value.includes('<iframe')) {
+                                const srcMatch = value.match(/src=["']([^"']+)["']/i);
+                                if (srcMatch && srcMatch[1]) {
+                                    value = srcMatch[1];
+                                } else {
+                                    value = '';
+                                }
+                            }
+                            // 特殊處理 age：確保有「年」字，但避免重複
+                            if (key === 'age' && value) {
+                                // 如果已經有「年」字，先移除所有「年」字，然後只加一個
+                                if (value.includes('年')) {
+                                    value = value.replace(/年+/g, '');
+                                    const numberMatch = value.match(/^\d+/);
+                                    if (numberMatch) {
+                                        value = numberMatch[0] + '年';
+                                    }
+                                }
+                                // 如果只有數字，加上「年」
+                                else if (/^\d+$/.test(value)) {
+                                    value = value + '年';
+                                }
+                                // 如果有數字但沒有「年」字，提取數字並加上「年」
+                                else if (/^\d+/.test(value)) {
+                                    const numberMatch = value.match(/^\d+/);
+                                    if (numberMatch) {
+                                        value = numberMatch[0] + '年';
+                                    }
+                                }
+                            }
+                            // 特殊處理坪數欄位：確保有「坪」字，但避免重複
+                            const areaFields = ['total_area', 'main_area', 'auxiliary_area', 'common_area', 'land_area', 'parking_area'];
+                            if (areaFields.includes(key) && value) {
+                                // 如果已經有「坪」字，先移除所有「坪」字，然後只加一個
+                                if (value.includes('坪')) {
+                                    value = value.replace(/坪+/g, '');
+                                    const numberMatch = value.match(/^[\d.]+/);
+                                    if (numberMatch) {
+                                        value = numberMatch[0] + '坪';
+                                    }
+                                }
+                                // 如果只有數字（可能包含小數點），加上「坪」
+                                else if (/^[\d.]+$/.test(value)) {
+                                    value = value + '坪';
+                                }
+                                // 如果有數字但沒有「坪」字，提取數字並加上「坪」
+                                else if (/^[\d.]+/.test(value)) {
+                                    const numberMatch = value.match(/^[\d.]+/);
+                                    if (numberMatch) {
+                                        value = numberMatch[0] + '坪';
+                                    }
+                                }
+                            }
+                            // 特殊處理建築類型：對應舊值到新值
+                            if (key === 'building_type' && value) {
+                                const buildingTypeMap = {
+                                    '華廈公寓': '華廈',
+                                    '透天別墅': '透天',
+                                    '透天厝': '透天',
+                                    '大樓': '電梯大樓',
+                                    '住宅大樓': '電梯大樓',
+                                    '商業大樓': '電梯大樓',
+                                    '住商大樓': '電梯大樓',
+                                    '大廈': '電梯大樓'
+                                };
+                                if (buildingTypeMap[value]) {
+                                    value = buildingTypeMap[value];
+                                }
+                            }
+                            element.value = value;
                         }
                     }
                 });
+                
+                // 處理增建樓層：如果 floor 欄位包含「（增建」，分離出來
+                const floorValue = prop.floor || '';
+                if (floorValue.includes('（增建') || floorValue.includes('(增建')) {
+                    const match = floorValue.match(/^(.+?)[（(]增建(.+?)[）)]/);
+                    if (match) {
+                        const originalFloor = match[1].trim();
+                        const extensionFloor = match[2].trim();
+                        const floorInput = document.getElementById('floor');
+                        const extensionInput = document.getElementById('extension_floor');
+                        if (floorInput) floorInput.value = originalFloor;
+                        if (extensionInput) extensionInput.value = extensionFloor;
+                    }
+                }
+                
+                // 根據物件類型顯示/隱藏增建樓層欄位
+                const propertyType = prop.type || '';
+                checkAndShowExtensionFloor();
                 
                 // 載入隱藏門牌號碼選項
                 const hideAddressCheckbox = document.getElementById('hide_address_number');
@@ -4546,6 +4890,132 @@
                     alert.classList.remove('show');
                     setTimeout(() => alert.remove(), 5000);
                 }, 8000);
+            }
+        }
+        
+        // 格式化屋齡輸入（自動加上「年」字，但避免重複）
+        function formatAgeInput(input) {
+            if (!input) return;
+            let value = input.value.trim();
+            if (!value) return;
+            
+            // 如果已經有「年」字，先移除所有「年」字，然後只加一個
+            if (value.includes('年')) {
+                value = value.replace(/年+/g, '');
+                const numberMatch = value.match(/^\d+/);
+                if (numberMatch) {
+                    input.value = numberMatch[0] + '年';
+                }
+            }
+            // 如果輸入的是純數字，自動加上「年」
+            else if (/^\d+$/.test(value)) {
+                input.value = value + '年';
+            }
+            // 如果有數字但沒有「年」字，提取數字並加上「年」
+            else if (/^\d+/.test(value)) {
+                const numberMatch = value.match(/^\d+/);
+                if (numberMatch) {
+                    input.value = numberMatch[0] + '年';
+                }
+            }
+        }
+        
+        // 格式化格局輸入（例如：3/2/2 → 3房2廳2衛）
+        function formatLayoutInput(input) {
+            if (!input) return;
+            let value = input.value.trim();
+            if (!value) return;
+            
+            // 如果已經包含「房」、「廳」、「衛」，不需要轉換
+            if (value.includes('房') || value.includes('廳') || value.includes('衛')) {
+                return;
+            }
+            
+            // 檢查是否符合 數字/數字/數字 格式（例如：3/2/2）
+            const layoutPattern = /^(\d+)\/(\d+)\/(\d+)$/;
+            const match = value.match(layoutPattern);
+            
+            if (match) {
+                const room = match[1];
+                const living = match[2];
+                const bath = match[3];
+                input.value = `${room}房${living}廳${bath}衛`;
+            }
+        }
+        
+        // 格式化坪數輸入（自動加上「坪」字）
+        function formatAreaInput(input) {
+            if (!input) return;
+            let value = input.value.trim();
+            if (!value) return;
+            
+            // 如果已經有「坪」字，先移除所有「坪」字，然後只加一個
+            if (value.includes('坪')) {
+                value = value.replace(/坪+/g, '');
+                // 提取數字（可能包含小數點）
+                const numberMatch = value.match(/^[\d.]+/);
+                if (numberMatch) {
+                    input.value = numberMatch[0] + '坪';
+                }
+            }
+            // 如果輸入的是純數字（可能包含小數點），自動加上「坪」
+            else if (/^[\d.]+$/.test(value)) {
+                input.value = value + '坪';
+            }
+            // 如果有數字但沒有「坪」字，提取數字並加上「坪」
+            else if (/^[\d.]+/.test(value)) {
+                const numberMatch = value.match(/^[\d.]+/);
+                if (numberMatch) {
+                    input.value = numberMatch[0] + '坪';
+                }
+            }
+        }
+        
+        // 當物件類型改變時，顯示/隱藏增建樓層欄位
+        function onTypeChange() {
+            const typeSelect = document.getElementById('type');
+            const extensionGroup = document.getElementById('extension-floor-group');
+            
+            if (!typeSelect || !extensionGroup) return;
+            
+            const selectedType = typeSelect.value.trim();
+            // 只有透天類型才顯示增建樓層欄位
+            if (selectedType === '透天') {
+                extensionGroup.style.display = 'block';
+            } else {
+                extensionGroup.style.display = 'none';
+                // 清空增建樓層欄位
+                const extensionInput = document.getElementById('extension_floor');
+                if (extensionInput) {
+                    extensionInput.value = '';
+                }
+            }
+        }
+        
+        // 當樓層改變時，檢查是否需要顯示增建欄位提示
+        function onFloorChange() {
+            const typeSelect = document.getElementById('type');
+            const extensionGroup = document.getElementById('extension-floor-group');
+            
+            if (!typeSelect || !extensionGroup) return;
+            
+            const selectedType = typeSelect.value.trim();
+            // 如果是透天，確保增建欄位顯示
+            if (selectedType === '透天') {
+                extensionGroup.style.display = 'block';
+            }
+        }
+        
+        // 檢查並顯示增建樓層欄位（用於編輯模式載入時）
+        function checkAndShowExtensionFloor() {
+            const typeSelect = document.getElementById('type');
+            const extensionGroup = document.getElementById('extension-floor-group');
+            
+            if (!typeSelect || !extensionGroup) return;
+            
+            const selectedType = typeSelect.value.trim();
+            if (selectedType === '透天') {
+                extensionGroup.style.display = 'block';
             }
         }
         

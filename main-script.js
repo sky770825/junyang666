@@ -1022,21 +1022,54 @@ function showMapModal(propertyId) {
                         <i class="fas fa-map-marker-alt"></i> ${property.title} - 位置地圖
                     </h2>
                     <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.9rem;">
-                        📍 ${property.address}
+                        📍 ${(typeof window.formatAddressForDisplay === 'function' 
+                            ? window.formatAddressForDisplay(property.address, property.hide_address_number, property.type)
+                            : property.address || '')}
                     </p>
                 </div>
                 
                 <!-- 地圖容器（✅ 快取優化） -->
                 <div id="map-iframe-container-${propertyId}" class="map-container" style="width: 100%; height: 30vh; min-height: 300px;">
-                    ${cachedIframe ? cachedIframe : `
-                    <iframe src="${property.google_maps || 'https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469'}" 
+                    ${cachedIframe ? (() => {
+                        // 確保快取的 iframe 有正確的 allow 屬性
+                        if (cachedIframe.includes('allow=') && !cachedIframe.includes('allow="accelerometer')) {
+                            return cachedIframe.replace(/allow=["'][^"']*["']/i, 'allow="accelerometer; gyroscope; geolocation"');
+                        } else if (!cachedIframe.includes('allow=')) {
+                            return cachedIframe.replace(/<iframe/i, '<iframe allow="accelerometer; gyroscope; geolocation"');
+                        }
+                        return cachedIframe;
+                    })() : `
+                    <iframe src="${(() => {
+                        let mapUrl = property.google_maps || '';
+                        // 如果 google_maps 是完整的 iframe HTML，提取 src 屬性值
+                        if (mapUrl && mapUrl.includes('<iframe')) {
+                            const srcMatch = mapUrl.match(/src=["']([^"']+)["']/i);
+                            if (srcMatch && srcMatch[1]) {
+                                mapUrl = srcMatch[1];
+                            } else {
+                                mapUrl = '';
+                            }
+                        }
+                        mapUrl = mapUrl.trim();
+                        // 如果沒有 URL，使用預設或根據地址生成
+                        if (!mapUrl) {
+                            const address = property.address || '';
+                            if (address) {
+                                const encodedAddress = encodeURIComponent(address);
+                                mapUrl = `https://www.google.com/maps?q=${encodedAddress}&output=embed`;
+                            } else {
+                                mapUrl = 'https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469';
+                            }
+                        }
+                        return mapUrl;
+                    })()}" 
                             width="100%" 
                             height="100%" 
                             style="border:0;" 
                             allowfullscreen="" 
                             loading="eager" 
                             referrerpolicy="no-referrer-when-downgrade"
-                            allow="">
+                            allow="accelerometer; gyroscope; geolocation">
                     </iframe>
                     `}
                 </div>
@@ -1090,6 +1123,11 @@ function showMapModal(propertyId) {
             setTimeout(() => {
                 const iframeContainer = document.getElementById(`map-iframe-container-${propertyId}`);
                 if (iframeContainer) {
+                    // 確保快取的 iframe 有正確的 allow 屬性
+                    const iframe = iframeContainer.querySelector('iframe');
+                    if (iframe && (!iframe.getAttribute('allow') || !iframe.getAttribute('allow').includes('accelerometer'))) {
+                        iframe.setAttribute('allow', 'accelerometer; gyroscope; geolocation');
+                    }
                     mapIframeCache.set(propertyId, iframeContainer.innerHTML);
                     console.log('💾 已快取地圖:', propertyId);
                 }

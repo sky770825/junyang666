@@ -279,20 +279,31 @@ class EmbeddedPropertyPaginationSystem {
             container.className = 'properties-grid-view';
             container.style.display = 'grid';
             
-            // 根據視窗寬度動態調整網格列數
+            // 根據視窗寬度動態調整網格列數 - 手機版改為 2 列網格
             const screenWidth = window.innerWidth;
-            if (screenWidth <= 600) {
-                container.style.gridTemplateColumns = '1fr';
+            if (screenWidth <= 400) {
+                // 超小螢幕：2 列，較小間距
+                container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                container.style.gap = '0.4rem';
+                container.style.padding = '0.5rem';
+            } else if (screenWidth <= 600) {
+                // 小螢幕：2 列網格
+                container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                container.style.gap = '0.6rem';
+                container.style.padding = '0.5rem';
             } else if (screenWidth <= 800) {
                 container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+                container.style.gap = '0.8rem';
+                container.style.padding = '0.5rem';
             } else if (screenWidth <= 1024) {
                 container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(240px, 1fr))';
+                container.style.gap = '1rem';
+                container.style.padding = '1rem';
             } else {
                 container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+                container.style.gap = '1.5rem';
+                container.style.padding = '1rem';
             }
-            
-            container.style.gap = screenWidth <= 768 ? '1rem' : '1.5rem';
-            container.style.padding = screenWidth <= 768 ? '0.5rem' : '1rem';
         } else {
             // 卡片模式：使用原有的卡片渲染
             const cards = [];
@@ -444,6 +455,36 @@ class EmbeddedPropertyPaginationSystem {
         if (property.number) {
             card.setAttribute('data-property-number', property.number);
         }
+        
+        // 處理 Google Maps URL
+        let mapUrl = property.google_maps || '';
+        
+        // 如果 google_maps 是完整的 iframe HTML，提取 src 屬性值
+        if (mapUrl && mapUrl.includes('<iframe')) {
+            const srcMatch = mapUrl.match(/src=["']([^"']+)["']/i);
+            if (srcMatch && srcMatch[1]) {
+                mapUrl = srcMatch[1];
+            } else {
+                mapUrl = ''; // 如果無法提取，設為空
+            }
+        }
+        
+        // 清理 URL（移除多餘的空格）
+        mapUrl = mapUrl.trim();
+        
+        if (!mapUrl || mapUrl === '') {
+            // 如果沒有自訂地圖 URL，根據地址生成 Google Maps 連結
+            const address = property.address || '';
+            if (address) {
+                const encodedAddress = encodeURIComponent(address);
+                // 使用 Google Maps 搜尋連結轉換為嵌入格式
+                mapUrl = `https://www.google.com/maps?q=${encodedAddress}&output=embed`;
+            } else {
+                // 預設地圖（桃園市）
+                mapUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d231263.22579999998!2d121.1637256!3d24.9936281!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346823c8c8c8c8c8%3A0x8c8c8c8c8c8c8c8c!2z5Y-w5Lit5biC!5e0!3m2!1szh-TW!2stw!4v1234567890123!5m2!1szh-TW!2stw';
+            }
+        }
+        
         card.innerHTML = `
             ${property.status && property.statusText ? `
                 <div class="property-status-tag status-${property.status}">
@@ -457,9 +498,18 @@ class EmbeddedPropertyPaginationSystem {
                 <div class="photo-scroll" style="display: flex; gap: 0.5rem; width: max-content;">
                     ${property.images.map((img, index) => `
                         <div class="photo-item" data-photo-index="${index}" 
-                             style="flex-shrink: 0; width: 80px; height: 60px; border-radius: 4px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative;"
+                             style="flex-shrink: 0; width: 80px; height: 60px; border-radius: 4px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; background: #f0f0f0;"
                              onclick="if(typeof openLightbox === 'function') { openLightbox(${index}, '${property.id}'); } else { console.error('openLightbox 函數未載入'); }">
-                            <img src="${img}" alt="物件照片" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" loading="lazy" onerror="this.style.display='none'">
+                            <!-- 第一張圖片優先載入，其他使用懶加載 -->
+                            <img src="${img}" 
+                                 alt="物件照片" 
+                                 data-src="${img}"
+                                 loading="${index === 0 ? 'eager' : 'lazy'}"
+                                 decoding="async"
+                                 style="width: 100%; height: 100%; object-fit: cover; pointer-events: none; transition: opacity 0.3s ease;" 
+                                 onerror="this.style.display='none'"
+                                 onload="this.style.opacity='1';"
+                                 onloadstart="this.style.opacity='0.5';">
                         </div>
                     `).join('')}
                 </div>
@@ -474,12 +524,33 @@ class EmbeddedPropertyPaginationSystem {
                     </div>
                     <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-radius: 4px; font-weight: 600;">
                         <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">坪數</div>
-                        <div style="font-size: 1.2rem;">${property.total_area || property.area || '未設定'}</div>
+                        <div style="font-size: 1.2rem;">${(() => {
+                            const area = property.total_area || property.area;
+                            if (!area) return '未設定';
+                            return area.includes('坪') ? area : area + '坪';
+                        })()}</div>
                     </div>
                 </div>
                 
                 <div style="margin-bottom: 0.6rem;">
-                    <strong>📍 地址：</strong>${property.address}
+                    <strong>📍 地址：</strong>${(typeof window.formatAddressForDisplay === 'function' 
+                        ? window.formatAddressForDisplay(property.address, property.hide_address_number, property.type)
+                        : (() => {
+                            // 備用處理邏輯
+                            let displayAddress = property.address || '';
+                            const typesToShowOnlyRoad = ['透天', '別墅', '店面'];
+                            const shouldShowOnlyRoad = property.type && typesToShowOnlyRoad.includes(property.type);
+                            
+                            if ((property.hide_address_number || shouldShowOnlyRoad) && displayAddress) {
+                                displayAddress = displayAddress.replace(/號[\d\w\-\s]*[樓層F]*.*$/i, '');
+                                displayAddress = displayAddress.replace(/[\d]+[樓層F]+.*$/i, '');
+                                if (shouldShowOnlyRoad) {
+                                    displayAddress = displayAddress.replace(/[巷弄][\d\w\-\s]*.*$/i, '');
+                                }
+                                displayAddress = displayAddress.replace(/[\s\-]+$/, '').trim();
+                            }
+                            return displayAddress;
+                        })())}
                 </div>
                 
                 ${property.layout ? `
@@ -490,7 +561,11 @@ class EmbeddedPropertyPaginationSystem {
                     </div>
                     <div style="flex: 1; padding: 0.4rem 0.3rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 0.95rem; font-weight: 600; color: #2d5016;">
                         <div style="font-size: 0.75rem; opacity: 0.8; margin-bottom: 0.2rem;">屋齡</div>
-                        <div>${property.age || '未設定'}</div>
+                        <div>${(() => {
+                            if (!property.age) return '未設定';
+                            // 如果已經有「年」字，直接顯示；如果沒有，加上「年」
+                            return property.age.includes('年') ? property.age : property.age + '年';
+                        })()}</div>
                     </div>
                 </div>
                 ` : ''}
@@ -502,7 +577,7 @@ class EmbeddedPropertyPaginationSystem {
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                             <!-- 地圖預覽 -->
                             <div class="map-preview-container" style="border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; cursor: pointer;" data-action="map">
-                                <iframe src="${property.google_maps || 'https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469'}" width="100%" height="120" style="border:0; pointer-events: none;" allow="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                <iframe src="${mapUrl}" width="100%" height="120" style="border:0; pointer-events: none;" allow="accelerometer; gyroscope; geolocation" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                                 <div class="map-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; pointer-events: auto; z-index: 10;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
                                     <div style="background: rgba(0,0,0,0.7); color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: 600;">
                                         <i class="fas fa-expand"></i> 地圖
@@ -547,7 +622,7 @@ class EmbeddedPropertyPaginationSystem {
                     ` : `
                         <!-- 單獨地圖預覽（無 TikTok 時） -->
                         <div class="map-preview-container" style="border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; cursor: pointer;" data-action="map">
-                            <iframe src="${property.google_maps || 'https://www.google.com/maps/embed?pb=!4v1758635508112!6m8!1m7!1sTcuziJwB6dHCbFzTFsQVIw!2m2!1d24.90580115978875!2d121.1774002660474!3f281.776500634199!4f24.362884434893175!5f0.7820865974627469'}" width="100%" height="120" style="border:0; pointer-events: none;" allow="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            <iframe src="${mapUrl}" width="100%" height="120" style="border:0; pointer-events: none;" allow="accelerometer; gyroscope; geolocation" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                             <div class="map-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; pointer-events: auto; z-index: 10;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
                                 <div style="background: rgba(0,0,0,0.7); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
                                     <i class="fas fa-expand"></i> 查看大地圖
@@ -558,10 +633,13 @@ class EmbeddedPropertyPaginationSystem {
                 </div>
                 
                 <div style="display: flex; gap: 10px; justify-content: center; align-items: center; position: relative; margin-bottom: 0;">
-                    <button data-action="details" 
-                            style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); flex: 1; font-size: 1rem;">
+                    <a href="property-detail.html?${property.number ? 'number=' + encodeURIComponent(property.number) : 'id=' + property.id}" 
+                       target="_blank"
+                       style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); flex: 1; font-size: 1rem; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;"
+                       onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)'"
+                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.3)'">
                         <i class="fas fa-info-circle"></i> 詳細資訊
-                    </button>
+                    </a>
                     <button data-action="loan" 
                             style="background: linear-gradient(45deg, #10b981, #3b82f6); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); flex: 1; font-size: 1rem;">
                         <i class="fas fa-calculator"></i> 貸款試算
@@ -593,9 +671,12 @@ class EmbeddedPropertyPaginationSystem {
                 <div class="grid-item-image-container" style="position: relative; width: 100%; padding-top: 60%; overflow: hidden; background: #f0f0f0;">
                     <img src="${mainImage}" 
                          alt="${property.title}" 
-                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;"
+                         decoding="async"
+                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease, transform 0.3s ease;"
                          loading="lazy"
                          onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'"
+                         onload="this.style.opacity='1';"
+                         onloadstart="this.style.opacity='0.7';"
                          onmouseover="this.style.transform='scale(1.05)'"
                          onmouseout="this.style.transform='scale(1)'">
                     ${property.images && property.images.length > 1 ? `
@@ -620,7 +701,10 @@ class EmbeddedPropertyPaginationSystem {
                             </div>
                             ${property.total_area || property.area ? `
                             <div style="font-size: clamp(0.85rem, 2.5vw, 0.95rem); color: #666; font-weight: 500;">
-                                ${property.total_area || property.area}坪
+                                ${(() => {
+                                    const area = property.total_area || property.area;
+                                    return area ? (area.includes('坪') ? area : area + '坪') : '未設定';
+                                })()}
                             </div>
                             ` : ''}
                         </div>
@@ -631,27 +715,22 @@ class EmbeddedPropertyPaginationSystem {
                             </span>
                             ${property.age ? `
                             <span style="background: #e3f2fd; color: #1976d2; padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: clamp(0.7rem, 1.8vw, 0.8rem); white-space: nowrap;">
-                                ${property.age}
+                                ${property.age.includes('年') ? property.age : property.age + '年'}
                             </span>
                             ` : ''}
                         </div>
                         ` : ''}
                     </div>
                     
-                    <!-- 地址（簡潔設計，參考主流網站） -->
-                    <div style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: clamp(0.85rem, 2.3vw, 0.95rem); color: #555; margin-bottom: 0.7rem; padding: 0.5rem 0; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;">
-                        <i class="fas fa-map-marker-alt" style="color: #667eea; flex-shrink: 0; margin-top: 0.15rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"></i>
-                        <span style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; flex: 1; line-height: 1.5;">
-                            ${property.address}
-                        </span>
-                    </div>
+                    <!-- 地址（簡潔設計，參考主流網站）- 網格模式不顯示地址 -->
                     
-                    <button data-action="details" 
-                            style="width: 100%; background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: clamp(0.55rem, 2.2vw, 0.65rem); border-radius: 8px; font-weight: 600; cursor: pointer; font-size: clamp(0.9rem, 2.5vw, 1rem); transition: all 0.3s ease; margin-top: 0.5rem; white-space: nowrap;"
-                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)'"
-                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <a href="property-detail.html?${property.number ? 'number=' + encodeURIComponent(property.number) : 'id=' + property.id}" 
+                       target="_blank"
+                       style="width: 100%; background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: clamp(0.55rem, 2.2vw, 0.65rem); border-radius: 8px; font-weight: 600; cursor: pointer; font-size: clamp(0.9rem, 2.5vw, 1rem); transition: all 0.3s ease; margin-top: 0.5rem; white-space: nowrap; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;"
+                       onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)'"
+                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
                         <i class="fas fa-info-circle"></i> 查看詳情
-                    </button>
+                    </a>
                 </div>
             </div>
         `;
@@ -1624,7 +1703,11 @@ class SoldPropertyPaginationSystem {
         // 坪數
         const areaItem = document.createElement('div');
         areaItem.className = 'info-item';
-        areaItem.innerHTML = `<strong>坪數：</strong>${property.total_area}`;
+        const areaValue = property.total_area || property.area || '未設定';
+        const formattedArea = areaValue && areaValue !== '未設定' 
+            ? (areaValue.includes('坪') ? areaValue : areaValue + '坪')
+            : '未設定';
+        areaItem.innerHTML = `<strong>坪數：</strong>${formattedArea}`;
         areaItem.style.cssText = `
             background: rgba(108, 117, 125, 0.1);
             padding: 0.3rem;
@@ -1824,7 +1907,11 @@ class SoldPropertyPaginationSystem {
         // 坪數
         const areaItem = document.createElement('div');
         areaItem.className = 'info-item';
-        areaItem.innerHTML = `<strong>坪數：</strong>${property.total_area}`;
+        const areaValue2 = property.total_area || property.area || '未設定';
+        const formattedArea2 = areaValue2 && areaValue2 !== '未設定' 
+            ? (areaValue2.includes('坪') ? areaValue2 : areaValue2 + '坪')
+            : '未設定';
+        areaItem.innerHTML = `<strong>坪數：</strong>${formattedArea2}`;
         areaItem.style.cssText = `
             background: rgba(108, 117, 125, 0.1);
             padding: 0.15rem;

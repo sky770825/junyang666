@@ -103,10 +103,17 @@ async function loadPropertiesFromSupabase() {
         // 初始化 Supabase 客戶端
         if (!supabaseClient) {
             if (typeof supabase === 'undefined') {
-                console.error('❌ Supabase SDK 未載入');
-                return;
+                console.error('❌ Supabase SDK 未載入，無法創建客戶端');
+                throw new Error('Supabase SDK 未載入');
             }
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            try {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase 客戶端創建成功');
+            } catch (error) {
+                console.error('❌ 創建 Supabase 客戶端失敗:', error);
+                throw error;
+            }
         }
         
         // 查詢已上架的本店物件（不包含非本店物件）
@@ -119,18 +126,28 @@ async function loadPropertiesFromSupabase() {
             .order('created_at', { ascending: false });
         
         if (error) {
+            console.error('❌ Supabase 查詢錯誤:', error);
             throw error;
         }
         
+        console.log(`📥 從 Supabase 收到 ${data ? data.length : 0} 筆資料`);
+        
         if (!Array.isArray(data)) {
+            console.error('❌ Supabase 返回的資料格式不正確，data 類型:', typeof data, data);
             throw new Error('Supabase 返回的資料格式不正確');
+        }
+        
+        if (data.length === 0) {
+            console.warn('⚠️ Supabase 返回空陣列，沒有找到已上架的物件');
         }
         
         const loadEndTime = Date.now();
         const loadDuration = loadEndTime - loadStartTime;
         
         console.log(`✅ 成功從 Supabase 載入 ${data.length} 個已上架的物件（耗時 ${loadDuration}ms）`);
-        console.log('📋 物件列表:', data.map((p, idx) => `${idx + 1}. ${p.title || p.id} (${p.type || 'N/A'}) - is_published: ${p.is_published}, status: ${p.status || 'N/A'}`));
+        if (data.length > 0) {
+            console.log('📋 物件列表（前5個）:', data.slice(0, 5).map((p, idx) => `${idx + 1}. ${p.title || p.id} (${p.type || 'N/A'}) - is_published: ${p.is_published}, status: ${p.status || 'N/A'}`));
+        }
         
         // 🔥 檢查資料一致性
         const publishedCount = data.filter(p => p.is_published === true).length;
@@ -236,6 +253,13 @@ async function loadPropertiesFromSupabase() {
         
         console.log(`✅ 已載入 ${formattedProperties.length} 個 Supabase 物件（已上架）`);
         console.log(`📊 資料統計：總數 ${formattedProperties.length}，未售 ${formattedProperties.filter(p => p.status !== 'sold').length}，已售 ${formattedProperties.filter(p => p.status === 'sold').length}`);
+        console.log(`✅ window.embeddedPropertiesData 已設置，包含 ${window.embeddedPropertiesData.properties.length} 個物件`);
+        
+        // 🔥 驗證資料是否正確設置
+        if (typeof window.embeddedPropertiesData === 'undefined' || !window.embeddedPropertiesData.properties) {
+            console.error('❌ 嚴重錯誤：embeddedPropertiesData 設置失敗！');
+            throw new Error('embeddedPropertiesData 設置失敗');
+        }
         
         // 🔥 記錄載入時間戳，用於除錯
         if (!window.lastDataLoadTime) {
@@ -327,9 +351,17 @@ const MIN_LOAD_INTERVAL = 1000; // 最小載入間隔 1 秒
         lastLoadTime = now;
         console.log('📦 開始載入 Supabase 資料...');
         
-        loadPropertiesFromSupabase().finally(() => {
-            isLoadingData = false;
-        });
+        loadPropertiesFromSupabase()
+            .then(() => {
+                console.log('✅ Supabase 資料載入 Promise 完成');
+            })
+            .catch((error) => {
+                console.error('❌ Supabase 資料載入 Promise 失敗:', error);
+            })
+            .finally(() => {
+                isLoadingData = false;
+                console.log('📦 Supabase 資料載入流程結束');
+            });
     }
     
     // 🔥 防止重複初始化：使用標記確保只初始化一次
@@ -339,16 +371,28 @@ const MIN_LOAD_INTERVAL = 1000; // 最小載入間隔 1 秒
     }
     window.supabaseDataLoaderInitialized = true;
     
-    // 如果 DOM 已經載入完成，立即執行
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        console.log('📦 DOM 已準備好，立即載入資料');
-        initDataLoader();
-    } else {
-        // 等待 DOM 載入完成
-        console.log('📦 等待 DOM 載入完成...');
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📦 DOM 載入完成，開始載入資料');
+    // 🔥 確保 Supabase SDK 已載入後再執行
+    function waitForSupabaseAndInit() {
+        if (typeof supabase === 'undefined') {
+            console.warn('⏳ Supabase SDK 尚未載入，等待載入...');
+            setTimeout(waitForSupabaseAndInit, 100);
+            return;
+        }
+        
+        // 如果 DOM 已經載入完成，立即執行
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            console.log('📦 DOM 已準備好，Supabase SDK 已載入，立即載入資料');
             initDataLoader();
-        }, { once: true }); // 🔥 使用 once: true 防止重複觸發
+        } else {
+            // 等待 DOM 載入完成
+            console.log('📦 等待 DOM 載入完成...');
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('📦 DOM 載入完成，開始載入資料');
+                initDataLoader();
+            }, { once: true }); // 🔥 使用 once: true 防止重複觸發
+        }
     }
+    
+    // 開始等待 Supabase SDK
+    waitForSupabaseAndInit();
 })();

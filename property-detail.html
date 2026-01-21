@@ -504,6 +504,39 @@
             return displayAddress.replace(/[\s\-]+$/, '').trim();
         }
         
+        // 正規化物件編號（處理舊格式，例如 TT-012 → TT00012）
+        function normalizePropertyNumber(number) {
+            if (!number || typeof number !== 'string') {
+                return number;
+            }
+            
+            const trimmedNumber = number.trim().toUpperCase();
+            
+            // 檢查是否已經是正確的新格式
+            // 店內物件：{2字母}{5數字}，例如 TT00012
+            // 店外物件：EX{2字母}{4數字}，例如 EXTT0001
+            const newFormatPattern = /^([A-Z]{2}\d{5}|EX[A-Z]{2}\d{4})$/;
+            if (newFormatPattern.test(trimmedNumber)) {
+                return trimmedNumber; // 已經是正確格式
+            }
+            
+            // 嘗試轉換舊格式（例如：TT-012 → TT00012）
+            // 匹配模式：{字母}-{數字} 或 {字母}{數字}
+            const oldFormatMatch = trimmedNumber.match(/^([A-Z]{2})[-]?(\d+)$/i);
+            if (oldFormatMatch) {
+                const prefix = oldFormatMatch[1].toUpperCase();
+                const seq = parseInt(oldFormatMatch[2], 10);
+                
+                if (!isNaN(seq) && seq > 0) {
+                    // 店內物件：{2字母}{5數字}
+                    return `${prefix}${String(seq).padStart(5, '0')}`;
+                }
+            }
+            
+            // 如果無法轉換，返回清理後的原始值
+            return trimmedNumber;
+        }
+        
         // 從 URL 參數獲取物件編號或 ID（優先使用編號）
         function getPropertyIdentifier() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -535,10 +568,40 @@
                 
                 // 優先使用編號查詢，如果沒有編號則使用 ID
                 if (number) {
-                    // 清理編號（移除前後空格，轉為大寫以確保匹配）
-                    const cleanNumber = number.trim().toUpperCase();
-                    console.log('🔍 查詢物件編號:', cleanNumber);
-                    query = query.eq('number', cleanNumber);
+                    // 正規化編號（處理舊格式）
+                    const normalizedNumber = normalizePropertyNumber(number);
+                    console.log('🔍 查詢物件編號:', number, '→ 正規化後:', normalizedNumber);
+                    
+                    // 先嘗試正規化後的編號
+                    let queryResult = await query.eq('number', normalizedNumber).maybeSingle();
+                    
+                    // 如果找不到，且原始編號與正規化後不同，嘗試原始編號
+                    if (!queryResult.data && normalizedNumber !== number.trim().toUpperCase()) {
+                        console.log('🔄 正規化編號未找到，嘗試原始編號:', number.trim().toUpperCase());
+                        queryResult = await query.eq('number', number.trim().toUpperCase()).maybeSingle();
+                    }
+                    
+                    if (queryResult.error && queryResult.error.code !== 'PGRST116') {
+                        throw queryResult.error;
+                    }
+                    
+                    if (!queryResult.data) {
+                        throw new Error(`找不到編號為 "${number}" 的物件`);
+                    }
+                    
+                    // 隱藏載入提示，顯示頁面
+                    loadingEl.style.display = 'none';
+                    pageEl.style.display = 'block';
+                    
+                    // 渲染物件詳細資訊
+                    renderProperty(queryResult.data);
+                    
+                    // 更新頁面標題：物件標題 + 價格（如果有）
+                    const pageTitle = queryResult.data.title 
+                        ? (queryResult.data.price ? `${queryResult.data.title} - ${queryResult.data.price} | 住商不動產` : `${queryResult.data.title} | 住商不動產`)
+                        : '物件詳細資訊 | 住商不動產';
+                    document.title = pageTitle;
+                    return;
                 } else if (id) {
                     console.log('🔍 查詢物件 ID:', id);
                     query = query.eq('id', id);
@@ -554,7 +617,9 @@
                     if (error.code === 'PGRST116') {
                         const { data: dataArray, error: arrayError } = await query.maybeSingle();
                         if (arrayError) throw arrayError;
-                        if (!dataArray) throw new Error('找不到物件');
+                        if (!dataArray) {
+                            throw new Error(`找不到 ID 為 "${id}" 的物件`);
+                        }
                         // 使用 maybeSingle 的結果
                         const propertyData = dataArray;
                         loadingEl.style.display = 'none';
@@ -569,7 +634,9 @@
                     }
                     throw error;
                 }
-                if (!data) throw new Error('找不到物件');
+                if (!data) {
+                    throw new Error(`找不到 ID 為 "${id}" 的物件`);
+                }
                 
                 // 隱藏載入提示，顯示頁面
                 loadingEl.style.display = 'none';
@@ -585,10 +652,25 @@
                 document.title = pageTitle;
                 
             } catch (error) {
-                console.error('載入物件失敗:', error);
+                console.error('❌ 載入物件失敗:', error);
+                console.error('錯誤詳情:', {
+                    message: error.message,
+                    code: error.code,
+                    details: error.details,
+                    hint: error.hint
+                });
                 loadingEl.style.display = 'none';
                 errorEl.style.display = 'block';
-                document.getElementById('error-message').textContent = error.message || '載入失敗';
+                // 提供更詳細的錯誤訊息
+                let errorMessage = error.message || '載入失敗';
+                if (error.code === 'PGRST116') {
+                    errorMessage = '找不到指定的物件，請確認物件編號或 ID 是否正確';
+                } else if (error.message && error.message.includes('找不到')) {
+                    errorMessage = error.message;
+                } else {
+                    errorMessage = `載入失敗：${errorMessage}`;
+                }
+                document.getElementById('error-message').textContent = errorMessage;
             }
         }
         
@@ -667,8 +749,18 @@
             
             pageEl.innerHTML = `
                 <div class="property-header">
-                    <h1 class="property-title">${property.title || '未命名物件'}</h1>
-                    ${displayAddress ? `<p class="property-address">📍 ${displayAddress}</p>` : property.address ? `<p class="property-address">📍 ${property.address}</p>` : ''}
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <h1 class="property-title">${property.title || '未命名物件'}</h1>
+                            ${displayAddress ? `<p class="property-address">📍 ${displayAddress}</p>` : property.address ? `<p class="property-address">📍 ${property.address}</p>` : ''}
+                        </div>
+                        ${property.price ? `
+                        <div style="text-align: right; min-width: 150px;">
+                            <div style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">售價</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: #667eea; line-height: 1.2;">${property.price}</div>
+                        </div>
+                        ` : ''}
+                    </div>
                     <div class="property-meta">
                         <div class="meta-item">
                             <i class="fas fa-tag"></i>

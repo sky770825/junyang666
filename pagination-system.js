@@ -531,9 +531,9 @@ class EmbeddedPropertyPaginationSystem {
             <!-- 物件資訊 -->
             <div class="property-info" style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px; margin: 0.5rem 0;">
                 <div style="display: flex; gap: 0.3rem; margin-bottom: 0.6rem;">
-                    <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 4px; font-weight: 600;">
-                        <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">售價</div>
-                        <div style="font-size: 1.2rem;">${property.price}</div>
+                    <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 4px; font-weight: 600;">
+                        <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem; color: white;">售價</div>
+                        <div style="font-size: 1.2rem; color: #e74c3c; font-weight: 700;">${property.price}</div>
                     </div>
                     <div style="flex: 1; text-align: center; padding: 0.3rem 0.2rem; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-radius: 4px; font-weight: 600;">
                         <div style="font-size: 0.7rem; opacity: 0.9; margin-bottom: 0.1rem;">坪數</div>

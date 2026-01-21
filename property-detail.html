@@ -560,7 +560,11 @@
                         loadingEl.style.display = 'none';
                         pageEl.style.display = 'block';
                         renderProperty(propertyData);
-                        document.title = `${propertyData.title} | 住商不動產`;
+                        // 設置吸引人的標題：物件標題 + 價格（如果有）
+                        const pageTitle = propertyData.title 
+                            ? (propertyData.price ? `${propertyData.title} - ${propertyData.price} | 住商不動產` : `${propertyData.title} | 住商不動產`)
+                            : '物件詳細資訊 | 住商不動產';
+                        document.title = pageTitle;
                         return;
                     }
                     throw error;
@@ -574,8 +578,11 @@
                 // 渲染物件詳細資訊
                 renderProperty(data);
                 
-                // 更新頁面標題
-                document.title = `${data.title} | 住商不動產`;
+                // 更新頁面標題：物件標題 + 價格（如果有），讓標題更吸引人
+                const pageTitle = data.title 
+                    ? (data.price ? `${data.title} - ${data.price} | 住商不動產` : `${data.title} | 住商不動產`)
+                    : '物件詳細資訊 | 住商不動產';
+                document.title = pageTitle;
                 
             } catch (error) {
                 console.error('載入物件失敗:', error);

@@ -444,6 +444,27 @@
                 gap: 1rem !important;
             }
             
+            /* Google Maps 按鈕手機版保持兩欄 */
+            .section > div[style*="grid-template-columns: 1fr 1fr"][style*="margin-top: 1rem"] {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.5rem !important;
+            }
+            
+            .section > div[style*="grid-template-columns: 1fr 1fr"][style*="margin-top: 1rem"] a {
+                font-size: 0.8rem !important;
+                padding: 0.6rem 0.5rem !important;
+            }
+            
+            .section > div[style*="grid-template-columns: 1fr 1fr"][style*="margin-top: 1rem"] a span {
+                display: none;
+            }
+            
+            @media (min-width: 480px) {
+                .section > div[style*="grid-template-columns: 1fr 1fr"][style*="margin-top: 1rem"] a span {
+                    display: inline;
+                }
+            }
+            
             /* 相關連結按鈕手機版 */
             .section a[style*="min-width: 180px"] {
                 min-width: calc(50% - 0.4rem) !important;
@@ -1138,16 +1159,20 @@
                                 referrerpolicy="no-referrer-when-downgrade">
                             </iframe>
                         </div>
-                        <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                             <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.address)}" 
                                target="_blank" 
-                               style="background: #4285f4; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                                <i class="fas fa-external-link-alt"></i> 在 Google Maps 中開啟
+                               style="background: #4285f4; color: white; padding: 0.75rem 1rem; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.9rem; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);"
+                               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(66, 133, 244, 0.4)'"
+                               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(66, 133, 244, 0.3)'">
+                                <i class="fas fa-external-link-alt"></i> <span>在 Google Maps 中開啟</span>
                             </a>
                             <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(property.address)}" 
                                target="_blank" 
-                               style="background: #ff6b6b; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                                <i class="fas fa-route"></i> 規劃路線
+                               style="background: #ff6b6b; color: white; padding: 0.75rem 1rem; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.9rem; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);"
+                               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 107, 107, 0.4)'"
+                               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 107, 107, 0.3)'">
+                                <i class="fas fa-route"></i> <span>規劃路線</span>
                             </a>
                         </div>
                     </div>

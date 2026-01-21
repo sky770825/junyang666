@@ -358,11 +358,12 @@
         
         @media (max-width: 768px) {
             .container {
-                padding: 1rem;
+                padding: 0;
+                max-width: 100%;
             }
             
             .property-header {
-                padding: 1.5rem;
+                padding: 1.5rem 1rem;
             }
             
             .property-title {
@@ -370,7 +371,27 @@
             }
             
             .property-content {
-                padding: 1.5rem;
+                padding: 1.5rem 1rem;
+            }
+            
+            /* 移除所有區塊的 max-width 限制，讓手機版全螢幕 */
+            .section {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            /* 聯絡方式區塊全寬 */
+            .section[style*="max-width: 1200px"],
+            .contact-grid {
+                max-width: 100% !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            /* 確保聯絡方式卡片不會換行 */
+            .contact-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 1rem !important;
             }
             
             /* 基本資訊手機版 - 三欄佈局 */
@@ -1146,7 +1167,7 @@
                     <h2 class="section-title" style="text-align: center; margin-bottom: 1.5rem;">
                         <span style="background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📞 聯絡方式</span>
                     </h2>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; max-width: 1200px; margin: 0 auto;">
+                    <div class="contact-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; max-width: 1200px; margin: 0 auto;">
                         <!-- 聯絡方式卡片 -->
                         <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); padding: 1.8rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid rgba(102, 126, 234, 0.1); position: relative; overflow: hidden; display: flex; flex-direction: column; height: 100%;">
                             <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2);"></div>

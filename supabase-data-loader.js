@@ -173,7 +173,7 @@ async function loadPropertiesFromSupabase() {
                     enableFilter: true
                 }
             };
-            console.log('✅ 已設置空的 embeddedPropertiesData（沒有物件資料）');
+            // 🔇 移除訊息，避免在刷新時顯示
             // 仍然觸發事件，讓分頁系統知道資料已載入（即使是空的）
             const event = new CustomEvent('supabaseDataLoaded', {
                 detail: { 
@@ -348,10 +348,10 @@ async function loadPropertiesFromSupabase() {
         // 這樣可以避免重複更新和競態條件
         // 如果分頁系統已經存在，只觸發事件通知更新（由 main-script.js 處理）
         if (window.paginationSystem && typeof window.paginationSystem.renderProperties === 'function') {
-            console.log('📦 分頁系統已存在，通過事件通知更新（避免重複更新）');
+            // 🔇 移除訊息，避免在刷新時顯示
         } else {
             // 如果分頁系統還不存在，觸發初始化
-            console.log('⏳ 分頁系統尚未初始化，等待初始化...');
+            // 🔇 移除訊息，避免在刷新時顯示
             // 觸發自定義事件，通知需要初始化
             const initEvent = new CustomEvent('needPaginationInit', {
                 detail: { 
@@ -372,7 +372,7 @@ async function loadPropertiesFromSupabase() {
         
         // 如果 Supabase 載入失敗，嘗試使用原有的 API 載入器
         if (typeof loadPropertiesFromAPI === 'function') {
-            console.log('🔄 嘗試使用 API 載入器作為備用方案...');
+            // 🔇 移除訊息，避免在刷新時顯示
             loadPropertiesFromAPI();
         }
     }

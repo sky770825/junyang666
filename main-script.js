@@ -1251,10 +1251,10 @@ let embeddedPaginationSystem;
 // 🔥 重要：在 DOMContentLoaded 之前設置事件監聽器，確保不會錯過資料載入事件
 // 監聽需要初始化的自定義事件（只執行一次，防止重複初始化）
 window.addEventListener('needPaginationInit', function(event) {
-    console.log('📦 收到需要初始化分頁系統的事件');
+    // 🔇 移除訊息，避免在刷新時顯示
     // 🔥 防止重複初始化：檢查是否已經初始化
     if (embeddedPaginationSystem) {
-        console.log('⏭️ 分頁系統已存在，跳過重複初始化');
+        // 🔇 移除訊息，避免在刷新時顯示
         return;
     }
     
@@ -1303,7 +1303,7 @@ window.addEventListener('supabaseDataLoaded', function(event) {
         if (embeddedPaginationSystem) {
             // 更新現有分頁系統
             const oldCount = embeddedPaginationSystem.allProperties ? embeddedPaginationSystem.allProperties.length : 0;
-            console.log(`🔄 更新分頁系統... (舊: ${oldCount} → 新: ${propertyCount})`);
+            // 🔇 移除訊息，避免在刷新時顯示
             
             embeddedPaginationSystem.allProperties = embeddedPropertiesData.properties;
             embeddedPaginationSystem.properties = embeddedPropertiesData.properties.filter(p => p.status !== 'sold');
@@ -1324,7 +1324,7 @@ window.addEventListener('supabaseDataLoaded', function(event) {
                 embeddedPaginationSystem.updateFilterCounts();
             }
             
-            console.log(`✅ 分頁系統已更新！目前有 ${embeddedPropertiesData.properties.length} 個物件（未售: ${embeddedPaginationSystem.properties.length}，已售: ${embeddedPaginationSystem.soldProperties.length}）`);
+            // 🔇 移除訊息，避免在刷新時顯示
         } else if (typeof EmbeddedPropertyPaginationSystem !== 'undefined') {
             // 🔥 防止重複初始化：檢查是否已經初始化
             if (!embeddedPaginationSystem) {
@@ -1334,7 +1334,7 @@ window.addEventListener('supabaseDataLoaded', function(event) {
                 
                 // 🔥 確保初始化後立即渲染（即使資料是空的也要渲染，顯示「目前沒有物件」）
                 if (embeddedPaginationSystem) {
-                    console.log('✅ 分頁系統已初始化，立即渲染（物件數: ' + (embeddedPaginationSystem.properties ? embeddedPaginationSystem.properties.length : 0) + '）');
+                    // 🔇 移除訊息，避免在刷新時顯示
                     embeddedPaginationSystem.renderProperties();
                 } else {
                     console.warn('⚠️ 分頁系統初始化失敗');
@@ -1365,7 +1365,7 @@ window.addEventListener('apiDataLoaded', function() {
         return;
     }
     
-    console.log('📦 收到 API 資料載入事件，更新分頁系統...');
+    // 🔇 移除訊息，避免在刷新時顯示
     
     if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties) {
         if (embeddedPaginationSystem) {
@@ -1389,7 +1389,7 @@ window.addEventListener('apiDataLoaded', function() {
                 embeddedPaginationSystem.updateFilterCounts();
             }
             
-            console.log(`✅ 分頁系統已更新！目前有 ${embeddedPropertiesData.properties.length} 個物件`);
+            // 🔇 移除訊息，避免在刷新時顯示
         } else if (typeof EmbeddedPropertyPaginationSystem !== 'undefined') {
             // 🔥 防止重複初始化：檢查是否已經初始化
             if (!embeddedPaginationSystem) {

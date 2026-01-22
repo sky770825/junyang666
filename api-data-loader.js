@@ -29,7 +29,7 @@ const API_BASE_URL = getApiBaseUrl();
 // 從 API 載入物件資料
 async function loadPropertiesFromAPI() {
     try {
-        console.log('🔄 正在從 API 載入物件資料...');
+        // 🔇 移除訊息，避免在刷新時顯示
         
         const response = await fetch(`${API_BASE_URL}/properties`, {
             method: 'GET',
@@ -52,8 +52,11 @@ async function loadPropertiesFromAPI() {
             throw new Error('API 返回的資料格式不正確');
         }
         
-        console.log(`✅ 成功從 API 載入 ${apiProperties.length} 個物件`);
-        console.log('📋 API 物件列表:', apiProperties.map(p => `${p.title} (${p.type})`));
+        // 🔇 移除訊息，避免在刷新時顯示（只在開發模式顯示）
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log(`✅ 成功從 API 載入 ${apiProperties.length} 個物件`);
+            console.log('📋 API 物件列表:', apiProperties.map(p => `${p.title} (${p.type})`));
+        }
         
         // 如果 embeddedPropertiesData 已存在，合併資料（避免重複）
         if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties) {
@@ -68,9 +71,9 @@ async function loadPropertiesFromAPI() {
                     ...embeddedPropertiesData.properties,
                     ...newProperties
                 ];
-                console.log(`✅ 已合併 ${newProperties.length} 個新物件到現有資料`);
+                // 🔇 移除訊息，避免在刷新時顯示
             } else {
-                console.log('ℹ️ 沒有新物件需要合併（所有物件已存在）');
+                // 🔇 移除訊息，避免在刷新時顯示
             }
         } else {
             // 如果 embeddedPropertiesData 不存在，建立它
@@ -83,10 +86,10 @@ async function loadPropertiesFromAPI() {
                     enableFilter: true
                 }
             };
-            console.log('✅ 已建立 embeddedPropertiesData 並載入 API 資料');
+            // 🔇 移除訊息，避免在刷新時顯示
         }
         
-        console.log(`📊 目前總物件數: ${embeddedPropertiesData.properties.length}`);
+        // 🔇 移除訊息，避免在刷新時顯示
         
         return apiProperties;
         
@@ -113,11 +116,11 @@ async function loadPropertiesFromAPI() {
 
 // 確保分頁系統重新載入資料的函數
 function refreshPaginationSystem() {
-    // 等待一下確保分頁系統已經初始化
-    setTimeout(() => {
+        // 等待一下確保分頁系統已經初始化
+        setTimeout(() => {
         // 如果分頁系統已存在，重新設定資料並渲染
         if (window.paginationSystem && typeof window.paginationSystem.renderProperties === 'function') {
-            console.log('🔄 重新載入分頁系統資料...');
+            // 🔇 移除訊息，避免在刷新時顯示
             
             // 重新設定資料
             if (typeof embeddedPropertiesData !== 'undefined') {
@@ -141,18 +144,11 @@ function refreshPaginationSystem() {
                     window.paginationSystem.updateFilterCounts();
                 }
                 
-                console.log('✅ 分頁系統已更新！');
-                console.log(`   總物件數: ${embeddedPropertiesData.properties.length}`);
-                console.log(`   未售物件: ${oldCount} → ${newCount}`);
-                console.log(`   已售物件: ${window.paginationSystem.soldProperties.length}`);
-                
-                if (newCount > oldCount) {
-                    console.log('🎉 發現新物件！');
-                }
+                // 🔇 移除訊息，避免在刷新時顯示
             }
         } else {
             // 這是正常的，分頁系統會在 DOMContentLoaded 時初始化
-            console.log('ℹ️ 分頁系統尚未初始化，將在初始化後自動更新');
+            // 🔇 移除訊息，避免在刷新時顯示
         }
     }, 500); // 等待 500ms 確保分頁系統已初始化
 }

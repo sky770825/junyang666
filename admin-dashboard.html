@@ -1070,6 +1070,65 @@
                 padding: 0.75rem 1rem;
                 font-size: 0.9rem;
             }
+            
+            /* 表單欄位優化 - 增加間距和大小 */
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+            
+            .form-group label {
+                font-size: 0.95rem;
+                margin-bottom: 0.6rem;
+                font-weight: 600;
+            }
+            
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 0.85rem;
+                font-size: 1rem;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                min-height: 44px; /* 觸控友好的最小高度 */
+            }
+            
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+                border-color: #667eea;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+            
+            .form-group textarea {
+                min-height: 120px;
+                line-height: 1.5;
+            }
+            
+            /* iframe 中的表單優化 */
+            #property-add-iframe,
+            #property-edit-iframe {
+                width: 100% !important;
+                min-height: auto !important;
+                border: none !important;
+            }
+            
+            /* 表單區塊優化 */
+            .form-section {
+                padding: 1rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .form-section h3 {
+                font-size: 1.1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .form-grid {
+                display: grid !important;
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
         }
         
         /* 桌面版隱藏漢堡選單 */

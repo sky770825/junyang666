@@ -162,8 +162,83 @@
         }
         
         @media (max-width: 768px) {
+            /* 容器優化 - 全螢幕寬度 */
+            .container {
+                padding: 0.5rem;
+                max-width: 100%;
+                width: 100%;
+                margin: 0;
+            }
+            
+            /* 表單網格改為單欄 */
             .form-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
+                gap: 1.25rem !important;
+            }
+            
+            /* 表單區塊優化 - 增加間距 */
+            .form-section {
+                padding: 1rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .form-section h3 {
+                font-size: 1.1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            /* 表單欄位優化 - 增加大小和間距 */
+            .form-group {
+                margin-bottom: 1.25rem !important;
+            }
+            
+            .form-group label {
+                font-size: 0.95rem !important;
+                margin-bottom: 0.6rem !important;
+                font-weight: 600 !important;
+            }
+            
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 0.85rem !important;
+                font-size: 1rem !important;
+                border: 2px solid #e9ecef !important;
+                border-radius: 8px !important;
+                min-height: 44px !important; /* 觸控友好的最小高度 */
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+                border-color: #667eea !important;
+                outline: none !important;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+            }
+            
+            .form-group textarea {
+                min-height: 120px !important;
+                line-height: 1.5 !important;
+            }
+            
+            /* 小型和中型欄位在手機版都佔滿寬度 */
+            .form-group.small,
+            .form-group.medium {
+                grid-column: span 1 !important;
+            }
+            
+            /* 全寬欄位 */
+            .form-group.full-width {
+                grid-column: 1 / -1 !important;
+            }
+            
+            /* 按鈕優化 */
+            .btn {
+                padding: 0.85rem 1.25rem !important;
+                font-size: 1rem !important;
+                min-height: 44px !important;
             }
         }
         
@@ -989,9 +1064,46 @@
         }
         
         @media (max-width: 768px) {
+            /* 容器優化 */
+            .container {
+                padding: 0.5rem;
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            /* Header 優化 */
+            .header {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .header p {
+                font-size: 0.85rem;
+            }
+            
+            /* Tabs 優化 */
+            .tabs {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+            
+            .tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+                flex: 1;
+                min-width: calc(50% - 0.25rem);
+            }
+            
+            /* Modal 優化 */
             .modal-dialog {
                 width: 95%;
                 margin: 1rem;
+                max-height: 90vh;
+                overflow-y: auto;
             }
             
             .modal-header {
@@ -1008,6 +1120,9 @@
             
             .modal-btn {
                 width: 100%;
+                padding: 0.85rem;
+                font-size: 1rem;
+                min-height: 44px;
             }
         }
         

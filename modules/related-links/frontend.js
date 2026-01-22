@@ -92,7 +92,8 @@
                 console.log(`✅ 成功從 Supabase 載入 ${result.length} 個連結（後台儲存的資料）`);
                 return result;
             } else {
-                console.warn('⚠️ Supabase 中沒有啟用的連結，使用預設資料');
+                // 這是正常的，如果 Supabase 中沒有連結，會使用後端 API 的資料
+                console.log('ℹ️ Supabase 中沒有啟用的連結，將嘗試從後端 API 載入');
                 if (typeof DEFAULT_RELATED_LINKS !== 'undefined') {
                     return DEFAULT_RELATED_LINKS.filter(l => l.is_active !== false);
                 }
@@ -149,7 +150,7 @@
             console.log(`📋 從後端 API 載入到 ${links.length} 個連結（後台儲存的資料），準備渲染到 ${containerId}`);
             
             if (!links || links.length === 0) {
-                console.warn('⚠️ 沒有找到任何連結資料');
+                console.log('ℹ️ 目前沒有相關連結資料');
                 container.innerHTML = '<p style="text-align: center; color: #666; padding: 1rem; width: 100%;">目前沒有相關連結</p>';
                 return;
             }

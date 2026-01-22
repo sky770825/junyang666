@@ -151,7 +151,8 @@ function refreshPaginationSystem() {
                 }
             }
         } else {
-            console.warn('⚠️ 分頁系統尚未初始化，將在初始化後更新');
+            // 這是正常的，分頁系統會在 DOMContentLoaded 時初始化
+            console.log('ℹ️ 分頁系統尚未初始化，將在初始化後自動更新');
         }
     }, 500); // 等待 500ms 確保分頁系統已初始化
 }

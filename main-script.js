@@ -313,10 +313,32 @@ function showLoanCalculator(propertyId) {
     }
 }
 
+// 打開貸款試算彈窗（不帶物件ID）
+function openLoanModal() {
+    // 顯示彈窗
+    const loanModal = document.getElementById('loanModal');
+    if (loanModal) {
+        loanModal.style.display = 'block';
+        
+        // 重新綁定滑桿事件
+        setTimeout(() => {
+            bindSliderEvents();
+            bindInputEvents();
+            calculateModalLoan();
+        }, 100);
+    }
+}
+
 // 關閉貸款試算彈窗
 function closeLoanModal() {
-    document.getElementById('loanModal').style.display = 'none';
+    const loanModal = document.getElementById('loanModal');
+    if (loanModal) {
+        loanModal.style.display = 'none';
+    }
 }
+
+// 滑桿事件處理器（儲存引用以便移除）
+const sliderHandlers = new Map();
 
 // 滑桿值更新
 function bindSliderEvents() {
@@ -325,34 +347,60 @@ function bindSliderEvents() {
     const interestRateSlider = document.getElementById('modalInterestRate');
     const agentFeeSlider = document.getElementById('modalAgentFee');
     
+    // 先移除舊的監聽器
+    if (loanRatioSlider && sliderHandlers.has('loanRatio')) {
+        loanRatioSlider.removeEventListener('input', sliderHandlers.get('loanRatio'));
+    }
+    if (loanYearsSlider && sliderHandlers.has('loanYears')) {
+        loanYearsSlider.removeEventListener('input', sliderHandlers.get('loanYears'));
+    }
+    if (interestRateSlider && sliderHandlers.has('interestRate')) {
+        interestRateSlider.removeEventListener('input', sliderHandlers.get('interestRate'));
+    }
+    if (agentFeeSlider && sliderHandlers.has('agentFee')) {
+        agentFeeSlider.removeEventListener('input', sliderHandlers.get('agentFee'));
+    }
+    
+    // 添加新的監聽器
     if (loanRatioSlider) {
-        loanRatioSlider.addEventListener('input', function() {
+        const handler = function() {
             document.getElementById('modalLoanRatioValue').textContent = this.value + '%';
             calculateModalLoan();
-        });
+        };
+        loanRatioSlider.addEventListener('input', handler);
+        sliderHandlers.set('loanRatio', handler);
     }
     
     if (loanYearsSlider) {
-        loanYearsSlider.addEventListener('input', function() {
+        const handler = function() {
             document.getElementById('modalLoanYearsValue').textContent = this.value + '年';
             calculateModalLoan();
-        });
+        };
+        loanYearsSlider.addEventListener('input', handler);
+        sliderHandlers.set('loanYears', handler);
     }
     
     if (interestRateSlider) {
-        interestRateSlider.addEventListener('input', function() {
+        const handler = function() {
             document.getElementById('modalInterestRateValue').textContent = this.value + '%';
             calculateModalLoan();
-        });
+        };
+        interestRateSlider.addEventListener('input', handler);
+        sliderHandlers.set('interestRate', handler);
     }
     
     if (agentFeeSlider) {
-        agentFeeSlider.addEventListener('input', function() {
+        const handler = function() {
             document.getElementById('modalAgentFeeValue').textContent = this.value + '%';
             calculateModalLoan();
-        });
+        };
+        agentFeeSlider.addEventListener('input', handler);
+        sliderHandlers.set('agentFee', handler);
     }
 }
+
+// 輸入框事件處理器（儲存引用以便移除）
+const inputHandlers = new Map();
 
 // 綁定輸入框事件
 function bindInputEvents() {
@@ -360,7 +408,14 @@ function bindInputEvents() {
     inputs.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
-            input.addEventListener('input', calculateModalLoan);
+            // 先移除舊的監聽器
+            if (inputHandlers.has(id)) {
+                input.removeEventListener('input', inputHandlers.get(id));
+            }
+            // 添加新的監聽器
+            const handler = calculateModalLoan;
+            input.addEventListener('input', handler);
+            inputHandlers.set(id, handler);
         }
     });
     
@@ -368,7 +423,16 @@ function bindInputEvents() {
     selects.forEach(id => {
         const select = document.getElementById(id);
         if (select) {
-            select.addEventListener('change', calculateModalLoan);
+            // 先移除舊的監聽器
+            if (inputHandlers.has(id)) {
+                select.removeEventListener('change', inputHandlers.get(id));
+            }
+            // 添加新的監聽器
+            const handler = id === 'modalExistingLoan' ? function() {
+                adjustLoanConditions();
+            } : calculateModalLoan;
+            select.addEventListener('change', handler);
+            inputHandlers.set(id, handler);
         }
     });
 }
@@ -425,93 +489,109 @@ function adjustLoanConditions() {
 
 // 貸款試算計算功能
 function calculateModalLoan() {
-    const housePrice = parseFloat(document.getElementById('modalHousePrice').value) * 10000;
-    const loanRatio = parseFloat(document.getElementById('modalLoanRatio').value) / 100;
-    const loanYears = parseInt(document.getElementById('modalLoanYears').value);
-    const interestRate = parseFloat(document.getElementById('modalInterestRate').value) / 100;
-    const gracePeriod = parseInt(document.getElementById('modalGracePeriod').value) || 0;
-    const serviceFee = parseFloat(document.getElementById('modalServiceFee').value) || 0;
-    const notaryFee = parseFloat(document.getElementById('modalNotaryFee').value) || 0;
-    const agentFeeRate = parseFloat(document.getElementById('modalAgentFee').value) || 0;
-    const agentFee = housePrice * (agentFeeRate / 100);
-    const repaymentType = document.getElementById('modalRepaymentType').value;
-    const monthlyIncome = parseFloat(document.getElementById('modalMonthlyIncome').value) * 10000 || 0;
-    const otherExpenses = parseFloat(document.getElementById('modalOtherExpenses').value) * 10000 || 0;
-    const existingLoan = document.getElementById('modalExistingLoan').value;
-    
-    if (!housePrice || housePrice <= 0) {
-        return;
-    }
-    
-    // 基本計算
-    const loanAmount = housePrice * loanRatio;
-    const downPayment = housePrice - loanAmount;
-    
-    // 新青安混合貸款計算
-    let youthLoanAmount = 0;
-    let normalLoanAmount = 0;
-    let youthInterestRate = interestRate;
-    let normalInterestRate = interestRate;
-    
-    if (existingLoan === 'youth') {
-        youthLoanAmount = Math.min(loanAmount, 10000000);
-        normalLoanAmount = Math.max(0, loanAmount - 10000000);
-        youthInterestRate = 1.8 / 100;
-        normalInterestRate = 2.8 / 100;
-    }
-    
-    // 貸款計算
-    const totalMonths = loanYears * 12;
-    const graceMonths = gracePeriod * 12;
-    const remainingMonths = totalMonths - graceMonths;
-    
-    // 計算月付金額
-    let gracePayment = 0;
-    let normalPayment = 0;
-    
-    if (existingLoan === 'youth' && youthLoanAmount > 0) {
-        // 新青安混合貸款
-        const youthMonthlyRate = youthInterestRate / 12;
-        const normalMonthlyRate = normalInterestRate / 12;
+    try {
+        const modalHousePrice = document.getElementById('modalHousePrice');
+        const modalLoanResults = document.getElementById('modalLoanResults');
         
-        gracePayment = (youthLoanAmount * youthMonthlyRate) + (normalLoanAmount * normalMonthlyRate);
-        
-        if (remainingMonths > 0) {
-            const youthNormalPayment = youthLoanAmount * youthMonthlyRate * Math.pow(1 + youthMonthlyRate, remainingMonths) / 
-                                     (Math.pow(1 + youthMonthlyRate, remainingMonths) - 1);
-            const normalNormalPayment = normalLoanAmount > 0 ? 
-                normalLoanAmount * normalMonthlyRate * Math.pow(1 + normalMonthlyRate, remainingMonths) / 
-                (Math.pow(1 + normalMonthlyRate, remainingMonths) - 1) : 0;
-            normalPayment = youthNormalPayment + normalNormalPayment;
+        if (!modalHousePrice || !modalLoanResults) {
+            console.error('❌ 找不到貸款試算相關元素');
+            return;
         }
-    } else {
-        // 一般貸款
-        const monthlyRate = interestRate / 12;
-        gracePayment = loanAmount * monthlyRate;
         
-        if (remainingMonths > 0) {
-            if (repaymentType === 'equal_payment') {
-                normalPayment = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths) / 
-                              (Math.pow(1 + monthlyRate, remainingMonths) - 1);
-            } else {
-                // 等額本金
-                const principalPayment = loanAmount / remainingMonths;
-                normalPayment = principalPayment + (loanAmount * monthlyRate);
+        const housePriceInput = parseFloat(modalHousePrice.value);
+        if (!housePriceInput || housePriceInput <= 0 || isNaN(housePriceInput)) {
+            modalLoanResults.innerHTML = `
+                <div class="text-center text-gray-500 py-4">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                    <p style="font-size: 0.75rem;">請輸入房屋價格開始計算</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const housePrice = housePriceInput * 10000;
+        const loanRatio = parseFloat(document.getElementById('modalLoanRatio').value) / 100;
+        const loanYears = parseInt(document.getElementById('modalLoanYears').value);
+        const interestRate = parseFloat(document.getElementById('modalInterestRate').value) / 100;
+        const gracePeriod = parseInt(document.getElementById('modalGracePeriod').value) || 0;
+        const serviceFee = parseFloat(document.getElementById('modalServiceFee').value) || 0;
+        const notaryFee = parseFloat(document.getElementById('modalNotaryFee').value) || 0;
+        const agentFeeRate = parseFloat(document.getElementById('modalAgentFee').value) || 0;
+        const agentFee = housePrice * (agentFeeRate / 100);
+        const repaymentType = document.getElementById('modalRepaymentType').value;
+        const monthlyIncome = parseFloat(document.getElementById('modalMonthlyIncome').value) * 10000 || 0;
+        const otherExpenses = parseFloat(document.getElementById('modalOtherExpenses').value) * 10000 || 0;
+        const existingLoan = document.getElementById('modalExistingLoan').value;
+        
+        // 基本計算
+        const loanAmount = housePrice * loanRatio;
+        const downPayment = housePrice - loanAmount;
+        
+        // 新青安混合貸款計算
+        let youthLoanAmount = 0;
+        let normalLoanAmount = 0;
+        let youthInterestRate = interestRate;
+        let normalInterestRate = interestRate;
+        
+        if (existingLoan === 'youth') {
+            youthLoanAmount = Math.min(loanAmount, 10000000);
+            normalLoanAmount = Math.max(0, loanAmount - 10000000);
+            youthInterestRate = 1.8 / 100;
+            normalInterestRate = 2.8 / 100;
+        }
+        
+        // 貸款計算
+        const totalMonths = loanYears * 12;
+        const graceMonths = gracePeriod * 12;
+        const remainingMonths = totalMonths - graceMonths;
+        
+        // 計算月付金額
+        let gracePayment = 0;
+        let normalPayment = 0;
+        
+        if (existingLoan === 'youth' && youthLoanAmount > 0) {
+            // 新青安混合貸款
+            const youthMonthlyRate = youthInterestRate / 12;
+            const normalMonthlyRate = normalInterestRate / 12;
+            
+            gracePayment = (youthLoanAmount * youthMonthlyRate) + (normalLoanAmount * normalMonthlyRate);
+            
+            if (remainingMonths > 0) {
+                const youthNormalPayment = youthLoanAmount * youthMonthlyRate * Math.pow(1 + youthMonthlyRate, remainingMonths) / 
+                                         (Math.pow(1 + youthMonthlyRate, remainingMonths) - 1);
+                const normalNormalPayment = normalLoanAmount > 0 ? 
+                    normalLoanAmount * normalMonthlyRate * Math.pow(1 + normalMonthlyRate, remainingMonths) / 
+                    (Math.pow(1 + normalMonthlyRate, remainingMonths) - 1) : 0;
+                normalPayment = youthNormalPayment + normalNormalPayment;
+            }
+        } else {
+            // 一般貸款
+            const monthlyRate = interestRate / 12;
+            gracePayment = loanAmount * monthlyRate;
+            
+            if (remainingMonths > 0) {
+                if (repaymentType === 'equal_payment') {
+                    normalPayment = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths) / 
+                                  (Math.pow(1 + monthlyRate, remainingMonths) - 1);
+                } else {
+                    // 等額本金
+                    const principalPayment = loanAmount / remainingMonths;
+                    normalPayment = principalPayment + (loanAmount * monthlyRate);
+                }
             }
         }
-    }
-    
-    // 計算總費用
-    const totalFees = serviceFee + notaryFee + agentFee;
-    const totalCost = downPayment + totalFees;
-    
-    // 計算負擔比
-    const currentPayment = gracePeriod > 0 ? gracePayment : normalPayment;
-    const availableIncome = monthlyIncome - otherExpenses;
-    const debtRatio = availableIncome > 0 ? (currentPayment / availableIncome) * 100 : 0;
-    
-    // 生成結果 HTML
-    let resultsHTML = `
+        
+        // 計算總費用
+        const totalFees = serviceFee + notaryFee + agentFee;
+        const totalCost = downPayment + totalFees;
+        
+        // 計算負擔比
+        const currentPayment = gracePeriod > 0 ? gracePayment : normalPayment;
+        const availableIncome = monthlyIncome - otherExpenses;
+        const debtRatio = availableIncome > 0 ? (currentPayment / availableIncome) * 100 : 0;
+        
+        // 生成結果 HTML
+        let resultsHTML = `
         <div class="loan-result-card">
             <div class="loan-result-title">💰 貸款資訊</div>
             <div class="loan-result-grid">
@@ -576,15 +656,19 @@ function calculateModalLoan() {
             </div>
         </div>
     `;
-    
-    document.getElementById('modalLoanResults').innerHTML = resultsHTML;
-}
-
-// 點擊背景關閉彈窗
-window.onclick = function(event) {
-    const loanModal = document.getElementById('loanModal');
-    if (event.target === loanModal) {
-        closeLoanModal();
+        
+        modalLoanResults.innerHTML = resultsHTML;
+    } catch (error) {
+        console.error('❌ 貸款試算計算錯誤:', error);
+        const modalLoanResults = document.getElementById('modalLoanResults');
+        if (modalLoanResults) {
+            modalLoanResults.innerHTML = `
+                <div class="text-center text-red-500 py-4">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚠️</div>
+                    <p style="font-size: 0.75rem;">計算時發生錯誤，請重新輸入</p>
+                </div>
+            `;
+        }
     }
 }
 
@@ -1306,7 +1390,42 @@ window.addEventListener('apiDataLoaded', function() {
     }, { once: false });
 }
 
+// 暴露貸款試算函數到全域
+window.showLoanCalculator = showLoanCalculator;
+window.openLoanModal = openLoanModal;
+window.closeLoanModal = closeLoanModal;
+window.adjustLoanConditions = adjustLoanConditions;
+window.calculateModalLoan = calculateModalLoan;
+
+// 點擊背景關閉貸款試算彈窗
+window.addEventListener('click', function(event) {
+    const loanModal = document.getElementById('loanModal');
+    if (event.target === loanModal) {
+        closeLoanModal();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
+    // 初始化貸款試算功能
+    setTimeout(() => {
+        console.log('🔧 初始化貸款試算功能...');
+        try {
+            bindSliderEvents();
+            bindInputEvents();
+            // 初始計算一次（如果有預設值）
+            const housePrice = document.getElementById('modalHousePrice');
+            if (housePrice && housePrice.value) {
+                console.log('💰 執行初始計算，房屋價格:', housePrice.value);
+                calculateModalLoan();
+            } else {
+                console.log('⏳ 等待輸入房屋價格...');
+            }
+            console.log('✅ 貸款試算功能初始化完成');
+        } catch (error) {
+            console.error('❌ 貸款試算功能初始化失敗:', error);
+        }
+    }, 100);
+    
     // 等待資料載入後再初始化分頁系統
     function initializePaginationSystem() {
         // 確保 embeddedPropertiesData 存在且有資料

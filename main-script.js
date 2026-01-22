@@ -1341,8 +1341,7 @@ window.addEventListener('supabaseDataLoaded', function(event) {
         console.warn('⚠️ Supabase 資料載入事件觸發，但 embeddedPropertiesData 不存在');
         isUpdatingPagination = false;
     }
-    }, { once: false });
-}
+}, { once: false });
 
 // 監聽 API 資料載入事件（備用）- 在 DOMContentLoaded 之前設置
 // 🔥 注意：只有在 Supabase 載入失敗時才會觸發此事件

@@ -36,6 +36,7 @@ class EmbeddedPropertyPaginationSystem {
         // 🔥 新增：雙重篩選
         this.buildingFilter = 'all'; // 建築類型篩選
         this.roomFilter = 'all'; // 房型篩選
+        this.districtFilter = ''; // 行政區篩選
         
         // 🔥 新增：緩存機制
         this.filteredCache = null;
@@ -121,6 +122,9 @@ class EmbeddedPropertyPaginationSystem {
                             this.cardCache.clear();
                         }
                         
+                        // 更新行政區選項
+                        this.updateDistrictOptions();
+                        
                         // 重新渲染
                         this.renderProperties();
                     } else if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties) {
@@ -128,6 +132,10 @@ class EmbeddedPropertyPaginationSystem {
                         this.allProperties = embeddedPropertiesData.properties || [];
                         this.properties = this.allProperties.filter(p => p.status !== 'sold');
                         this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
+                        
+                        // 更新行政區選項
+                        this.updateDistrictOptions();
+                        
                         this.renderProperties();
                     } else {
                         // 繼續檢查
@@ -149,8 +157,8 @@ class EmbeddedPropertyPaginationSystem {
     }
 
     getFilteredProperties() {
-        // 🔥 新增：檢查緩存（包含雙重篩選）
-        const newCacheKey = `${this.buildingFilter}_${this.roomFilter}_${this.searchTerm}`;
+        // 🔥 新增：檢查緩存（包含雙重篩選和行政區篩選）
+        const newCacheKey = `${this.buildingFilter}_${this.roomFilter}_${this.districtFilter}_${this.searchTerm}`;
         if (this.cacheKey === newCacheKey && this.filteredCache) {
             console.log('📦 使用緩存的篩選結果');
             return this.filteredCache;
@@ -158,6 +166,27 @@ class EmbeddedPropertyPaginationSystem {
         
         console.log('🔄 重新計算篩選結果');
         let filtered = this.properties;
+        
+        // 🔥 行政區篩選（優先處理）
+        if (this.districtFilter) {
+            filtered = filtered.filter(property => {
+                // 檢查物件的 district 欄位或從 address 中提取行政區
+                const propertyDistrict = property.district || '';
+                const propertyAddress = property.address || '';
+                
+                // 如果 district 欄位存在且匹配
+                if (propertyDistrict && propertyDistrict.includes(this.districtFilter)) {
+                    return true;
+                }
+                
+                // 如果 district 欄位不存在，從 address 中提取行政區
+                if (propertyAddress.includes(this.districtFilter)) {
+                    return true;
+                }
+                
+                return false;
+            });
+        }
         
         // 🔥 建築類型篩選
         if (this.buildingFilter !== 'all') {
@@ -1061,6 +1090,9 @@ class EmbeddedPropertyPaginationSystem {
         
         // 🔥 新增：組合篩選條件顯示
         const filterConditions = [];
+        if (this.districtFilter) {
+            filterConditions.push(`📍 ${this.districtFilter}`);
+        }
         if (this.buildingFilter !== 'all') {
             filterConditions.push(`🏗️ ${this.buildingFilter}`);
         }
@@ -1304,6 +1336,74 @@ class EmbeddedPropertyPaginationSystem {
         }, this.debounceDelay);
     }
 
+    // 更新行政區選項（只顯示有物件的行政區）
+    updateDistrictOptions() {
+        const districtSelect = document.getElementById('district-filter');
+        if (!districtSelect) return;
+        
+        // 桃園市所有行政區列表
+        const allDistricts = [
+            '中壢區', '平鎮區', '龍潭區', '楊梅區', '新屋區', '觀音區',
+            '桃園區', '龜山區', '八德區', '大溪區', '復興區', '大園區',
+            '蘆竹區'
+        ];
+        
+        // 從物件中提取所有存在的行政區
+        const existingDistricts = new Set();
+        
+        this.properties.forEach(property => {
+            // 優先使用 district 欄位
+            if (property.district) {
+                // 提取行政區名稱（移除「區」字，然後加上「區」確保格式一致）
+                const district = property.district.replace(/區$/, '') + '區';
+                if (allDistricts.includes(district)) {
+                    existingDistricts.add(district);
+                }
+            }
+            
+            // 如果 district 欄位不存在，從 address 中提取
+            if (property.address) {
+                allDistricts.forEach(district => {
+                    if (property.address.includes(district)) {
+                        existingDistricts.add(district);
+                    }
+                });
+            }
+        });
+        
+        // 保存當前選中的值
+        const currentValue = districtSelect.value;
+        
+        // 清空選項（保留「全部行政區」）
+        districtSelect.innerHTML = '<option value="">全部行政區</option>';
+        
+        // 按順序添加有物件的行政區
+        allDistricts.forEach(district => {
+            if (existingDistricts.has(district)) {
+                const option = document.createElement('option');
+                option.value = district;
+                option.textContent = district;
+                districtSelect.appendChild(option);
+            }
+        });
+        
+        // 恢復選中的值（如果還存在）
+        if (currentValue && existingDistricts.has(currentValue)) {
+            districtSelect.value = currentValue;
+        }
+        
+        console.log('✅ 已更新行政區選項，共有', existingDistricts.size, '個行政區有物件');
+    }
+    
+    // 設置行政區篩選
+    setDistrictFilter(district) {
+        this.districtFilter = district || '';
+        this.currentPage = 1;
+        this.filteredCache = null; // 清除緩存
+        this.cacheKey = '';
+        this.renderProperties();
+    }
+    
     setupEventListeners() {
         // 確保所有必要的元素都存在
         try {
@@ -1319,6 +1419,23 @@ class EmbeddedPropertyPaginationSystem {
                 });
             } else {
                 console.warn('⚠️ property-search 元素不存在');
+            }
+            
+            // 行政區篩選功能
+            const districtSelect = document.getElementById('district-filter');
+            if (districtSelect) {
+                districtSelect.addEventListener('change', (e) => {
+                    try {
+                        this.setDistrictFilter(e.target.value);
+                    } catch (error) {
+                        console.error('行政區篩選錯誤:', error);
+                    }
+                });
+                
+                // 初始化時更新行政區選項
+                this.updateDistrictOptions();
+            } else {
+                console.warn('⚠️ district-filter 元素不存在');
             }
         } catch (error) {
             console.error('設置搜尋事件監聽器失敗:', error);

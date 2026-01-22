@@ -782,10 +782,276 @@
             transform: translateY(0);
         }
         
+        /* 手機版響應式設計 */
         @media (max-width: 768px) {
+            /* 基本佈局調整 */
+            .container {
+                padding: 1rem;
+                max-width: 100%;
+            }
+            
+            /* Header 優化 */
+            .header {
+                padding: 1rem;
+                position: relative;
+            }
+            
+            .header h1 {
+                font-size: 1.2rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .header p {
+                font-size: 0.8rem;
+            }
+            
+            /* 漢堡選單按鈕 */
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                padding: 0.5rem;
+                border-radius: 4px;
+                cursor: pointer;
+                z-index: 1001;
+            }
+            
+            .mobile-menu-btn:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+            
+            /* 導航欄改為側邊抽屜 */
+            .nav {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                background: white;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+                z-index: 1000;
+                transition: left 0.3s ease;
+                flex-direction: column;
+                padding: 3rem 0 0 0;
+                overflow-y: auto;
+            }
+            
+            .nav.active {
+                left: 0;
+            }
+            
+            /* 側邊欄遮罩 */
+            .nav-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            
+            .nav-overlay.active {
+                display: block;
+            }
+            
+            .nav-item {
+                padding: 1rem 1.5rem;
+                border-bottom: 1px solid #e9ecef;
+                border-left: 4px solid transparent;
+                border-bottom-width: 1px;
+            }
+            
+            .nav-item.active {
+                border-left-color: #667eea;
+                background: #f8f9fa;
+            }
+            
+            /* 關閉按鈕 */
+            .nav-close-btn {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: #666;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            
+            /* 統計卡片優化 */
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-card h3 {
+                font-size: 0.85rem;
+            }
+            
+            .stat-card .value {
+                font-size: 1.5rem;
+            }
+            
+            /* 搜尋和篩選區域優化 */
+            .search-box {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .search-box input,
+            .search-box select {
+                width: 100%;
+            }
+            
+            /* 篩選按鈕優化 */
+            .filter-buttons {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .filter-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+                flex: 1;
+                min-width: calc(50% - 0.25rem);
+            }
+            
+            /* 檢視模式切換優化 */
+            .view-mode-toggle {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            
+            /* 表格改為卡片式顯示 */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .table {
+                min-width: 800px;
+            }
+            
+            /* 物件卡片模式（手機版預設） */
+            .properties-grid-view {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .property-card-mobile {
+                background: white;
+                border-radius: 8px;
+                padding: 1rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin-bottom: 1rem;
+            }
+            
+            .property-card-mobile-header {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .property-card-mobile-image {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 6px;
+            }
+            
+            .property-card-mobile-info {
+                flex: 1;
+            }
+            
+            .property-card-mobile-title {
+                font-size: 1rem;
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+                color: #333;
+            }
+            
+            .property-card-mobile-number {
+                font-size: 0.85rem;
+                color: #666;
+            }
+            
+            .property-card-mobile-details {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid #e9ecef;
+            }
+            
+            .property-card-mobile-detail-item {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .property-card-mobile-detail-label {
+                font-size: 0.75rem;
+                color: #999;
+                margin-bottom: 0.25rem;
+            }
+            
+            .property-card-mobile-detail-value {
+                font-size: 0.9rem;
+                color: #333;
+                font-weight: 500;
+            }
+            
+            .property-card-mobile-actions {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+            
+            .property-card-mobile-actions .btn {
+                flex: 1;
+                min-width: calc(50% - 0.25rem);
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            /* 內容卡片優化 */
+            .content-card {
+                padding: 1rem;
+            }
+            
+            .content-card h2 {
+                font-size: 1.2rem;
+            }
+            
+            /* 快速操作按鈕優化 */
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .quick-actions .btn {
+                width: 100%;
+            }
+            
+            /* Modal 優化 */
             .modal-dialog {
                 width: 95%;
                 margin: 1rem;
+                max-height: 90vh;
+                overflow-y: auto;
             }
             
             .modal-header {
@@ -802,6 +1068,29 @@
             
             .modal-btn {
                 width: 100%;
+            }
+            
+            /* 子標籤切換優化 */
+            .sub-tab-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* 桌面版隱藏漢堡選單 */
+        @media (min-width: 769px) {
+            .mobile-menu-btn,
+            .nav-close-btn,
+            .nav-overlay {
+                display: none !important;
+            }
+            
+            .nav {
+                position: static;
+                width: auto;
+                height: auto;
+                flex-direction: row;
+                padding: 0 2rem;
             }
         }
         
@@ -1000,15 +1289,20 @@
 </head>
 <body>
     <div class="header">
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
         <h1>🏠 後台管理系統</h1>
         <p>物件管理、上下架控制、連結管理</p>
     </div>
     
-    <div class="nav">
-        <div class="nav-item active" onclick="switchTab('dashboard', this)">📊 儀表板</div>
-        <div class="nav-item" onclick="switchTab('properties', this)">🏘️ 物件管理</div>
-        <div class="nav-item" onclick="switchTab('duplicates', this)">🔍 重複物件檢測</div>
-        <div class="nav-item" onclick="switchTab('links', this)">🔗 連結管理</div>
+    <!-- 側邊欄遮罩 -->
+    <div class="nav-overlay" onclick="toggleMobileMenu()"></div>
+    
+    <div class="nav" id="main-nav">
+        <button class="nav-close-btn" onclick="toggleMobileMenu()">×</button>
+        <div class="nav-item active" onclick="switchTab('dashboard', this); toggleMobileMenu();">📊 儀表板</div>
+        <div class="nav-item" onclick="switchTab('properties', this); toggleMobileMenu();">🏘️ 物件管理</div>
+        <div class="nav-item" onclick="switchTab('duplicates', this); toggleMobileMenu();">🔍 重複物件檢測</div>
+        <div class="nav-item" onclick="switchTab('links', this); toggleMobileMenu();">🔗 連結管理</div>
     </div>
     
     <div class="container">
@@ -1096,7 +1390,7 @@
                         </select>
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
                         <div class="filter-buttons" style="margin: 0;">
                             <button class="filter-btn active" onclick="setFilter('all', this)">全部</button>
                             <button class="filter-btn" onclick="setFilter('published', this)">已上架</button>
@@ -1105,7 +1399,7 @@
                             <button class="filter-btn" onclick="setFilter('internal', this)">🏠 本店物件</button>
                             <button class="filter-btn" onclick="setFilter('external', this)">🏢 非本店物件</button>
                         </div>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <div class="view-mode-toggle" style="display: flex; gap: 0.5rem; align-items: center;">
                             <span style="color: #666; font-size: 0.9rem; margin-right: 0.5rem;">檢視模式：</span>
                             <button class="filter-btn active" id="view-table-btn" onclick="setViewMode('table', this)" style="padding: 0.4rem 0.8rem;">
                                 📋 表格
@@ -2256,20 +2550,91 @@
                     </div>
                 `;
             } else {
-                // 表格模式
-                listDiv.innerHTML = `
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>物件</th>
-                                <th>來源</th>
-                                <th>房型</th>
-                                <th>價格</th>
-                                <th>上架狀態</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                // 表格模式（手機上自動改為卡片式）
+                if (isMobileDevice()) {
+                    // 手機版：使用卡片式顯示
+                    listDiv.innerHTML = `
+                        <div class="properties-grid-view">
+                            ${filtered.map(prop => {
+                                const images = Array.isArray(prop.images) ? prop.images : [];
+                                const imgUrl = images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0].url) : '';
+                                const publishedBadge = prop.is_published 
+                                    ? '<span class="badge badge-success">✅ 已上架</span>' 
+                                    : '<span class="badge badge-danger">❌ 已下架</span>';
+                                
+                                const isExternal = prop.is_external === true || prop.is_external === 'true';
+                                const sourceBadge = isExternal 
+                                    ? '<span class="badge" style="background: #ff9800; color: white;">🏢 非本店</span>' 
+                                    : '<span class="badge" style="background: #28a745; color: white;">🏠 本店</span>';
+                                
+                                const safeTitle = escapeHtml(prop.title || '未命名物件');
+                                const safeNumber = escapeHtml(prop.number || 'N/A');
+                                const safeType = escapeHtml(prop.type || 'N/A');
+                                const safePrice = escapeHtml(prop.price || 'N/A');
+                                const safeAddress = escapeHtml(prop.address || 'N/A');
+                                const safeId = escapeHtml(prop.id);
+                                const safeImgUrl = imgUrl ? escapeHtml(imgUrl) : '';
+                                const isPublished = prop.is_published;
+                                
+                                return `
+                                    <div class="property-card-mobile">
+                                        <div class="property-card-mobile-header">
+                                            ${safeImgUrl 
+                                                ? `<img src="${safeImgUrl}" alt="${safeTitle}" class="property-card-mobile-image" onerror="this.style.display='none';">`
+                                                : '<div class="property-card-mobile-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 2rem;">🏠</div>'
+                                            }
+                                            <div class="property-card-mobile-info">
+                                                <div class="property-card-mobile-title">${safeTitle}</div>
+                                                <div class="property-card-mobile-number">${safeNumber}</div>
+                                            </div>
+                                        </div>
+                                        <div class="property-card-mobile-details">
+                                            <div class="property-card-mobile-detail-item">
+                                                <div class="property-card-mobile-detail-label">來源</div>
+                                                <div class="property-card-mobile-detail-value">${sourceBadge}</div>
+                                            </div>
+                                            <div class="property-card-mobile-detail-item">
+                                                <div class="property-card-mobile-detail-label">房型</div>
+                                                <div class="property-card-mobile-detail-value">${safeType}</div>
+                                            </div>
+                                            <div class="property-card-mobile-detail-item">
+                                                <div class="property-card-mobile-detail-label">價格</div>
+                                                <div class="property-card-mobile-detail-value">${safePrice}</div>
+                                            </div>
+                                            <div class="property-card-mobile-detail-item">
+                                                <div class="property-card-mobile-detail-label">狀態</div>
+                                                <div class="property-card-mobile-detail-value">${publishedBadge}</div>
+                                            </div>
+                                        </div>
+                                        <div class="property-card-mobile-actions">
+                                            <button class="btn btn-primary btn-small" onclick="openPropertyDetail({id: '${safeId}', number: '${safeNumber || ''}'})">👁️ 查看</button>
+                                            <button class="btn btn-info btn-small" onclick="copyPropertyLink({id: '${safeId}', number: '${safeNumber || ''}'})">📋 連結</button>
+                                            <button class="btn btn-info btn-small" onclick="downloadQRCode({id: '${safeId}', number: '${safeNumber || ''}'})">📱 QR</button>
+                                            <button class="btn ${isPublished ? 'btn-danger' : 'btn-success'} btn-small" data-property-id="${safeId}" data-action="toggle" data-status="${!isPublished}">${isPublished ? '⬇️ 下架' : '⬆️ 上架'}</button>
+                                            <button class="btn btn-secondary btn-small" data-property-id="${safeId}" data-action="edit">✏️ 編輯</button>
+                                            <button class="btn btn-danger btn-small" data-property-id="${safeId}" data-action="delete" title="刪除">🗑️</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                } else {
+                    // 桌面版：使用表格顯示（可橫向滾動）
+                    listDiv.innerHTML = `
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>物件</th>
+                                        <th>來源</th>
+                                        <th>房型</th>
+                                        <th>價格</th>
+                                        <th>上架狀態</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                             ${filtered.map(prop => {
                                 const images = Array.isArray(prop.images) ? prop.images : [];
                                 const imgUrl = images.length > 0 ? (typeof images[0] === 'string' ? images[0] : images[0].url) : '';
@@ -2353,9 +2718,11 @@
                                     </tr>
                                 `;
                             }).join('')}
-                        </tbody>
-                    </table>
-                `;
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
             }
         }
         
@@ -2367,6 +2734,29 @@
             });
             element.classList.add('active');
             renderProperties();
+        }
+        
+        // 切換手機選單
+        function toggleMobileMenu() {
+            const nav = document.getElementById('main-nav');
+            const overlay = document.querySelector('.nav-overlay');
+            
+            if (nav && overlay) {
+                nav.classList.toggle('active');
+                overlay.classList.toggle('active');
+                
+                // 防止背景滾動
+                if (nav.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+        
+        // 檢測是否為手機裝置
+        function isMobileDevice() {
+            return window.innerWidth <= 768;
         }
         
         // 設定視圖模式

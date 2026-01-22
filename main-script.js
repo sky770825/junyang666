@@ -1316,6 +1316,11 @@ window.addEventListener('supabaseDataLoaded', function(event) {
                 embeddedPaginationSystem.cardCache.clear();
             }
             
+            // 更新行政區選項（只顯示有物件的行政區）
+            if (typeof embeddedPaginationSystem.updateDistrictOptions === 'function') {
+                embeddedPaginationSystem.updateDistrictOptions();
+            }
+            
             // 重新渲染
             embeddedPaginationSystem.renderProperties();
             

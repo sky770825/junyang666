@@ -2245,12 +2245,25 @@
                     </button>
                 </div>
                 
-                <!-- 搜尋框 -->
-                <div style="margin-bottom: 1.5rem;">
+                <!-- 搜尋框和行政區篩選 -->
+                <div style="margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
                     <input type="text" id="property-search" placeholder="搜尋物件名稱、地址、社區..." 
                            style="width: 300px; max-width: 90%; padding: 0.8rem 1rem; border: 2px solid #e9ecef; border-radius: 25px; font-size: 1rem; outline: none; transition: all 0.3s ease;"
                            onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
                            onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
+                    
+                    <!-- 地址社區篩選 -->
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
+                        <span style="font-size: 0.9rem; color: #666; font-weight: 500;">📍 地址社區：</span>
+                        <span style="font-size: 0.9rem; color: #667eea; font-weight: 600; padding: 0.3rem 0.8rem; background: #f0f4ff; border-radius: 8px;">桃園市</span>
+                        <select id="district-filter" 
+                                style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 12px; font-size: 0.9rem; outline: none; transition: all 0.3s ease; cursor: pointer; min-width: 120px;"
+                                onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                                onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
+                            <option value="">全部行政區</option>
+                            <!-- 行政區選項將由 JavaScript 動態生成 -->
+                        </select>
+                    </div>
                 </div>
                 
                 <!-- 建築類型篩選 -->

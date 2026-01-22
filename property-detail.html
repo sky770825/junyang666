@@ -488,7 +488,7 @@
 <body>
     <div class="header">
         <div class="header-content">
-            <a href="index.html" class="back-button">
+            <a href="../index.html" class="back-button" id="back-button-link">
                 <i class="fas fa-arrow-left"></i> 返回首頁
             </a>
             <h1 style="font-size: 1.2rem; margin: 0;">物件詳細資訊</h1>
@@ -517,10 +517,47 @@
     <!-- 相關連結載入器 -->
     <!-- 相關連結前端顯示模組（從後端 API 載入） -->
     <!-- Supabase 配置（包含預設連結資料） -->
-    <script src="supabase-config.js"></script>
-    
-    <!-- 相關連結前端顯示模組（從後端 API 載入） -->
-    <script src="modules/related-links/frontend.js"></script>
+    <!-- 使用動態路徑處理，支援不同目錄結構 -->
+    <script>
+        // 動態計算正確的基礎路徑
+        (function() {
+            const currentPath = window.location.pathname;
+            let basePath = './';
+            
+            // 如果路徑包含 admin-dashboard，使用相對路徑
+            if (currentPath.includes('/admin-dashboard/')) {
+                basePath = '../';
+            } else if (currentPath.includes('/')) {
+                // 計算需要返回的層級
+                const depth = currentPath.split('/').filter(p => p && !p.includes('.html')).length - 1;
+                basePath = depth > 0 ? '../'.repeat(depth) : './';
+            }
+            
+            console.log('📁 計算的基礎路徑:', basePath, '當前路徑:', currentPath);
+            
+            // 載入 supabase-config.js
+            const configScript = document.createElement('script');
+            configScript.src = basePath + 'supabase-config.js';
+            configScript.onerror = function() {
+                console.error('❌ 無法載入 supabase-config.js，使用內建配置');
+            };
+            configScript.onload = function() {
+                console.log('✅ supabase-config.js 載入成功');
+            };
+            document.head.appendChild(configScript);
+            
+            // 載入 frontend.js
+            const frontendScript = document.createElement('script');
+            frontendScript.src = basePath + 'modules/related-links/frontend.js';
+            frontendScript.onerror = function() {
+                console.error('❌ 無法載入 frontend.js');
+            };
+            frontendScript.onload = function() {
+                console.log('✅ frontend.js 載入成功');
+            };
+            document.head.appendChild(frontendScript);
+        })();
+    </script>
     
     <script>
         // Supabase 設定（獨立頁面不需要載入所有物件資料，直接使用設定值）
@@ -694,9 +731,21 @@
         // 載入物件資料
         async function loadProperty() {
             console.log('🚀 開始載入物件資料...');
+            console.log('🔍 環境檢查:', {
+                supabase: typeof supabase !== 'undefined',
+                SUPABASE_CONFIG: typeof SUPABASE_CONFIG !== 'undefined',
+                createSupabaseClient: typeof createSupabaseClient !== 'undefined',
+                windowSupabaseClient: typeof window.supabaseClient !== 'undefined'
+            });
+            
             const loadingEl = document.getElementById('loading');
             const errorEl = document.getElementById('error');
             const pageEl = document.getElementById('property-page');
+            
+            if (!loadingEl || !errorEl || !pageEl) {
+                console.error('❌ 找不到必要的 DOM 元素');
+                return;
+            }
             
             try {
                 const { number, id } = getPropertyIdentifier();
@@ -704,6 +753,11 @@
                 
                 if (!number && !id) {
                     throw new Error('請提供物件編號或 ID');
+                }
+                
+                // 檢查 Supabase SDK 是否已載入
+                if (typeof supabase === 'undefined') {
+                    throw new Error('Supabase SDK 尚未載入，請重新整理頁面');
                 }
                 
                 // 使用 Supabase 設定值（單例模式，避免多個實例）
@@ -714,12 +768,20 @@
                 } else {
                     // 優先使用統一配置函數
                     if (typeof createSupabaseClient === 'function') {
+                        console.log('📦 使用 createSupabaseClient 函數');
                         supabaseClient = createSupabaseClient();
                     } else if (typeof SUPABASE_CONFIG !== 'undefined') {
+                        console.log('📦 使用 SUPABASE_CONFIG');
                         supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
                     } else {
+                        console.log('📦 使用內建配置值');
                         supabaseClient = supabase.createClient(SUPABASE_URL_VALUE, SUPABASE_ANON_KEY_VALUE);
                     }
+                    
+                    if (!supabaseClient) {
+                        throw new Error('無法創建 Supabase 客戶端');
+                    }
+                    
                     // 儲存到全域，供其他模組使用
                     window.supabaseClient = supabaseClient;
                     console.log('✅ 創建新的 Supabase 客戶端（單例模式）');
@@ -779,6 +841,12 @@
                                     title: data.title,
                                     is_published: data.is_published
                                 });
+                                
+                                // 檢查物件是否已發布（獨立頁面允許顯示未發布的物件，但可以記錄）
+                                if (data.is_published === false) {
+                                    console.log('ℹ️ 物件未發布，但獨立頁面仍可顯示');
+                                }
+                                
                                 propertyData = data;
                                 break;
                             } else {
@@ -1509,8 +1577,79 @@
             }, 100);
         }
         
+        // 修正返回按鈕的路徑
+        function fixBackButtonPath() {
+            const backButton = document.getElementById('back-button-link');
+            if (backButton) {
+                const isInAdminDashboard = window.location.pathname.includes('/admin-dashboard/');
+                backButton.href = isInAdminDashboard ? '../index.html' : 'index.html';
+            }
+        }
+        
         // 頁面載入時執行
-        document.addEventListener('DOMContentLoaded', loadProperty);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOMContentLoaded 事件觸發');
+            console.log('📍 當前 URL:', window.location.href);
+            console.log('📍 當前路徑:', window.location.pathname);
+            
+            // 修正返回按鈕路徑
+            fixBackButtonPath();
+            
+            // 檢查 Supabase SDK 是否已載入
+            if (typeof supabase === 'undefined') {
+                console.error('❌ Supabase SDK 尚未載入，等待載入...');
+                let retries = 0;
+                const maxRetries = 10;
+                const checkSupabase = setInterval(() => {
+                    retries++;
+                    if (typeof supabase !== 'undefined') {
+                        console.log('✅ Supabase SDK 已載入');
+                        clearInterval(checkSupabase);
+                        loadProperty();
+                    } else if (retries >= maxRetries) {
+                        console.error('❌ Supabase SDK 載入超時');
+                        clearInterval(checkSupabase);
+                        const loadingEl = document.getElementById('loading');
+                        const errorEl = document.getElementById('error');
+                        if (loadingEl) loadingEl.style.display = 'none';
+                        if (errorEl) {
+                            errorEl.style.display = 'block';
+                            document.getElementById('error-message').textContent = '無法載入必要的資源，請重新整理頁面';
+                        }
+                    }
+                }, 500);
+            } else {
+                console.log('✅ Supabase SDK 已就緒');
+                loadProperty();
+            }
+        });
+        
+        // 如果 DOMContentLoaded 已經觸發，立即執行
+        if (document.readyState === 'loading') {
+            console.log('⏳ 等待 DOMContentLoaded...');
+        } else {
+            console.log('✅ DOM 已就緒，立即執行 loadProperty');
+            fixBackButtonPath();
+            if (typeof supabase !== 'undefined') {
+                loadProperty();
+            } else {
+                console.warn('⚠️ Supabase SDK 尚未載入，等待載入...');
+                setTimeout(() => {
+                    if (typeof supabase !== 'undefined') {
+                        loadProperty();
+                    } else {
+                        console.error('❌ Supabase SDK 載入失敗');
+                        const loadingEl = document.getElementById('loading');
+                        const errorEl = document.getElementById('error');
+                        if (loadingEl) loadingEl.style.display = 'none';
+                        if (errorEl) {
+                            errorEl.style.display = 'block';
+                            document.getElementById('error-message').textContent = '無法載入必要的資源，請重新整理頁面';
+                        }
+                    }
+                }, 1000);
+            }
+        }
     </script>
 </body>
 </html>

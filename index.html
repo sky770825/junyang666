@@ -2868,29 +2868,43 @@
             
             // 載入相關連結（從後端 API，使用與備份檔案一致的樣式）
             function loadRelatedLinksOnPage() {
+                console.log('🔄 開始初始化相關連結載入器...');
                 const maxRetries = 30; // 最多重試 15 秒
                 let retries = 0;
+                let hasLoaded = false;
                 
                 function tryLoad() {
+                    // 如果已經載入成功，不再重試
+                    if (hasLoaded) {
+                        return;
+                    }
+                    
                     // 檢查新模組是否已載入
                     const hasModule = typeof RelatedLinksFrontend !== 'undefined' && 
                                      typeof RelatedLinksFrontend.renderRelatedLinks === 'function';
                     
                     if (hasModule) {
                         console.log('✅ 開始載入相關連結（從後端 API，使用 contact-button 樣式）');
-                        RelatedLinksFrontend.renderRelatedLinks('related-links-container').catch(error => {
-                            console.error('❌ 載入相關連結失敗:', error);
-                            const container = document.getElementById('related-links-container');
-                            if (container) {
-                                container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 1rem;">載入連結失敗</p>';
-                            }
-                        });
+                        RelatedLinksFrontend.renderRelatedLinks('related-links-container')
+                            .then(() => {
+                                hasLoaded = true;
+                                console.log('✅ 相關連結載入完成');
+                            })
+                            .catch(error => {
+                                console.error('❌ 載入相關連結失敗:', error);
+                                const container = document.getElementById('related-links-container');
+                                if (container) {
+                                    container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 1rem;">載入連結失敗</p>';
+                                }
+                            });
                     } else if (retries < maxRetries) {
                         retries++;
                         if (retries % 5 === 0) {
-                            console.warn(`⚠️ RelatedLinksFrontend 尚未載入 (${retries}/${maxRetries})`, {
+                            console.log(`ℹ️ RelatedLinksFrontend 尚未載入 (${retries}/${maxRetries})`, {
                                 RelatedLinksFrontend: typeof RelatedLinksFrontend,
-                                renderRelatedLinks: typeof RelatedLinksFrontend?.renderRelatedLinks
+                                renderRelatedLinks: typeof RelatedLinksFrontend?.renderRelatedLinks,
+                                supabase: typeof supabase !== 'undefined',
+                                SUPABASE_CONFIG: typeof SUPABASE_CONFIG !== 'undefined'
                             });
                         }
                         setTimeout(tryLoad, 500);

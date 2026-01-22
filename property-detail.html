@@ -546,16 +546,41 @@
             };
             document.head.appendChild(configScript);
             
-            // 載入 frontend.js
+            // 載入 frontend.js（確保在 supabase-config.js 之後載入）
             const frontendScript = document.createElement('script');
             frontendScript.src = basePath + 'modules/related-links/frontend.js';
             frontendScript.onerror = function() {
-                console.error('❌ 無法載入 frontend.js');
+                console.error('❌ 無法載入 modules/related-links/frontend.js，路徑:', basePath + 'modules/related-links/frontend.js');
+                // 顯示錯誤訊息在相關連結容器中
+                const container = document.getElementById('related-links-container-detail');
+                if (container) {
+                    container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 1rem;">載入相關連結模組失敗</p>';
+                }
             };
             frontendScript.onload = function() {
-                console.log('✅ frontend.js 載入成功');
+                console.log('✅ modules/related-links/frontend.js 載入成功');
+                // 觸發自定義事件，通知模組已載入
+                if (typeof window.dispatchEvent !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('relatedLinksScriptLoaded'));
+                }
             };
-            document.head.appendChild(frontendScript);
+            // 確保在 supabase-config.js 載入後再載入 frontend.js
+            if (configScript.onload) {
+                const originalOnload = configScript.onload;
+                configScript.onload = function() {
+                    originalOnload.call(this);
+                    // 延遲一下確保配置已設置
+                    setTimeout(() => {
+                        document.head.appendChild(frontendScript);
+                    }, 100);
+                };
+            } else {
+                configScript.onload = function() {
+                    setTimeout(() => {
+                        document.head.appendChild(frontendScript);
+                    }, 100);
+                };
+            }
         })();
     </script>
     
@@ -1353,12 +1378,12 @@
                 
                 function tryLoad() {
                     // 檢查新模組是否已載入
-                    const hasModule = typeof RelatedLinksFrontend !== 'undefined' && 
-                                     typeof RelatedLinksFrontend.renderRelatedLinks === 'function';
+                    const hasModule = typeof window.RelatedLinksFrontend !== 'undefined' && 
+                                     typeof window.RelatedLinksFrontend.renderRelatedLinks === 'function';
                     
                     if (hasModule) {
                         console.log('✅ 開始載入相關連結（從後端 API，使用 contact-button 樣式）');
-                        RelatedLinksFrontend.renderRelatedLinks('related-links-container-detail').catch(error => {
+                        window.RelatedLinksFrontend.renderRelatedLinks('related-links-container-detail').catch(error => {
                             console.error('❌ 載入相關連結失敗:', error);
                             const container = document.getElementById('related-links-container-detail');
                             if (container) {
@@ -1369,8 +1394,9 @@
                         retries++;
                         if (retries % 5 === 0) {
                             console.warn(`⚠️ RelatedLinksFrontend 尚未載入 (${retries}/${maxRetries})`, {
-                                RelatedLinksFrontend: typeof RelatedLinksFrontend,
-                                renderRelatedLinks: typeof RelatedLinksFrontend?.renderRelatedLinks
+                                RelatedLinksFrontend: typeof window.RelatedLinksFrontend,
+                                renderRelatedLinks: typeof window.RelatedLinksFrontend?.renderRelatedLinks,
+                                windowKeys: Object.keys(window).filter(k => k.includes('Related') || k.includes('Link'))
                             });
                         }
                         setTimeout(tryLoad, 500);
@@ -1387,6 +1413,21 @@
                         }
                     }
                 }
+                
+                // 監聽腳本載入事件
+                window.addEventListener('relatedLinksScriptLoaded', function() {
+                    console.log('📦 收到相關連結腳本載入事件');
+                    setTimeout(tryLoad, 200); // 給模組一點時間初始化
+                }, { once: true });
+                
+                // 也監聽模組準備就緒事件
+                window.addEventListener('relatedLinksFrontendReady', function() {
+                    console.log('📦 收到相關連結前端準備就緒事件');
+                    tryLoad();
+                }, { once: true });
+                
+                // 立即開始嘗試載入（如果模組已經載入）
+                setTimeout(tryLoad, 500);
                 
                 // 監聽自定義事件（優先使用）
                 window.addEventListener('relatedLinksFrontendReady', function handler() {

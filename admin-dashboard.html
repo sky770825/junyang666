@@ -792,6 +792,16 @@
                 margin: 0;
             }
             
+            /* 新增物件標籤頁 - 移除容器 padding */
+            #properties-tab {
+                padding: 0 !important;
+            }
+            
+            #property-add-subtab {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
             /* Header 優化 */
             .header {
                 padding: 1rem;
@@ -1036,6 +1046,23 @@
                 margin-bottom: 1rem;
             }
             
+            /* 新增物件區塊 - 移除多餘的 padding */
+            #property-add-subtab .content-card {
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+                box-shadow: none !important;
+            }
+            
+            #property-add-subtab .content-card h2 {
+                display: none !important; /* 隱藏標題，因為 iframe 內已有標題 */
+            }
+            
+            #property-add-form-container {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
             .content-card h2 {
                 font-size: 1.1rem;
                 margin-bottom: 0.75rem;
@@ -1105,12 +1132,15 @@
                 line-height: 1.5;
             }
             
-            /* iframe 中的表單優化 */
+            /* iframe 中的表單優化 - 移除所有邊距和邊框 */
             #property-add-iframe,
             #property-edit-iframe {
                 width: 100% !important;
                 min-height: auto !important;
                 border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: block !important;
             }
             
             /* 表單區塊優化 */

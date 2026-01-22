@@ -246,6 +246,99 @@
                 font-size: 1rem !important;
                 min-height: 44px !important;
             }
+            
+            /* 按鈕組優化 - Sticky 儲存按鈕 */
+            .btn-group {
+                position: sticky !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                background: white !important;
+                padding: 1rem !important;
+                margin: 0 !important;
+                margin-top: 1.5rem !important;
+                margin-bottom: 0 !important;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
+                z-index: 100 !important;
+                display: flex !important;
+                gap: 0.75rem !important;
+                flex-direction: column !important;
+            }
+            
+            /* 確保表單底部有足夠空間，不被 sticky 按鈕遮擋 */
+            form {
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+            }
+            
+            .btn-group .btn {
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            
+            /* 表單區塊可摺疊 */
+            .form-section h3 {
+                cursor: pointer !important;
+                user-select: none !important;
+                position: relative !important;
+                padding-right: 2rem !important;
+            }
+            
+            .form-section h3::after {
+                content: '▼' !important;
+                position: absolute !important;
+                right: 0 !important;
+                font-size: 0.8rem !important;
+                transition: transform 0.3s ease !important;
+                color: #667eea !important;
+            }
+            
+            .form-section.collapsed h3::after {
+                transform: rotate(-90deg) !important;
+            }
+            
+            .form-section.collapsed .form-grid {
+                display: none !important;
+            }
+            
+            /* 圖片上傳區域在摺疊時也要隱藏 */
+            .form-section.collapsed .image-upload-area,
+            .form-section.collapsed .image-preview-grid {
+                display: none !important;
+            }
+            
+            /* 確保摺疊不影響表單提交（表單元素仍然存在，只是隱藏） */
+            .form-section.collapsed input,
+            .form-section.collapsed select,
+            .form-section.collapsed textarea {
+                display: none !important;
+            }
+            
+            /* 表單進度指示器樣式 */
+            #form-progress {
+                display: block !important;
+            }
+            
+            /* 欄位錯誤提示樣式 */
+            .field-error-message {
+                animation: fadeIn 0.3s ease;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-5px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            /* 圖片上傳區域優化 */
+            .image-upload-area {
+                min-height: 120px !important;
+                padding: 1.5rem !important;
+            }
+            
+            .image-preview-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.75rem !important;
+            }
         }
         
         /* 小型欄位（物件來源、物件編號等） */
@@ -1282,6 +1375,18 @@
         <div id="add-tab" class="tab-content active">
             <div id="alert-container"></div>
             
+            <!-- 表單填寫進度指示（僅手機版） -->
+            <div id="form-progress" style="display: none; margin-bottom: 1rem; padding: 0.75rem; background: #f0f4ff; border-radius: 8px; border-left: 4px solid #667eea;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.9rem; font-weight: 600; color: #667eea;">📊 表單填寫進度</span>
+                    <span id="progress-percentage" style="font-size: 0.9rem; font-weight: 600; color: #667eea;">0%</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+                    <div id="progress-bar" style="height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); width: 0%; transition: width 0.3s ease;"></div>
+                </div>
+                <p id="progress-text" style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; margin-bottom: 0;">請填寫必填欄位</p>
+            </div>
+            
             <form id="property-form">
                 <!-- 基本資訊 -->
                 <div class="form-section">
@@ -1375,7 +1480,7 @@
                         </div>
                         <div class="form-group">
                             <label>售價 *</label>
-                            <input type="text" id="price" placeholder="例如: 896萬" required>
+                            <input type="text" id="price" placeholder="例如: 896萬" required inputmode="numeric" pattern="[0-9]*">
                         </div>
                         <div class="form-group">
                             <label>上架狀態 *</label>
@@ -1441,22 +1546,22 @@
                         </div>
                         <div class="form-group">
                             <label>總坪數 *</label>
-                            <input type="text" id="total_area" placeholder="例如: 40.08（輸入數字即可，系統會自動加上「坪」）" required onblur="formatAreaInput(this)">
+                            <input type="text" id="total_area" placeholder="例如: 40.08（輸入數字即可，系統會自動加上「坪」）" required onblur="formatAreaInput(this)" inputmode="decimal" pattern="[0-9.]*">
                             <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
                                 💡 提示：輸入數字即可，系統會自動加上「坪」字
                             </small>
                         </div>
                         <div class="form-group">
                             <label>主建物坪數</label>
-                            <input type="text" id="main_area" placeholder="例如: 18.17（輸入數字即可）" onblur="formatAreaInput(this)">
+                            <input type="text" id="main_area" placeholder="例如: 18.17（輸入數字即可）" onblur="formatAreaInput(this)" inputmode="decimal" pattern="[0-9.]*">
                         </div>
                         <div class="form-group">
                             <label>附屬建物坪數</label>
-                            <input type="text" id="auxiliary_area" placeholder="例如: 1.63（輸入數字即可）" onblur="formatAreaInput(this)">
+                            <input type="text" id="auxiliary_area" placeholder="例如: 1.63（輸入數字即可）" onblur="formatAreaInput(this)" inputmode="decimal" pattern="[0-9.]*">
                         </div>
                         <div class="form-group">
                             <label>公設坪數</label>
-                            <input type="text" id="common_area" placeholder="例如: 9.07（輸入數字即可）" onblur="formatAreaInput(this)">
+                            <input type="text" id="common_area" placeholder="例如: 9.07（輸入數字即可）" onblur="formatAreaInput(this)" inputmode="decimal" pattern="[0-9.]*">
                         </div>
                         <div class="form-group">
                             <label>土地坪數</label>
@@ -1932,6 +2037,303 @@
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
     <script>
+        // 表單區塊摺疊功能（僅手機版）
+        function toggleSection(section, event) {
+            // 只在手機版啟用摺疊功能
+            if (window.innerWidth <= 768) {
+                // 如果點擊的是標題，才執行摺疊
+                if (event && event.target.tagName === 'H3') {
+                    event.stopPropagation(); // 防止事件冒泡
+                    section.classList.toggle('collapsed');
+                } else if (!event) {
+                    // 如果沒有事件參數，直接切換（用於程式呼叫）
+                    section.classList.toggle('collapsed');
+                }
+            }
+        }
+        
+        // 優化：點擊標題時才摺疊，點擊表單內容不摺疊
+        document.addEventListener('DOMContentLoaded', function() {
+            // 為所有表單區塊的標題添加點擊事件
+            const sections = document.querySelectorAll('.form-section');
+            sections.forEach(section => {
+                const h3 = section.querySelector('h3');
+                if (h3) {
+                    h3.addEventListener('click', function(e) {
+                        if (window.innerWidth <= 768) {
+                            e.stopPropagation();
+                            section.classList.toggle('collapsed');
+                        }
+                    });
+                }
+            });
+            
+            // 初始化表單進度追蹤和自動儲存草稿
+            initFormProgress();
+            initAutoSave();
+            initFormValidation();
+        });
+        
+        // 表單填寫進度追蹤
+        function initFormProgress() {
+            // 只在手機版顯示進度
+            if (window.innerWidth <= 768) {
+                const progressDiv = document.getElementById('form-progress');
+                if (progressDiv) {
+                    progressDiv.style.display = 'block';
+                }
+            }
+            
+            // 監聽表單欄位變化
+            const form = document.getElementById('property-form');
+            if (form) {
+                const requiredFields = form.querySelectorAll('[required]');
+                const allFields = form.querySelectorAll('input, select, textarea');
+                
+                // 計算進度
+                function updateProgress() {
+                    if (window.innerWidth > 768) return; // 只在手機版顯示
+                    
+                    let filledCount = 0;
+                    let totalRequired = requiredFields.length;
+                    
+                    requiredFields.forEach(field => {
+                        const value = field.value.trim();
+                        if (value !== '' && value !== null && value !== undefined) {
+                            filledCount++;
+                        }
+                    });
+                    
+                    const percentage = totalRequired > 0 ? Math.round((filledCount / totalRequired) * 100) : 0;
+                    
+                    const progressBar = document.getElementById('progress-bar');
+                    const progressPercentage = document.getElementById('progress-percentage');
+                    const progressText = document.getElementById('progress-text');
+                    
+                    if (progressBar) progressBar.style.width = percentage + '%';
+                    if (progressPercentage) progressPercentage.textContent = percentage + '%';
+                    
+                    if (progressText) {
+                        if (percentage === 100) {
+                            progressText.textContent = '✅ 所有必填欄位已填寫完成！';
+                            progressText.style.color = '#28a745';
+                        } else {
+                            const remaining = totalRequired - filledCount;
+                            progressText.textContent = `還需填寫 ${remaining} 個必填欄位`;
+                            progressText.style.color = '#666';
+                        }
+                    }
+                }
+                
+                // 監聽所有欄位變化
+                allFields.forEach(field => {
+                    field.addEventListener('input', updateProgress);
+                    field.addEventListener('change', updateProgress);
+                });
+                
+                // 初始計算
+                updateProgress();
+            }
+        }
+        
+        // 自動儲存草稿功能
+        let autoSaveTimer = null;
+        function initAutoSave() {
+            // 只在手機版啟用自動儲存
+            if (window.innerWidth <= 768) {
+                const form = document.getElementById('property-form');
+                if (form) {
+                    // 每 30 秒自動儲存一次
+                    autoSaveTimer = setInterval(() => {
+                        saveDraft();
+                    }, 30000); // 30 秒
+                    
+                    // 監聽表單變化
+                    const fields = form.querySelectorAll('input, select, textarea');
+                    fields.forEach(field => {
+                        field.addEventListener('input', () => {
+                            // 延遲 2 秒後儲存（避免頻繁儲存）
+                            clearTimeout(autoSaveTimer);
+                            autoSaveTimer = setTimeout(() => {
+                                saveDraft();
+                            }, 2000);
+                        });
+                    });
+                }
+            }
+            
+            // 頁面載入時恢復草稿
+            loadDraft();
+        }
+        
+        // 儲存草稿到 localStorage
+        function saveDraft() {
+            try {
+                const form = document.getElementById('property-form');
+                if (!form) return;
+                
+                const formData = new FormData(form);
+                const draft = {};
+                
+                // 收集所有表單資料
+                for (let [key, value] of formData.entries()) {
+                    draft[key] = value;
+                }
+                
+                // 儲存圖片預覽資訊（僅 URL，不儲存檔案）
+                if (uploadedImages && uploadedImages.length > 0) {
+                    draft.uploadedImages = uploadedImages.map(img => ({
+                        previewURL: img.previewURL || img.url,
+                        isCover: img.isCover || false
+                    }));
+                }
+                
+                localStorage.setItem('property-form-draft', JSON.stringify(draft));
+                console.log('💾 草稿已自動儲存');
+            } catch (error) {
+                console.warn('⚠️ 自動儲存草稿失敗:', error);
+            }
+        }
+        
+        // 載入草稿
+        function loadDraft() {
+            try {
+                const draftStr = localStorage.getItem('property-form-draft');
+                if (!draftStr) return;
+                
+                const draft = JSON.parse(draftStr);
+                if (!draft || Object.keys(draft).length === 0) return;
+                
+                // 詢問用戶是否要恢復草稿
+                if (confirm('發現未完成的表單草稿，是否要恢復？')) {
+                    // 恢復表單欄位
+                    Object.keys(draft).forEach(key => {
+                        if (key === 'uploadedImages') return; // 圖片稍後處理
+                        
+                        const field = document.getElementById(key);
+                        if (field && draft[key] !== null && draft[key] !== undefined) {
+                            field.value = draft[key];
+                            // 觸發 change 事件，確保相關邏輯執行
+                            field.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                    
+                    // 恢復圖片預覽（僅顯示，不重新上傳）
+                    if (draft.uploadedImages && draft.uploadedImages.length > 0) {
+                        console.log('📸 發現草稿中的圖片，請重新上傳');
+                        // 不自動恢復圖片，因為需要重新上傳
+                    }
+                    
+                    showAlert('info', '草稿已恢復，請檢查表單內容');
+                } else {
+                    // 清除草稿
+                    localStorage.removeItem('property-form-draft');
+                }
+            } catch (error) {
+                console.warn('⚠️ 載入草稿失敗:', error);
+            }
+        }
+        
+        // 表單驗證優化 - 即時驗證提示
+        function initFormValidation() {
+            const form = document.getElementById('property-form');
+            if (!form) return;
+            
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            requiredFields.forEach(field => {
+                // 失去焦點時驗證
+                field.addEventListener('blur', function() {
+                    validateField(this);
+                });
+                
+                // 輸入時清除錯誤狀態
+                field.addEventListener('input', function() {
+                    clearFieldError(this);
+                });
+            });
+        }
+        
+        // 驗證單個欄位
+        function validateField(field) {
+            const value = field.value.trim();
+            const isValid = field.checkValidity();
+            
+            if (!isValid || (field.hasAttribute('required') && value === '')) {
+                showFieldError(field, '此欄位為必填');
+                return false;
+            } else {
+                clearFieldError(field);
+                return true;
+            }
+        }
+        
+        // 顯示欄位錯誤
+        function showFieldError(field, message) {
+            clearFieldError(field); // 先清除舊的錯誤
+            
+            field.style.borderColor = '#dc3545';
+            field.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.1)';
+            
+            // 添加錯誤提示
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'field-error-message';
+            errorDiv.style.cssText = 'color: #dc3545; font-size: 0.85rem; margin-top: 0.25rem; display: block;';
+            errorDiv.textContent = message;
+            
+            field.parentNode.appendChild(errorDiv);
+        }
+        
+        // 清除欄位錯誤
+        function clearFieldError(field) {
+            field.style.borderColor = '';
+            field.style.boxShadow = '';
+            
+            const errorDiv = field.parentNode.querySelector('.field-error-message');
+            if (errorDiv) {
+                errorDiv.remove();
+            }
+        }
+        
+        // 包裝 resetForm 函數，確保清除草稿
+        const originalResetForm = window.resetForm;
+        if (typeof originalResetForm === 'function') {
+            window.resetForm = function() {
+                // 清除草稿
+                localStorage.removeItem('property-form-draft');
+                // 清除自動儲存計時器
+                if (autoSaveTimer) {
+                    clearInterval(autoSaveTimer);
+                    autoSaveTimer = null;
+                }
+                // 執行原始重置函數
+                originalResetForm();
+                // 重新初始化自動儲存
+                setTimeout(() => {
+                    initAutoSave();
+                    if (window.innerWidth <= 768) {
+                        initFormProgress();
+                    }
+                }, 100);
+            };
+        }
+        
+        // 包裝 saveProperty 函數，在成功儲存後清除草稿
+        const originalSaveProperty = window.saveProperty;
+        if (typeof originalSaveProperty === 'function') {
+            window.saveProperty = async function() {
+                try {
+                    await originalSaveProperty();
+                    // 儲存成功後清除草稿
+                    localStorage.removeItem('property-form-draft');
+                    console.log('✅ 儲存成功，已清除草稿');
+                } catch (error) {
+                    // 儲存失敗時保留草稿
+                    throw error;
+                }
+            };
+        }
+        
         // 全域變數
         let uploadedImages = []; // 已上傳的圖片 URL 和 key 陣列 [{url, key}]
         let editingPropertyId = null;

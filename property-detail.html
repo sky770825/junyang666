@@ -961,20 +961,30 @@
                     message: error.message,
                     code: error.code,
                     details: error.details,
-                    hint: error.hint
+                    hint: error.hint,
+                    url: window.location.href,
+                    pathname: window.location.pathname
                 });
-                loadingEl.style.display = 'none';
-                errorEl.style.display = 'block';
-                // 提供更詳細的錯誤訊息
-                let errorMessage = error.message || '載入失敗';
-                if (error.code === 'PGRST116') {
-                    errorMessage = '找不到指定的物件，請確認物件編號或 ID 是否正確';
-                } else if (error.message && error.message.includes('找不到')) {
-                    errorMessage = error.message;
-                } else {
-                    errorMessage = `載入失敗：${errorMessage}`;
+                
+                // 確保顯示錯誤訊息，隱藏載入和頁面內容
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (pageEl) pageEl.style.display = 'none';
+                if (errorEl) {
+                    errorEl.style.display = 'block';
+                    // 提供更詳細的錯誤訊息
+                    let errorMessage = error.message || '載入失敗';
+                    if (error.code === 'PGRST116') {
+                        errorMessage = '找不到指定的物件，請確認物件編號或 ID 是否正確';
+                    } else if (error.message && error.message.includes('找不到')) {
+                        errorMessage = error.message;
+                    } else {
+                        errorMessage = `載入失敗：${errorMessage}`;
+                    }
+                    const errorMsgEl = document.getElementById('error-message');
+                    if (errorMsgEl) {
+                        errorMsgEl.textContent = errorMessage;
+                    }
                 }
-                document.getElementById('error-message').textContent = errorMessage;
             }
         }
         

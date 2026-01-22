@@ -5,6 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>後台管理系統 | 住商不動產</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <!-- QR Code 生成函式庫 (使用多個備用 CDN) -->
+    <script>
+        // 嘗試載入 QRCode 函式庫，使用多個備用 CDN
+        (function() {
+            const cdnUrls = [
+                'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+                'https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js'
+            ];
+            
+            let currentIndex = 0;
+            
+            function loadScript(url) {
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = url;
+                    script.onload = () => {
+                        console.log('✅ QRCode 函式庫已從', url, '載入');
+                        resolve();
+                    };
+                    script.onerror = () => {
+                        console.warn('❌ 無法從', url, '載入 QRCode 函式庫');
+                        reject();
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+            
+            function tryLoadNext() {
+                if (currentIndex >= cdnUrls.length) {
+                    console.error('❌ 所有 QRCode CDN 都載入失敗');
+                    return;
+                }
+                
+                loadScript(cdnUrls[currentIndex])
+                    .then(() => {
+                        // 載入成功，檢查 QRCode 是否可用
+                        if (typeof QRCode === 'undefined') {
+                            console.warn('⚠️ QRCode 函式庫載入但全域變數不存在，嘗試下一個 CDN');
+                            currentIndex++;
+                            tryLoadNext();
+                        } else {
+                            console.log('✅ QRCode 函式庫已準備就緒');
+                        }
+                    })
+                    .catch(() => {
+                        currentIndex++;
+                        tryLoadNext();
+                    });
+            }
+            
+            tryLoadNext();
+        })();
+    </script>
     <!-- 統一 Supabase 配置 -->
     <script src="supabase-config.js"></script>
     <!-- 相關連結後台管理模組 -->
@@ -453,6 +507,100 @@
         .cute-modal-close:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: rotate(90deg) scale(1.1);
+        }
+        
+        /* QR Code 彈窗樣式 */
+        .qrcode-modal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUpBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+        }
+        
+        .qrcode-modal-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+        }
+        
+        .qrcode-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .qrcode-container {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            min-height: 300px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .qrcode-container img,
+        .qrcode-container canvas {
+            width: 300px;
+            height: 300px;
+            border-radius: 8px;
+            display: block;
+            object-fit: contain;
+        }
+        
+        .qrcode-loading {
+            padding: 3rem;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+        
+        .qrcode-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .qrcode-modal-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .qrcode-modal-btn-primary {
+            background: white;
+            color: #667eea;
+        }
+        
+        .qrcode-modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .qrcode-modal-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .qrcode-modal-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
         
         /* 錯誤狀態的彈窗 */
@@ -1416,6 +1564,223 @@
             window.open(url, '_blank');
         }
         
+        // 顯示 QR Code 彈窗
+        function downloadQRCode(property) {
+            const url = getPropertyDetailUrl(property);
+            if (url === '#') {
+                showCuteModal('error', '無法生成 QR Code', '缺少物件編號或 ID，請檢查物件資料');
+                return;
+            }
+            
+            // 移除現有的 QR Code 彈窗
+            const existingModal = document.querySelector('.qrcode-modal-overlay');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // 創建彈窗
+            const overlay = document.createElement('div');
+            overlay.className = 'cute-modal-overlay qrcode-modal-overlay';
+            
+            const modal = document.createElement('div');
+            modal.className = 'qrcode-modal';
+            
+            const fileName = property.number && property.number !== 'N/A' && property.number !== '' 
+                ? `QRCode-${property.number}.png` 
+                : `QRCode-${property.id || 'property'}.png`;
+            
+            modal.innerHTML = `
+                <button class="cute-modal-close" onclick="this.closest('.qrcode-modal-overlay').remove()">×</button>
+                <div class="qrcode-modal-content">
+                    <div class="qrcode-modal-title">📱 QR Code</div>
+                    <div class="qrcode-container">
+                        <div class="qrcode-loading">⏳ 正在生成 QR Code...</div>
+                    </div>
+                    <div class="qrcode-modal-buttons">
+                        <button class="qrcode-modal-btn qrcode-modal-btn-primary" id="download-qrcode-btn" disabled>
+                            💾 下載 QR Code
+                        </button>
+                        <button class="qrcode-modal-btn qrcode-modal-btn-secondary" onclick="this.closest('.qrcode-modal-overlay').remove()">
+                            關閉
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            const container = modal.querySelector('.qrcode-container');
+            const downloadBtn = modal.querySelector('#download-qrcode-btn');
+            let qrcodeImage = null;
+            
+            // 使用本地函式庫生成 QR Code
+            function generateQRCode() {
+                // 檢查 QRCode 函式庫是否已載入（等待一下讓函式庫有時間載入）
+                function checkAndGenerate() {
+                    const QRCodeLib = window.QRCode || (typeof QRCode !== 'undefined' ? QRCode : null);
+                    
+                    if (!QRCodeLib || typeof QRCodeLib !== 'function') {
+                        // 如果還沒載入，等待一下再檢查
+                        if (container.querySelector('.qrcode-loading') && !container.querySelector('.qrcode-loading').textContent.includes('❌')) {
+                            setTimeout(checkAndGenerate, 500);
+                            return;
+                        }
+                        
+                        // 如果已經等待過，顯示錯誤並嘗試重新載入
+                        container.innerHTML = '<div class="qrcode-loading" style="color: #f5576c;">❌ 無法載入 QR Code 函式庫<br><small>正在嘗試重新載入...</small></div>';
+                        console.error('QRCode 函式庫未載入');
+                        console.log('檢查 window.QRCode:', typeof window.QRCode);
+                        console.log('檢查 QRCode:', typeof QRCode);
+                        
+                        // 嘗試重新載入函式庫
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js';
+                        script.onload = () => {
+                            console.log('✅ QRCode 函式庫重新載入成功');
+                            setTimeout(checkAndGenerate, 100); // 重新檢查
+                        };
+                        script.onerror = () => {
+                            console.error('❌ QRCode 函式庫重新載入失敗');
+                            container.innerHTML = '<div class="qrcode-loading" style="color: #f5576c;">❌ 無法載入 QR Code 函式庫<br><small>請檢查網路連線或重新整理頁面</small></div>';
+                        };
+                        document.head.appendChild(script);
+                        return;
+                    }
+                    
+                    // 函式庫已載入，開始生成
+                    generateWithLibrary(QRCodeLib);
+                }
+                
+                // 實際生成 QR Code 的函數
+                function generateWithLibrary(QRCodeLib) {
+                
+                    try {
+                        // 創建一個臨時的隱藏 div 來生成 QR Code
+                        const tempDiv = document.createElement('div');
+                        tempDiv.style.width = '300px';
+                        tempDiv.style.height = '300px';
+                        tempDiv.style.position = 'absolute';
+                        tempDiv.style.left = '-9999px';
+                        tempDiv.style.top = '-9999px';
+                        document.body.appendChild(tempDiv);
+                        
+                        // 使用 qrcodejs 生成 QR Code
+                        const qrcode = new QRCodeLib(tempDiv, {
+                            text: url,
+                            width: 300,
+                            height: 300,
+                            colorDark: '#000000',
+                            colorLight: '#FFFFFF',
+                            correctLevel: QRCodeLib.CorrectLevel ? QRCodeLib.CorrectLevel.H : 2
+                        });
+                    
+                        // 等待 QR Code 生成完成
+                        setTimeout(() => {
+                            try {
+                                const canvas = tempDiv.querySelector('canvas');
+                                const img = tempDiv.querySelector('img');
+                                
+                                if (!canvas && !img) {
+                                    throw new Error('無法找到 QR Code 元素');
+                                }
+                                
+                                container.innerHTML = '';
+                                
+                                if (canvas) {
+                                    // 對於 canvas，創建一個新的 canvas 並複製內容
+                                    const newCanvas = document.createElement('canvas');
+                                    newCanvas.width = 300;
+                                    newCanvas.height = 300;
+                                    newCanvas.style.width = '300px';
+                                    newCanvas.style.height = '300px';
+                                    newCanvas.style.display = 'block';
+                                    const ctx = newCanvas.getContext('2d');
+                                    ctx.drawImage(canvas, 0, 0, 300, 300);
+                                    container.appendChild(newCanvas);
+                                    qrcodeImage = newCanvas;
+                                    console.log('✅ QR Code canvas 已添加到容器');
+                                } else if (img) {
+                                    // 對於 img，直接移動或複製
+                                    const newImg = img.cloneNode(true);
+                                    newImg.style.width = '300px';
+                                    newImg.style.height = '300px';
+                                    newImg.style.display = 'block';
+                                    newImg.style.margin = '0 auto';
+                                    container.appendChild(newImg);
+                                    qrcodeImage = newImg;
+                                    console.log('✅ QR Code img 已添加到容器');
+                                }
+                                
+                                // 確保容器可見
+                                container.style.display = 'flex';
+                                container.style.justifyContent = 'center';
+                                container.style.alignItems = 'center';
+                                
+                                downloadBtn.disabled = false;
+                                
+                                // 綁定下載事件
+                                downloadBtn.onclick = function() {
+                                    let targetElement = qrcodeImage;
+                                    
+                                    // 如果是 img，需要轉換為 canvas
+                                    if (qrcodeImage.tagName === 'IMG') {
+                                        const newCanvas = document.createElement('canvas');
+                                        newCanvas.width = 300;
+                                        newCanvas.height = 300;
+                                        const ctx = newCanvas.getContext('2d');
+                                        ctx.drawImage(qrcodeImage, 0, 0);
+                                        targetElement = newCanvas;
+                                    }
+                                    
+                                    // 確保是 canvas 才能使用 toBlob
+                                    if (targetElement.tagName === 'CANVAS') {
+                                        targetElement.toBlob((blob) => {
+                                            if (!blob) {
+                                                showCuteModal('error', '轉換失敗', '無法將 QR Code 轉換為圖片');
+                                                return;
+                                            }
+                                            
+                                            const downloadUrl = URL.createObjectURL(blob);
+                                            const link = document.createElement('a');
+                                            link.href = downloadUrl;
+                                            link.download = fileName;
+                                            
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                            
+                                            setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
+                                            showCuteModal('success', 'QR Code 已下載！', `QR Code 已成功下載為 ${fileName}`);
+                                        }, 'image/png');
+                                    } else {
+                                        showCuteModal('error', '下載失敗', '無法轉換 QR Code 為圖片');
+                                    }
+                                };
+                                
+                                document.body.removeChild(tempDiv);
+                            } catch (error) {
+                                console.error('生成 QR Code 失敗:', error);
+                                container.innerHTML = '<div class="qrcode-loading" style="color: #f5576c;">❌ 生成失敗：' + (error.message || '未知錯誤') + '</div>';
+                                if (tempDiv.parentNode) {
+                                    document.body.removeChild(tempDiv);
+                                }
+                            }
+                        }, 200);
+                    } catch (error) {
+                        console.error('生成 QR Code 失敗:', error);
+                        container.innerHTML = '<div class="qrcode-loading" style="color: #f5576c;">❌ 生成失敗：' + (error.message || '未知錯誤') + '</div>';
+                    }
+                }
+                
+                // 開始檢查並生成
+                checkAndGenerate();
+            }
+            
+            // 開始生成 QR Code
+            generateQRCode();
+        }
+        
         // 背景刷新間隔（30分鐘）
         const REFRESH_INTERVAL = 30 * 60 * 1000; // 30分鐘 = 1800000 毫秒
         let refreshTimer = null;
@@ -1857,6 +2222,12 @@
                                                     style="font-size: 0.85rem;">
                                                 📋 複製連結
                                             </button>
+                                            <button class="btn btn-info" 
+                                                    onclick="downloadQRCode({id: '${safeId}', number: '${safeNumber || ''}'})"
+                                                    style="font-size: 0.85rem;"
+                                                    title="下載 QR Code">
+                                                📱 QR Code
+                                            </button>
                                             <button class="btn ${isPublished ? 'btn-danger' : 'btn-success'}" 
                                                     data-property-id="${safeId}" 
                                                     data-action="toggle" 
@@ -1873,8 +2244,9 @@
                                             <button class="btn btn-danger" 
                                                     data-property-id="${safeId}" 
                                                     data-action="delete"
-                                                    style="font-size: 0.85rem;">
-                                                🗑️ 刪除
+                                                    style="font-size: 0.85rem;"
+                                                    title="刪除">
+                                                🗑️
                                             </button>
                                         </div>
                                     </div>
@@ -1955,6 +2327,11 @@
                                                     title="複製物件獨立網頁連結">
                                                 📋 複製連結
                                             </button>
+                                            <button class="btn btn-info btn-small" 
+                                                    onclick="downloadQRCode({id: '${safeId}', number: '${safeNumber || ''}'})"
+                                                    title="下載 QR Code">
+                                                📱 QR Code
+                                            </button>
                                             <button class="btn btn-small ${isPublished ? 'btn-danger' : 'btn-success'}" 
                                                     data-property-id="${safeId}" 
                                                     data-action="toggle" 
@@ -1968,8 +2345,9 @@
                                             </button>
                                             <button class="btn btn-danger btn-small" 
                                                     data-property-id="${safeId}" 
-                                                    data-action="delete">
-                                                🗑️ 刪除
+                                                    data-action="delete"
+                                                    title="刪除">
+                                                🗑️
                                             </button>
                                         </td>
                                     </tr>
@@ -2615,8 +2993,9 @@
                                             <button class="btn btn-primary btn-small" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.editLink) { RelatedLinksBackend.editLink('${link.id}'); } else { editLink('${link.id}'); }">
                                                 ✏️ 編輯
                                             </button>
-                                            <button class="btn btn-danger btn-small" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.deleteLink) { RelatedLinksBackend.deleteLink('${link.id}'); } else { deleteLink('${link.id}'); }">
-                                                🗑️ 刪除
+                                            <button class="btn btn-danger btn-small" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.deleteLink) { RelatedLinksBackend.deleteLink('${link.id}'); } else { deleteLink('${link.id}'); }"
+                                                    title="刪除">
+                                                🗑️
                                             </button>
                                         </div>
                                     </td>
@@ -2981,8 +3360,9 @@
                 <div style="background: white; padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem; border: 1px solid #ddd;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <strong>項目 ${index + 1}</strong>
-                        <button type="button" class="btn btn-danger btn-small" onclick="removeLinkItem(${index})">
-                            🗑️ 刪除
+                        <button type="button" class="btn btn-danger btn-small" onclick="removeLinkItem(${index})"
+                                title="刪除">
+                            🗑️
                         </button>
                     </div>
                     <div class="form-group" style="margin-bottom: 0.5rem;">

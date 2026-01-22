@@ -551,6 +551,7 @@
             aspect-ratio: 1;
             min-height: 100px;
             background: #f8f9fa;
+            transition: all 0.3s ease;
             /* 禁用文字選擇 */
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -558,6 +559,58 @@
             user-select: none;
             /* 防止點擊時出現高亮 */
             -webkit-tap-highlight-color: transparent;
+        }
+        
+        .image-preview-item.cover-image {
+            border: 3px solid #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+        
+        .image-cover-btn {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .image-cover-btn:hover {
+            background: rgba(102, 126, 234, 1);
+            transform: scale(1.05);
+        }
+        
+        .image-cover-btn.is-cover {
+            background: rgba(40, 167, 69, 0.9);
+        }
+        
+        .image-cover-btn.is-cover:hover {
+            background: rgba(40, 167, 69, 1);
+        }
+        
+        .image-cover-badge {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: bold;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 2px;
         }
         
         .image-preview-item img {
@@ -2185,12 +2238,28 @@
                 uploadedAt: Date.now()
             });
             
+            // 如果是第一張圖片，自動設為封面
+            const isFirstImage = uploadedImages.length === 0;
+            if (isFirstImage) {
+                // 這張圖片將成為第一張，標記為封面
+                // 注意：這裡先 push，所以實際上是 uploadedImages.length === 1
+            }
+            
             // 創建預覽項目
             try {
-                const previewItem = createImagePreviewItemForLocal(imageId, previewURL, file.name);
+                const previewItem = createImagePreviewItemForLocal(imageId, previewURL, file.name, isFirstImage);
                 if (previewItem) {
                     imagePreviewGrid.appendChild(previewItem);
                     console.log(`✅ 已添加圖片預覽: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+                    
+                    // 如果是第一張圖片，標記為封面
+                    if (isFirstImage) {
+                        const imageData = uploadedImages[uploadedImages.length - 1];
+                        if (imageData) {
+                            imageData.isCover = true;
+                        }
+                    }
+                    
                     return true;
                 } else {
                     console.error(`❌ 無法創建預覽項目: ${file.name}`);
@@ -2360,9 +2429,12 @@
         }
         
         // 建立圖片預覽項目（本地預覽版本，不上傳）
-        function createImagePreviewItemForLocal(imageId, previewURL, fileName) {
+        function createImagePreviewItemForLocal(imageId, previewURL, fileName, isCover = false) {
             const item = document.createElement('div');
             item.className = 'image-preview-item';
+            if (isCover) {
+                item.classList.add('cover-image');
+            }
             item.dataset.imageId = imageId;
             item.style.position = 'relative';
             
@@ -2398,9 +2470,38 @@
             statusBadge.textContent = '待上傳';
             statusBadge.style.cssText = 'position: absolute; top: 2px; left: 2px; background: #ffc107; color: #000; padding: 1px 4px; border-radius: 2px; font-size: 9px; font-weight: bold; z-index: 10; line-height: 1.2;';
             
+            // 封面標籤（如果是指定的封面）
+            let coverBadge = null;
+            if (isCover) {
+                coverBadge = document.createElement('div');
+                coverBadge.className = 'image-cover-badge';
+                coverBadge.innerHTML = '⭐ 封面';
+                coverBadge.style.cssText = 'position: absolute; top: 2px; left: 2px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: bold; z-index: 11; display: flex; align-items: center; gap: 2px;';
+                // 如果是指定封面，隱藏待上傳標籤
+                statusBadge.style.display = 'none';
+            }
+            
+            // 設為封面按鈕
+            const coverBtn = document.createElement('button');
+            coverBtn.className = 'image-cover-btn';
+            if (isCover) {
+                coverBtn.classList.add('is-cover');
+                coverBtn.innerHTML = '✓ 封面';
+            } else {
+                coverBtn.innerHTML = '⭐ 設為封面';
+            }
+            coverBtn.onclick = (e) => {
+                e.stopPropagation();
+                setAsCoverImage(imageId);
+            };
+            
             item.appendChild(img);
             item.appendChild(removeBtn);
             item.appendChild(statusBadge);
+            if (coverBadge) {
+                item.appendChild(coverBadge);
+            }
+            item.appendChild(coverBtn);
             
             return item;
         }
@@ -2446,12 +2547,98 @@
             return item;
         }
         
+        // 設為封面圖片
+        function setAsCoverImage(imageId) {
+            // 清除所有圖片的封面標記
+            uploadedImages.forEach(img => {
+                img.isCover = false;
+            });
+            
+            // 設置指定圖片為封面
+            const imageIndex = uploadedImages.findIndex(img => img.imageId === imageId);
+            if (imageIndex !== -1) {
+                uploadedImages[imageIndex].isCover = true;
+                console.log(`⭐ 已設置封面圖片: ${uploadedImages[imageIndex].originalName || '未知'}`);
+                
+                // 更新所有圖片預覽的視覺效果
+                updateImagePreviewDisplay();
+                
+                showAlert('success', '已設置為封面圖片！');
+            } else {
+                console.warn('⚠️ 找不到指定的圖片:', imageId);
+            }
+        }
+        
+        // 更新圖片預覽顯示（更新封面標記）
+        function updateImagePreviewDisplay() {
+            const imagePreviewGrid = document.getElementById('image-preview-grid');
+            if (!imagePreviewGrid) return;
+            
+            // 獲取所有圖片項目
+            const items = imagePreviewGrid.querySelectorAll('.image-preview-item');
+            items.forEach(item => {
+                const imageId = item.dataset.imageId;
+                const imageData = uploadedImages.find(img => img.imageId === imageId);
+                
+                if (imageData && imageData.isCover) {
+                    // 添加封面樣式
+                    item.classList.add('cover-image');
+                    
+                    // 更新按鈕狀態
+                    const coverBtn = item.querySelector('.image-cover-btn');
+                    if (coverBtn) {
+                        coverBtn.classList.add('is-cover');
+                        coverBtn.innerHTML = '✓ 封面';
+                    }
+                    
+                    // 顯示封面標籤
+                    let coverBadge = item.querySelector('.image-cover-badge');
+                    if (!coverBadge) {
+                        coverBadge = document.createElement('div');
+                        coverBadge.className = 'image-cover-badge';
+                        coverBadge.innerHTML = '⭐ 封面';
+                        coverBadge.style.cssText = 'position: absolute; top: 2px; left: 2px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: bold; z-index: 11; display: flex; align-items: center; gap: 2px;';
+                        item.appendChild(coverBadge);
+                    }
+                    
+                    // 隱藏待上傳標籤（如果存在）
+                    const statusBadge = item.querySelector('.image-status-badge');
+                    if (statusBadge) {
+                        statusBadge.style.display = 'none';
+                    }
+                } else {
+                    // 移除封面樣式
+                    item.classList.remove('cover-image');
+                    
+                    // 更新按鈕狀態
+                    const coverBtn = item.querySelector('.image-cover-btn');
+                    if (coverBtn) {
+                        coverBtn.classList.remove('is-cover');
+                        coverBtn.innerHTML = '⭐ 設為封面';
+                    }
+                    
+                    // 移除封面標籤
+                    const coverBadge = item.querySelector('.image-cover-badge');
+                    if (coverBadge) {
+                        coverBadge.remove();
+                    }
+                    
+                    // 顯示待上傳標籤（如果存在）
+                    const statusBadge = item.querySelector('.image-status-badge');
+                    if (statusBadge) {
+                        statusBadge.style.display = 'block';
+                    }
+                }
+            });
+        }
+        
         // 移除圖片
         async function removeImage(item, imageId) {
             // 從 uploadedImages 中移除（根據 imageId）
             const index = uploadedImages.findIndex(img => img.imageId === imageId);
             if (index !== -1) {
                 const imgData = uploadedImages[index];
+                const wasCover = imgData.isCover;
                 
                 // 如果圖片已經上傳到 Storage，嘗試刪除臨時檔案
                 if (imgData.tempKey && storage) {
@@ -2471,6 +2658,12 @@
                 
                 uploadedImages.splice(index, 1);
                 console.log(`🗑️ 已移除圖片: ${imgData.originalName || '未知'}`);
+                
+                // 如果刪除的是封面圖片，將第一張圖片設為封面
+                if (wasCover && uploadedImages.length > 0) {
+                    uploadedImages[0].isCover = true;
+                    updateImagePreviewDisplay();
+                }
             }
             item.remove();
         }
@@ -2833,7 +3026,25 @@
                 console.warn('⚠️ 清理臨時資料夾時發生錯誤:', error);
             }
             
-            return organizedImages.map(img => img.url);
+            // 將封面圖片移到第一位
+            const imageUrls = organizedImages.map(img => img.url);
+            const coverImageIndex = uploadedImages.findIndex(img => img.isCover);
+            
+            if (coverImageIndex !== -1 && coverImageIndex !== 0) {
+                // 找到封面圖片在最終 URL 陣列中的位置
+                // 因為 uploadedImages 和 organizedImages 的順序應該一致
+                const coverUrl = imageUrls[coverImageIndex];
+                // 移除原位置的封面圖片
+                imageUrls.splice(coverImageIndex, 1);
+                // 將封面圖片插入到第一位
+                imageUrls.unshift(coverUrl);
+                console.log('⭐ 已將封面圖片移到第一位');
+            } else if (coverImageIndex === -1 && imageUrls.length > 0) {
+                // 如果沒有指定封面，第一張圖片自動作為封面
+                console.log('ℹ️ 未指定封面圖片，使用第一張圖片作為封面');
+            }
+            
+            return imageUrls;
         }
         
         // 儲存物件

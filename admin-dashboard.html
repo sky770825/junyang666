@@ -282,6 +282,195 @@
             border: 1px solid #c3e6cb;
         }
         
+        /* 🎨 可愛的複製連結彈窗樣式 */
+        .cute-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeInOverlay 0.3s ease-out;
+        }
+        
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .cute-modal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUpBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+        }
+        
+        @keyframes slideUpBounce {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.8);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .cute-modal::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .cute-modal-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+        }
+        
+        .cute-modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease-in-out infinite;
+            display: inline-block;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+        
+        .cute-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .cute-modal-message {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+        
+        .cute-modal-url {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            word-break: break-all;
+            font-size: 0.9rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .cute-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .cute-modal-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .cute-modal-btn-primary {
+            background: white;
+            color: #667eea;
+        }
+        
+        .cute-modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .cute-modal-btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .cute-modal-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .cute-modal-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .cute-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cute-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        /* 錯誤狀態的彈窗 */
+        .cute-modal.error {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .cute-modal.warning {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+        
+        .cute-modal.warning .cute-modal-url {
+            background: rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+        
         .alert-error {
             background: #f8d7da;
             color: #721c24;
@@ -1076,17 +1265,119 @@
             return '#';
         }
         
+        // 🎨 顯示可愛的彈窗
+        function showCuteModal(type, title, message, url = null) {
+            // 移除現有的彈窗
+            const existingModal = document.querySelector('.cute-modal-overlay');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // 創建彈窗
+            const overlay = document.createElement('div');
+            overlay.className = 'cute-modal-overlay';
+            
+            const modal = document.createElement('div');
+            modal.className = `cute-modal ${type}`;
+            
+            // 根據類型選擇圖標和顏色
+            let icon = '✨';
+            if (type === 'success') {
+                icon = '🎉';
+            } else if (type === 'error') {
+                icon = '😢';
+            } else if (type === 'warning') {
+                icon = '⚠️';
+            }
+            
+            modal.innerHTML = `
+                <button class="cute-modal-close" onclick="this.closest('.cute-modal-overlay').remove()">×</button>
+                <div class="cute-modal-content">
+                    <div class="cute-modal-icon">${icon}</div>
+                    <div class="cute-modal-title">${title}</div>
+                    <div class="cute-modal-message">${message}</div>
+                    ${url ? `<div class="cute-modal-url">${url}</div>` : ''}
+                    <div class="cute-modal-buttons">
+                        ${url ? `
+                            <button class="cute-modal-btn cute-modal-btn-primary" data-url="${url.replace(/"/g, '&quot;')}">
+                                📋 再次複製
+                            </button>
+                        ` : ''}
+                        <button class="cute-modal-btn cute-modal-btn-secondary">
+                            關閉
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            // 綁定按鈕事件
+            const primaryBtn = modal.querySelector('.cute-modal-btn-primary');
+            const secondaryBtn = modal.querySelector('.cute-modal-btn-secondary');
+            
+            if (primaryBtn && url) {
+                primaryBtn.addEventListener('click', function() {
+                    navigator.clipboard.writeText(url).then(() => {
+                        this.textContent = '✅ 已複製！';
+                        this.style.background = '#4caf50';
+                        this.style.color = 'white';
+                        setTimeout(() => {
+                            overlay.remove();
+                        }, 1000);
+                    }).catch(err => {
+                        console.error('複製失敗:', err);
+                        this.textContent = '❌ 複製失敗';
+                        this.style.background = '#f5576c';
+                    });
+                });
+            }
+            
+            if (secondaryBtn) {
+                secondaryBtn.addEventListener('click', function() {
+                    overlay.remove();
+                });
+            }
+            
+            // 點擊背景關閉
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+            
+            // ESC 鍵關閉
+            const handleEsc = (e) => {
+                if (e.key === 'Escape') {
+                    overlay.remove();
+                    document.removeEventListener('keydown', handleEsc);
+                }
+            };
+            document.addEventListener('keydown', handleEsc);
+            
+            // 3秒後自動關閉（成功時）
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (overlay.parentNode) {
+                        overlay.style.animation = 'fadeInOverlay 0.3s ease-out reverse';
+                        setTimeout(() => overlay.remove(), 300);
+                    }
+                }, 3000);
+            }
+        }
+        
         // 複製物件獨立網頁連結
         function copyPropertyLink(property) {
             const url = getPropertyDetailUrl(property);
             if (url === '#') {
-                alert('無法生成連結：缺少物件編號或 ID');
+                showCuteModal('error', '無法生成連結', '缺少物件編號或 ID，請檢查物件資料');
                 return;
             }
             
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(url).then(() => {
-                    alert('✅ 連結已複製到剪貼簿！\n\n' + url);
+                    showCuteModal('success', '連結已複製！', '連結已成功複製到剪貼簿，可以直接貼上使用囉～', url);
                 }).catch(err => {
                     console.error('複製失敗:', err);
                     fallbackCopy(url);
@@ -1107,10 +1398,10 @@
             textarea.select();
             try {
                 document.execCommand('copy');
-                alert('✅ 連結已複製到剪貼簿！\n\n' + url);
+                showCuteModal('success', '連結已複製！', '連結已成功複製到剪貼簿，可以直接貼上使用囉～', url);
             } catch (err) {
                 console.error('複製失敗:', err);
-                alert('❌ 複製失敗，請手動複製：\n\n' + url);
+                showCuteModal('error', '複製失敗', '無法自動複製，請手動複製以下連結：', url);
             }
             document.body.removeChild(textarea);
         }
@@ -1119,7 +1410,7 @@
         function openPropertyDetail(property) {
             const url = getPropertyDetailUrl(property);
             if (url === '#') {
-                alert('無法開啟連結：缺少物件編號或 ID');
+                showCuteModal('error', '無法開啟連結', '缺少物件編號或 ID，請檢查物件資料');
                 return;
             }
             window.open(url, '_blank');

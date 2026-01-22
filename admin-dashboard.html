@@ -1038,24 +1038,37 @@
         function getPropertyDetailUrl(property) {
             if (!property) return '#';
             
-            // 獲取當前頁面的基礎路徑（移除 admin-dashboard.html）
+            // 獲取當前頁面的基礎路徑
             let basePath = window.location.pathname;
-            if (basePath.endsWith('admin-dashboard.html')) {
-                basePath = basePath.replace(/admin-dashboard\.html$/, '');
+            
+            // 移除檔案名稱，只保留目錄路徑
+            if (basePath.includes('/')) {
+                const lastSlash = basePath.lastIndexOf('/');
+                basePath = basePath.substring(0, lastSlash + 1);
+            } else {
+                // 如果沒有斜線，說明在根目錄
+                basePath = '/';
             }
-            // 確保 basePath 以 / 結尾（如果不在根目錄）
-            if (basePath && !basePath.endsWith('/')) {
+            
+            // 確保 basePath 以 / 結尾
+            if (!basePath.endsWith('/')) {
                 basePath = basePath + '/';
             }
+            
+            // 構建完整 URL
             const baseUrl = window.location.origin + basePath;
             
             // 優先使用物件編號
             if (property.number && property.number !== 'N/A' && property.number !== '' && property.number !== null) {
-                return `${baseUrl}property-detail.html?number=${encodeURIComponent(property.number)}`;
+                const url = `${baseUrl}property-detail.html?number=${encodeURIComponent(property.number)}`;
+                console.log('🔗 生成獨立頁 URL:', url, '基礎路徑:', basePath);
+                return url;
             } 
             // 如果沒有編號，使用 ID
             else if (property.id) {
-                return `${baseUrl}property-detail.html?id=${property.id}`;
+                const url = `${baseUrl}property-detail.html?id=${property.id}`;
+                console.log('🔗 生成獨立頁 URL:', url, '基礎路徑:', basePath);
+                return url;
             }
             
             // 如果都沒有，返回空連結

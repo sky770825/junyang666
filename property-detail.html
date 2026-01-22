@@ -522,27 +522,59 @@
         // 動態計算正確的基礎路徑
         (function() {
             const currentPath = window.location.pathname;
+            const currentUrl = window.location.href;
             let basePath = './';
             
-            // 如果路徑包含 admin-dashboard，使用相對路徑
-            if (currentPath.includes('/admin-dashboard/')) {
+            // 判斷是否在根目錄
+            // 如果路徑是 /property-detail.html 或 /admin-dashboard/property-detail.html
+            const isRoot = currentPath === '/property-detail.html' || 
+                          currentPath.match(/^\/[^\/]+\.html$/);
+            const isInSubDir = currentPath.includes('/admin-dashboard/') || 
+                              currentPath.match(/\/[^\/]+\/[^\/]+\.html$/);
+            
+            if (isInSubDir) {
+                // 在子目錄中，需要返回上一層
                 basePath = '../';
-            } else if (currentPath.includes('/')) {
-                // 計算需要返回的層級
-                const depth = currentPath.split('/').filter(p => p && !p.includes('.html')).length - 1;
+            } else if (isRoot) {
+                // 在根目錄，使用相對路徑
+                basePath = './';
+            } else {
+                // 其他情況，計算需要返回的層級
+                const pathParts = currentPath.split('/').filter(p => p && !p.includes('.html'));
+                const depth = pathParts.length;
                 basePath = depth > 0 ? '../'.repeat(depth) : './';
             }
             
-            console.log('📁 計算的基礎路徑:', basePath, '當前路徑:', currentPath);
+            console.log('📁 路徑計算:', {
+                currentPath: currentPath,
+                currentUrl: currentUrl,
+                isRoot: isRoot,
+                isInSubDir: isInSubDir,
+                basePath: basePath
+            });
             
             // 載入 supabase-config.js
             const configScript = document.createElement('script');
-            configScript.src = basePath + 'supabase-config.js';
+            const configScriptUrl = basePath + 'supabase-config.js';
+            configScript.src = configScriptUrl;
             configScript.onerror = function() {
-                console.error('❌ 無法載入 supabase-config.js，使用內建配置');
+                console.error('❌ 無法載入 supabase-config.js，路徑:', configScriptUrl);
+                console.error('   當前 URL:', window.location.href);
+                console.error('   當前路徑:', window.location.pathname);
+                console.error('   計算的基礎路徑:', basePath);
+                // 使用內建配置作為備用
+                if (typeof window.SUPABASE_CONFIG === 'undefined') {
+                    window.SUPABASE_CONFIG = {
+                        url: 'https://cnzqtuuegdqwkgvletaa.supabase.co',
+                        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE',
+                    };
+                    window.createSupabaseClient = function() {
+                        return supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+                    };
+                }
             };
             configScript.onload = function() {
-                console.log('✅ supabase-config.js 載入成功');
+                console.log('✅ supabase-config.js 載入成功，路徑:', configScriptUrl);
             };
             document.head.appendChild(configScript);
             

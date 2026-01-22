@@ -444,17 +444,17 @@ const MIN_LOAD_INTERVAL = 1000; // 最小載入間隔 1 秒
             return;
         }
         
-        console.log('✅ Supabase SDK 已載入，準備開始載入資料');
+        // 🔇 移除訊息，避免在刷新時顯示
         
         // 如果 DOM 已經載入完成，立即執行
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            console.log('📦 DOM 已準備好，Supabase SDK 已載入，立即載入資料');
+            // 🔇 移除訊息，避免在刷新時顯示
             initDataLoader();
         } else {
             // 等待 DOM 載入完成
-            console.log('📦 等待 DOM 載入完成...');
+            // 🔇 移除訊息，避免在刷新時顯示
             document.addEventListener('DOMContentLoaded', function() {
-                console.log('📦 DOM 載入完成，開始載入資料');
+                // 🔇 移除訊息，避免在刷新時顯示
                 initDataLoader();
             }, { once: true }); // 🔥 使用 once: true 防止重複觸發
         }

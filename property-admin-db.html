@@ -176,15 +176,21 @@
                 gap: 1.25rem !important;
             }
             
-            /* 表單區塊優化 - 增加間距 */
+            /* 表單區塊優化 - 增加間距，更明顯的視覺層次 */
             .form-section {
                 padding: 1rem !important;
-                margin-bottom: 1.5rem !important;
+                margin-bottom: 1.25rem !important;
+                background: #ffffff !important;
+                border: 1px solid #e9ecef !important;
+                border-radius: 10px !important;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
             }
             
             .form-section h3 {
-                font-size: 1.1rem !important;
-                margin-bottom: 1rem !important;
+                font-size: 1rem !important;
+                margin-bottom: 0.75rem !important;
+                padding-bottom: 0.5rem !important;
+                border-bottom: 2px solid #f0f0f0 !important;
             }
             
             /* 表單欄位優化 - 增加大小和間距 */
@@ -1064,38 +1070,58 @@
         }
         
         @media (max-width: 768px) {
-            /* 容器優化 */
+            /* 容器優化 - 移除圓角和陰影，全螢幕 */
             .container {
-                padding: 0.5rem;
+                padding: 0;
                 max-width: 100%;
                 width: 100%;
+                border-radius: 0;
+                box-shadow: none;
             }
             
-            /* Header 優化 */
+            /* Header 優化 - 更緊湊，sticky */
             .header {
-                padding: 1rem;
+                padding: 0.75rem 1rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             }
             
             .header h1 {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
+                margin-bottom: 0.25rem;
             }
             
             .header p {
-                font-size: 0.85rem;
+                font-size: 0.8rem;
+                margin: 0;
             }
             
-            /* Tabs 優化 */
+            /* Tabs 優化 - sticky，更緊湊 */
             .tabs {
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
                 gap: 0.5rem;
                 padding: 0.5rem;
+                position: sticky;
+                top: 0;
+                background: white;
+                z-index: 99;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .tabs::-webkit-scrollbar {
+                display: none;
             }
             
             .tab {
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
-                flex: 1;
-                min-width: calc(50% - 0.25rem);
+                padding: 0.6rem 0.9rem;
+                font-size: 0.85rem;
+                flex: 0 0 auto;
+                white-space: nowrap;
+                min-width: auto;
             }
             
             /* Modal 優化 */

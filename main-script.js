@@ -1386,8 +1386,7 @@ window.addEventListener('apiDataLoaded', function() {
     } else {
         console.warn('⚠️ API 資料載入事件觸發，但 embeddedPropertiesData 不存在');
     }
-    }, { once: false });
-}
+}, { once: false });
 
 // 暴露貸款試算函數到全域
 window.showLoanCalculator = showLoanCalculator;

@@ -3450,10 +3450,13 @@
                     delete propertyData.park;
                 }
                 
-                // 處理 features
+                // 處理 features：即使為空也要設置為空陣列，確保可以清空
                 const featuresText = document.getElementById('features').value.trim();
                 if (featuresText) {
                     propertyData.features = featuresText.split('\n').map(line => line.trim()).filter(line => line);
+                } else {
+                    // 明確設置為空陣列，確保可以清空現有的 features
+                    propertyData.features = [];
                 }
                 
                 // 整理圖片：將本地預覽的圖片上傳到正確的物件資料夾
@@ -3488,12 +3491,22 @@
                 // 添加時間戳
                 propertyData.updated_at = new Date().toISOString();
                 
-                // 清理空字串欄位
+                // 清理空字串欄位（但保留 features 和 description，即使為空也要更新）
                 Object.keys(propertyData).forEach(key => {
+                    // features 和 description 即使為空也要保留，確保可以清空現有值
+                    if (key === 'features' || key === 'description') {
+                        return; // 跳過清理
+                    }
                     if (propertyData[key] === '' || propertyData[key] === null) {
                         delete propertyData[key];
                     }
                 });
+                
+                // 確保 description 即使為空字串也要設置（用於清空現有值）
+                if (!('description' in propertyData)) {
+                    const descriptionValue = document.getElementById('description').value.trim();
+                    propertyData.description = descriptionValue || null;
+                }
                 
                 console.log('💾 準備儲存物件資料:', {
                     number: propertyData.number,
@@ -3944,6 +3957,16 @@
                                     addressElement.value = prop.address_detail;
                                 }
                             }
+                        } else if (key === 'features') {
+                            // 特殊處理 features：確保是陣列格式
+                            if (Array.isArray(prop[key])) {
+                                element.value = prop[key].join('\n');
+                            } else {
+                                element.value = '';
+                            }
+                        } else if (key === 'description') {
+                            // 特殊處理 description：確保正確顯示
+                            element.value = prop[key] || '';
                         } else if (Array.isArray(prop[key])) {
                             element.value = prop[key].join('\n');
                         } else if (typeof prop[key] === 'object' && prop[key] !== null) {

@@ -222,9 +222,30 @@ class EmbeddedPropertyPaginationSystem {
     }
 
     renderProperties() {
+        // 🔥 防止重複渲染：使用防抖機制
+        if (this._isRendering) {
+            console.log('⏭️ 正在渲染中，跳過重複調用');
+            return;
+        }
+        
+        // 設置渲染標記
+        this._isRendering = true;
+        
+        // 清除之前的防抖計時器
+        if (this._renderDebounceTimer) {
+            clearTimeout(this._renderDebounceTimer);
+        }
+        
+        // 使用防抖：延遲 50ms 執行，如果 50ms 內再次調用則取消之前的調用
+        this._renderDebounceTimer = setTimeout(() => {
+            this._isRendering = false;
+            this._renderDebounceTimer = null;
+        }, 50);
+        
         const container = document.getElementById('properties-container');
         if (!container) {
             console.warn('⚠️ properties-container 元素不存在');
+            this._isRendering = false;
             return;
         }
 
@@ -382,6 +403,13 @@ class EmbeddedPropertyPaginationSystem {
         requestAnimationFrame(() => {
             this.adjustTitleFontSize();
         });
+        
+        // 清除渲染標記
+        if (this._renderDebounceTimer) {
+            clearTimeout(this._renderDebounceTimer);
+        }
+        this._isRendering = false;
+        this._renderDebounceTimer = null;
     }
 
     // 🚀 新增：設置事件委託

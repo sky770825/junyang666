@@ -1485,65 +1485,28 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('⚠️ 資料尚未載入，等待資料載入事件...');
     }
     
-    // 延遲初始化（給資料載入一些時間，作為備用）
-    setTimeout(() => {
-        if (!embeddedPaginationSystem && typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
-            console.log('⏰ 延遲初始化分頁系統（備用機制 500ms）');
-            initializePaginationSystem();
-        }
-    }, 500);
-    
-    // 更長的延遲檢查（確保資料載入完成）
-    setTimeout(() => {
-        if (!embeddedPaginationSystem && typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
-            console.log('⏰ 最終檢查並初始化分頁系統（2000ms）');
-            initializePaginationSystem();
-        } else if (!embeddedPaginationSystem) {
-            console.warn('⚠️ 分頁系統未初始化，資料可能尚未載入');
-            console.log('📊 當前狀態:', {
-                hasData: typeof embeddedPropertiesData !== 'undefined',
-                dataLength: typeof embeddedPropertiesData !== 'undefined' ? embeddedPropertiesData.properties?.length : 0,
-                hasSystem: !!embeddedPaginationSystem,
-                hasClass: typeof EmbeddedPropertyPaginationSystem !== 'undefined'
-            });
-            
-            // 如果類別存在但系統未初始化，強制初始化
-            if (typeof EmbeddedPropertyPaginationSystem !== 'undefined' && typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
-                console.log('🔧 強制初始化分頁系統...');
-                const initResult = initializePaginationSystem();
-                if (initResult) {
-                    console.log('✅ 強制初始化成功');
-                } else {
-                    console.error('❌ 強制初始化失敗');
-                }
-            } else {
-                console.error('❌ 無法強制初始化：缺少必要條件');
-                console.log('   - EmbeddedPropertyPaginationSystem:', typeof EmbeddedPropertyPaginationSystem !== 'undefined' ? '✅' : '❌');
-                console.log('   - embeddedPropertiesData:', typeof embeddedPropertiesData !== 'undefined' ? '✅' : '❌');
-                console.log('   - 資料數量:', typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties ? embeddedPropertiesData.properties.length : 0);
+    // 🔥 防止重複初始化：使用標記確保只執行一次延遲檢查
+    if (!window.paginationSystemInitChecked) {
+        window.paginationSystemInitChecked = true;
+        
+        // 只保留一個延遲檢查（2000ms），移除其他重複的檢查
+        setTimeout(() => {
+            if (!embeddedPaginationSystem && typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
+                console.log('⏰ 延遲檢查並初始化分頁系統（2000ms）');
+                initializePaginationSystem();
+            } else if (!embeddedPaginationSystem) {
+                console.warn('⚠️ 分頁系統未初始化，資料可能尚未載入');
+                console.log('📊 當前狀態:', {
+                    hasData: typeof embeddedPropertiesData !== 'undefined',
+                    dataLength: typeof embeddedPropertiesData !== 'undefined' ? embeddedPropertiesData.properties?.length : 0,
+                    hasSystem: !!embeddedPaginationSystem,
+                    hasClass: typeof EmbeddedPropertyPaginationSystem !== 'undefined'
+                });
             }
-        }
-    }, 2000);
-    
-    // 最終備用檢查（5000ms）
-    setTimeout(() => {
-        if (!embeddedPaginationSystem) {
-            console.warn('⚠️ 分頁系統仍未初始化，執行最終備用檢查');
-            if (typeof EmbeddedPropertyPaginationSystem !== 'undefined') {
-                if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
-                    console.log('🔧 最終備用：強制初始化分頁系統');
-                    initializePaginationSystem();
-                } else {
-                    console.error('❌ 無法初始化：資料未載入');
-                    // 🔥 移除手動觸發，避免無限循環
-                    // 資料載入應該由 supabase-data-loader.js 自動處理
-                    console.log('⏳ 等待 Supabase 資料載入器自動載入資料...');
-                }
-            } else {
-                console.error('❌ 無法初始化：EmbeddedPropertyPaginationSystem 類別未定義');
-            }
-        }
-    }, 5000);
+        }, 2000);
+    } else {
+        console.log('⏭️ 分頁系統初始化檢查已執行，跳過重複檢查');
+    }
     
     // 客戶見證輪播功能
     let currentTestimonialIndex = 0;

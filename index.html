@@ -2864,82 +2864,85 @@
             }, 3000);
             
             // 載入相關連結（從後端 API，使用與備份檔案一致的樣式）
-            function loadRelatedLinksOnPage() {
-                console.log('🔄 開始初始化相關連結載入器...');
-                const maxRetries = 30; // 最多重試 15 秒
-                let retries = 0;
-                let hasLoaded = false;
+            // 🔥 防止重複載入：使用全域標記
+            if (!window.relatedLinksLoading) {
+                window.relatedLinksLoading = true;
                 
-                function tryLoad() {
-                    // 如果已經載入成功，不再重試
-                    if (hasLoaded) {
-                        return;
+                function loadRelatedLinksOnPage() {
+                    console.log('🔄 開始初始化相關連結載入器...');
+                    const maxRetries = 30; // 最多重試 15 秒
+                    let retries = 0;
+                    let hasLoaded = false;
+                    let tryLoadTimer = null;
+                    
+                    function tryLoad() {
+                        // 如果已經載入成功，不再重試
+                        if (hasLoaded) {
+                            if (tryLoadTimer) clearTimeout(tryLoadTimer);
+                            return;
+                        }
+                        
+                        // 檢查新模組是否已載入
+                        const hasModule = typeof RelatedLinksFrontend !== 'undefined' && 
+                                         typeof RelatedLinksFrontend.renderRelatedLinks === 'function';
+                        
+                        if (hasModule) {
+                            console.log('✅ 開始載入相關連結（從後端 API，使用 contact-button 樣式）');
+                            RelatedLinksFrontend.renderRelatedLinks('related-links-container')
+                                .then(() => {
+                                    hasLoaded = true;
+                                    if (tryLoadTimer) clearTimeout(tryLoadTimer);
+                                    console.log('✅ 相關連結載入完成');
+                                })
+                                .catch(error => {
+                                    console.error('❌ 載入相關連結失敗:', error);
+                                    const container = document.getElementById('related-links-container');
+                                    if (container) {
+                                        container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 1rem;">載入連結失敗</p>';
+                                    }
+                                });
+                        } else if (retries < maxRetries) {
+                            retries++;
+                            if (retries % 5 === 0) {
+                                console.log(`ℹ️ RelatedLinksFrontend 尚未載入 (${retries}/${maxRetries})`);
+                            }
+                            tryLoadTimer = setTimeout(tryLoad, 500);
+                        } else {
+                            console.error('❌ 載入相關連結超時');
+                            const container = document.getElementById('related-links-container');
+                            if (container) {
+                                container.innerHTML = `
+                                    <div style="text-align: center; color: #dc3545; padding: 1rem;">
+                                        <p>載入連結失敗，請重新整理頁面</p>
+                                        <button onclick="location.reload()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">重新整理</button>
+                                    </div>
+                                `;
+                            }
+                        }
                     }
                     
-                    // 檢查新模組是否已載入
-                    const hasModule = typeof RelatedLinksFrontend !== 'undefined' && 
-                                     typeof RelatedLinksFrontend.renderRelatedLinks === 'function';
+                    // 監聽自定義事件（優先使用，只執行一次）
+                    let eventHandled = false;
+                    window.addEventListener('relatedLinksFrontendReady', function handler() {
+                        if (eventHandled) return;
+                        eventHandled = true;
+                        console.log('📢 收到 relatedLinksFrontendReady 事件');
+                        window.removeEventListener('relatedLinksFrontendReady', handler);
+                        if (!hasLoaded) {
+                            tryLoadTimer = setTimeout(tryLoad, 100);
+                        }
+                    }, { once: true });
                     
-                    if (hasModule) {
-                        console.log('✅ 開始載入相關連結（從後端 API，使用 contact-button 樣式）');
-                        RelatedLinksFrontend.renderRelatedLinks('related-links-container')
-                            .then(() => {
-                                hasLoaded = true;
-                                console.log('✅ 相關連結載入完成');
-                            })
-                            .catch(error => {
-                                console.error('❌ 載入相關連結失敗:', error);
-                                const container = document.getElementById('related-links-container');
-                                if (container) {
-                                    container.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 1rem;">載入連結失敗</p>';
-                                }
-                            });
-                    } else if (retries < maxRetries) {
-                        retries++;
-                        if (retries % 5 === 0) {
-                            console.log(`ℹ️ RelatedLinksFrontend 尚未載入 (${retries}/${maxRetries})`, {
-                                RelatedLinksFrontend: typeof RelatedLinksFrontend,
-                                renderRelatedLinks: typeof RelatedLinksFrontend?.renderRelatedLinks,
-                                supabase: typeof supabase !== 'undefined',
-                                SUPABASE_CONFIG: typeof SUPABASE_CONFIG !== 'undefined'
-                            });
-                        }
-                        setTimeout(tryLoad, 500);
-                    } else {
-                        console.error('❌ 載入相關連結超時');
-                        const container = document.getElementById('related-links-container');
-                        if (container) {
-                            container.innerHTML = `
-                                <div style="text-align: center; color: #dc3545; padding: 1rem;">
-                                    <p>載入連結失敗，請重新整理頁面</p>
-                                    <button onclick="location.reload()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">重新整理</button>
-                                </div>
-                            `;
-                        }
+                    // 只執行一次初始檢查
+                    if (!hasLoaded) {
+                        tryLoadTimer = setTimeout(tryLoad, 500);
                     }
                 }
                 
-                // 監聽自定義事件（優先使用）
-                window.addEventListener('relatedLinksFrontendReady', function handler() {
-                    console.log('📢 收到 relatedLinksFrontendReady 事件');
-                    window.removeEventListener('relatedLinksFrontendReady', handler); // 只執行一次
-                    setTimeout(tryLoad, 100);
-                }, { once: true });
-                
-                // 立即檢查一次（腳本可能已經載入）
-                setTimeout(tryLoad, 100);
-                
-                // 頁面載入完成後也嘗試載入
-                if (document.readyState === 'complete') {
-                    setTimeout(tryLoad, 500);
-                } else {
-                    window.addEventListener('load', () => {
-                        setTimeout(tryLoad, 500);
-                    });
-                }
+                loadRelatedLinksOnPage();
+            } else {
+                console.log('⏭️ 相關連結載入器已在執行中，跳過重複初始化');
             }
-            
-            loadRelatedLinksOnPage();
         });
         
         // 🔍 開發模式調試（生產環境可移除）

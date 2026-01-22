@@ -1322,12 +1322,12 @@ window.addEventListener('supabaseDataLoaded', function(event) {
             embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
             window.paginationSystem = embeddedPaginationSystem;
             
-            // 🔥 確保初始化後立即渲染
-            if (embeddedPaginationSystem && embeddedPaginationSystem.properties && embeddedPaginationSystem.properties.length > 0) {
-                console.log('✅ 分頁系統已初始化，立即渲染物件');
+            // 🔥 確保初始化後立即渲染（即使資料是空的也要渲染，顯示「目前沒有物件」）
+            if (embeddedPaginationSystem) {
+                console.log('✅ 分頁系統已初始化，立即渲染（物件數: ' + (embeddedPaginationSystem.properties ? embeddedPaginationSystem.properties.length : 0) + '）');
                 embeddedPaginationSystem.renderProperties();
             } else {
-                console.warn('⚠️ 分頁系統已初始化，但沒有物件資料可渲染');
+                console.warn('⚠️ 分頁系統初始化失敗');
             }
         } else {
             console.error('❌ EmbeddedPropertyPaginationSystem 類別未定義，無法初始化分頁系統');

@@ -230,14 +230,18 @@ class EmbeddedPropertyPaginationSystem {
 
         // 檢查是否有資料，如果沒有則嘗試從 embeddedPropertiesData 更新
         if (!this.properties || this.properties.length === 0) {
-            // 檢查是否正在載入資料
-            if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
-                // 資料已載入但還沒更新到分頁系統，更新資料
+            // 🔥 檢查 embeddedPropertiesData 是否已設置（即使資料是空的）
+            const hasEmbeddedData = typeof embeddedPropertiesData !== 'undefined' && 
+                                   embeddedPropertiesData !== null &&
+                                   embeddedPropertiesData.properties !== undefined;
+            
+            if (hasEmbeddedData) {
+                // 資料已載入（可能是空的），更新分頁系統資料
                 const oldCount = this.allProperties ? this.allProperties.length : 0;
-                const newCount = embeddedPropertiesData.properties.length;
+                const newCount = embeddedPropertiesData.properties ? embeddedPropertiesData.properties.length : 0;
                 
                 console.log(`🔄 資料已載入，更新分頁系統資料... (舊: ${oldCount} → 新: ${newCount})`);
-                this.allProperties = embeddedPropertiesData.properties;
+                this.allProperties = embeddedPropertiesData.properties || [];
                 this.properties = this.allProperties.filter(p => p.status !== 'sold');
                 this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
                 // 清除緩存

@@ -1249,10 +1249,16 @@ document.addEventListener('keydown', function(e) {
 let embeddedPaginationSystem;
 
 // 🔥 重要：在 DOMContentLoaded 之前設置事件監聽器，確保不會錯過資料載入事件
-// 監聽需要初始化的自定義事件
+// 監聽需要初始化的自定義事件（只執行一次，防止重複初始化）
 window.addEventListener('needPaginationInit', function(event) {
     console.log('📦 收到需要初始化分頁系統的事件');
-    if (!embeddedPaginationSystem && typeof EmbeddedPropertyPaginationSystem !== 'undefined') {
+    // 🔥 防止重複初始化：檢查是否已經初始化
+    if (embeddedPaginationSystem) {
+        console.log('⏭️ 分頁系統已存在，跳過重複初始化');
+        return;
+    }
+    
+    if (typeof EmbeddedPropertyPaginationSystem !== 'undefined') {
         // 確保 embeddedPropertiesData 存在且有資料
         if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
             console.log('🚀 從 needPaginationInit 事件初始化分頁系統');
@@ -1260,7 +1266,7 @@ window.addEventListener('needPaginationInit', function(event) {
             window.paginationSystem = embeddedPaginationSystem;
         }
     }
-});
+}, { once: true }); // 🔥 只執行一次，防止重複監聽
 
 // 監聽 Supabase 資料載入事件（優先）- 在 DOMContentLoaded 之前設置
 // 🔥 防止重複更新：使用標記確保同一批資料只更新一次
@@ -1317,17 +1323,21 @@ window.addEventListener('supabaseDataLoaded', function(event) {
             
             console.log(`✅ 分頁系統已更新！目前有 ${embeddedPropertiesData.properties.length} 個物件（未售: ${embeddedPaginationSystem.properties.length}，已售: ${embeddedPaginationSystem.soldProperties.length}）`);
         } else if (typeof EmbeddedPropertyPaginationSystem !== 'undefined') {
-            // 如果分頁系統還沒初始化，現在初始化
-            console.log('🚀 資料已載入，立即初始化分頁系統（從事件）');
-            embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
-            window.paginationSystem = embeddedPaginationSystem;
-            
-            // 🔥 確保初始化後立即渲染（即使資料是空的也要渲染，顯示「目前沒有物件」）
-            if (embeddedPaginationSystem) {
-                console.log('✅ 分頁系統已初始化，立即渲染（物件數: ' + (embeddedPaginationSystem.properties ? embeddedPaginationSystem.properties.length : 0) + '）');
-                embeddedPaginationSystem.renderProperties();
+            // 🔥 防止重複初始化：檢查是否已經初始化
+            if (!embeddedPaginationSystem) {
+                console.log('🚀 資料已載入，立即初始化分頁系統（從事件）');
+                embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
+                window.paginationSystem = embeddedPaginationSystem;
+                
+                // 🔥 確保初始化後立即渲染（即使資料是空的也要渲染，顯示「目前沒有物件」）
+                if (embeddedPaginationSystem) {
+                    console.log('✅ 分頁系統已初始化，立即渲染（物件數: ' + (embeddedPaginationSystem.properties ? embeddedPaginationSystem.properties.length : 0) + '）');
+                    embeddedPaginationSystem.renderProperties();
+                } else {
+                    console.warn('⚠️ 分頁系統初始化失敗');
+                }
             } else {
-                console.warn('⚠️ 分頁系統初始化失敗');
+                console.log('⏭️ 分頁系統已存在，跳過重複初始化');
             }
         } else {
             console.error('❌ EmbeddedPropertyPaginationSystem 類別未定義，無法初始化分頁系統');
@@ -1378,10 +1388,14 @@ window.addEventListener('apiDataLoaded', function() {
             
             console.log(`✅ 分頁系統已更新！目前有 ${embeddedPropertiesData.properties.length} 個物件`);
         } else if (typeof EmbeddedPropertyPaginationSystem !== 'undefined') {
-            // 如果分頁系統還沒初始化，現在初始化
-            console.log('🚀 API 資料已載入，立即初始化分頁系統（從事件）');
-            embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
-            window.paginationSystem = embeddedPaginationSystem;
+            // 🔥 防止重複初始化：檢查是否已經初始化
+            if (!embeddedPaginationSystem) {
+                console.log('🚀 API 資料已載入，立即初始化分頁系統（從事件）');
+                embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
+                window.paginationSystem = embeddedPaginationSystem;
+            } else {
+                console.log('⏭️ 分頁系統已存在，跳過重複初始化');
+            }
         }
     } else {
         console.warn('⚠️ API 資料載入事件觸發，但 embeddedPropertiesData 不存在');

@@ -1,11 +1,16 @@
 // Supabase 資料載入器
 // 從 Supabase 載入已上架的物件資料並合併到 embeddedPropertiesData
 
-// Supabase 設定
-const SUPABASE_URL = 'https://cnzqtuuegdqwkgvletaa.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE';
+// 🔥 使用統一配置：優先使用 supabase-config.js 中的配置
+// 如果 supabase-config.js 未載入，使用備用配置
+const SUPABASE_URL = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG?.url) 
+    ? SUPABASE_CONFIG.url 
+    : 'https://cnzqtuuegdqwkgvletaa.supabase.co';
+const SUPABASE_ANON_KEY = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG?.anonKey) 
+    ? SUPABASE_CONFIG.anonKey 
+    : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE';
 
-// 初始化 Supabase 客戶端
+// 初始化 Supabase 客戶端（使用單例模式）
 let supabaseClient = null;
 
 // 處理地址顯示的輔助函數（根據 hide_address_number 和物件類型決定是否隱藏門牌號碼）
@@ -100,19 +105,33 @@ async function loadPropertiesFromSupabase() {
         console.log('🔄 正在從 Supabase 載入已上架的物件資料...');
         const loadStartTime = Date.now();
         
-        // 初始化 Supabase 客戶端
+        // 初始化 Supabase 客戶端（使用單例模式，避免多個實例）
         if (!supabaseClient) {
-            if (typeof supabase === 'undefined') {
+            // 🔥 優先使用全域客戶端（單例模式）
+            if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient) {
+                console.log('🔄 使用現有的 Supabase 客戶端（避免多個實例）');
+                supabaseClient = window.supabaseClient;
+            } else if (typeof supabase === 'undefined') {
                 console.error('❌ Supabase SDK 未載入，無法創建客戶端');
                 throw new Error('Supabase SDK 未載入');
-            }
-            
-            try {
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Supabase 客戶端創建成功');
-            } catch (error) {
-                console.error('❌ 創建 Supabase 客戶端失敗:', error);
-                throw error;
+            } else {
+                // 🔥 優先使用統一配置函數
+                try {
+                    if (typeof createSupabaseClient === 'function') {
+                        supabaseClient = createSupabaseClient();
+                    } else {
+                        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    }
+                    
+                    // 儲存到全域，供其他模組使用
+                    if (supabaseClient) {
+                        window.supabaseClient = supabaseClient;
+                    }
+                    console.log('✅ Supabase 客戶端創建成功（單例模式）');
+                } catch (error) {
+                    console.error('❌ 創建 Supabase 客戶端失敗:', error);
+                    throw error;
+                }
             }
         }
         

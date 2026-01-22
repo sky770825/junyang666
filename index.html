@@ -2955,10 +2955,12 @@
                 console.log('- SoldPropertyPaginationSystem:', typeof SoldPropertyPaginationSystem !== 'undefined' ? '✅' : '❌');
                 console.log('- window.paginationSystem:', typeof window.paginationSystem !== 'undefined' ? '✅' : '❌');
                 
-                // 🔥 如果分頁系統未初始化，嘗試強制初始化
+                // 🔥 如果分頁系統未初始化，嘗試強制初始化（僅在開發模式）
+                // 注意：生產環境應該由 main-script.js 的事件監聽器處理
                 if (typeof window.paginationSystem === 'undefined' && typeof EmbeddedPropertyPaginationSystem !== 'undefined' && typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
-                    console.log('🔧 檢測到分頁系統未初始化，嘗試強制初始化...');
+                    // 🔥 檢查是否已經有 embeddedPaginationSystem（避免重複初始化）
                     if (typeof embeddedPaginationSystem === 'undefined') {
+                        console.log('🔧 檢測到分頁系統未初始化，嘗試強制初始化（開發模式）...');
                         window.embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
                         window.paginationSystem = window.embeddedPaginationSystem;
                         console.log('✅ 分頁系統已強制初始化');

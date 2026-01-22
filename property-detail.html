@@ -1646,6 +1646,15 @@
             // 修正返回按鈕路徑
             fixBackButtonPath();
             
+            // 確保頁面顯示載入狀態（防止顯示首頁內容）
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const pageEl = document.getElementById('property-page');
+            
+            if (loadingEl) loadingEl.style.display = 'block';
+            if (errorEl) errorEl.style.display = 'none';
+            if (pageEl) pageEl.style.display = 'none';
+            
             // 檢查 Supabase SDK 是否已載入
             if (typeof supabase === 'undefined') {
                 console.error('❌ Supabase SDK 尚未載入，等待載入...');
@@ -1660,8 +1669,6 @@
                     } else if (retries >= maxRetries) {
                         console.error('❌ Supabase SDK 載入超時');
                         clearInterval(checkSupabase);
-                        const loadingEl = document.getElementById('loading');
-                        const errorEl = document.getElementById('error');
                         if (loadingEl) loadingEl.style.display = 'none';
                         if (errorEl) {
                             errorEl.style.display = 'block';
@@ -1670,7 +1677,7 @@
                     }
                 }, 500);
             } else {
-                console.log('✅ Supabase SDK 已就緒');
+                console.log('✅ Supabase SDK 已就緒，開始載入物件資料');
                 loadProperty();
             }
         });

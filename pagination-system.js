@@ -86,8 +86,8 @@ class EmbeddedPropertyPaginationSystem {
                 `;
             }
             
-            // 如果資料還沒載入，等待一下再檢查（多次檢查確保資料載入）
-            const checkData = (attempt = 1, maxAttempts = 10) => {
+            // 🚀 性能優化：如果資料還沒載入，快速檢查（減少延遲）
+            const checkData = (attempt = 1, maxAttempts = 20) => {
                 if (attempt > maxAttempts) {
                     console.warn('⚠️ 資料載入超時，請檢查 Supabase 連接');
                     const container = document.getElementById('properties-container');
@@ -103,10 +103,12 @@ class EmbeddedPropertyPaginationSystem {
                     return;
                 }
                 
+                // 🚀 使用更短的檢查間隔（100ms），但增加最大檢查次數
+                const checkInterval = 100; // 固定 100ms 間隔，不遞增
+                
                 setTimeout(() => {
                     // 再次檢查資料是否已載入
                     if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
-                        console.log(`✅ 資料已載入（第 ${attempt} 次檢查），開始渲染`);
                         // 更新資料
                         this.allProperties = embeddedPropertiesData.properties || [];
                         this.properties = this.allProperties.filter(p => p.status !== 'sold');
@@ -121,12 +123,17 @@ class EmbeddedPropertyPaginationSystem {
                         
                         // 重新渲染
                         this.renderProperties();
-                        console.log(`✅ 資料已載入並渲染完成（${this.properties.length} 個物件）`);
+                    } else if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties) {
+                        // 資料已載入但為空陣列，也要渲染（顯示「目前沒有物件」）
+                        this.allProperties = embeddedPropertiesData.properties || [];
+                        this.properties = this.allProperties.filter(p => p.status !== 'sold');
+                        this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
+                        this.renderProperties();
                     } else {
                         // 繼續檢查
                         checkData(attempt + 1, maxAttempts);
                     }
-                }, 500 * attempt); // 每次間隔遞增
+                }, checkInterval);
             };
             
             checkData();

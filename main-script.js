@@ -1503,26 +1503,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 🔥 防止重複初始化：使用標記確保只執行一次延遲檢查
+    // 🚀 性能優化：減少延遲時間
     if (!window.paginationSystemInitChecked) {
         window.paginationSystemInitChecked = true;
         
-        // 只保留一個延遲檢查（2000ms），移除其他重複的檢查
+        // 🚀 減少延遲檢查時間到 1000ms
         setTimeout(() => {
             if (!embeddedPaginationSystem && typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
-                console.log('⏰ 延遲檢查並初始化分頁系統（2000ms）');
                 initializePaginationSystem();
             } else if (!embeddedPaginationSystem) {
-                console.warn('⚠️ 分頁系統未初始化，資料可能尚未載入');
-                console.log('📊 當前狀態:', {
-                    hasData: typeof embeddedPropertiesData !== 'undefined',
-                    dataLength: typeof embeddedPropertiesData !== 'undefined' ? embeddedPropertiesData.properties?.length : 0,
-                    hasSystem: !!embeddedPaginationSystem,
-                    hasClass: typeof EmbeddedPropertyPaginationSystem !== 'undefined'
-                });
+                // 🔇 移除警告訊息，避免在刷新時顯示
             }
-        }, 2000);
-    } else {
-        console.log('⏭️ 分頁系統初始化檢查已執行，跳過重複檢查');
+        }, 1000); // 從 2000ms 減少到 1000ms
     }
     
     // 客戶見證輪播功能

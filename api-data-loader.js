@@ -153,15 +153,24 @@ function refreshPaginationSystem() {
     }, 500); // 等待 500ms 確保分頁系統已初始化
 }
 
-// 在 DOM 載入完成後載入 API 資料
+// 🚀 性能優化：如果 Supabase 已成功載入，跳過 API 載入
+// 在 DOM 載入完成後載入 API 資料（僅作為備用）
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
+        // 🚀 檢查是否已有 Supabase 資料，如果有則跳過 API 載入
+        if (typeof embeddedPropertiesData !== 'undefined' && 
+            embeddedPropertiesData.properties && 
+            embeddedPropertiesData.properties.length > 0) {
+            // Supabase 已成功載入，跳過 API 載入
+            return;
+        }
+        
         await loadPropertiesFromAPI();
         
-        // 觸發重新渲染
+        // 觸發重新渲染（減少延遲）
         setTimeout(() => {
             refreshPaginationSystem();
-        }, 100);
+        }, 50); // 減少到 50ms
         
         // 觸發自定義事件，通知其他模組資料已載入
         window.dispatchEvent(new CustomEvent('apiDataLoaded', { 
@@ -170,10 +179,18 @@ if (document.readyState === 'loading') {
     });
 } else {
     // DOM 已經載入完成
+    // 🚀 檢查是否已有 Supabase 資料
+    if (typeof embeddedPropertiesData !== 'undefined' && 
+        embeddedPropertiesData.properties && 
+        embeddedPropertiesData.properties.length > 0) {
+        // Supabase 已成功載入，跳過 API 載入
+        return;
+    }
+    
     loadPropertiesFromAPI().then(() => {
         setTimeout(() => {
             refreshPaginationSystem();
-        }, 100);
+        }, 50); // 減少到 50ms
         
         window.dispatchEvent(new CustomEvent('apiDataLoaded', { 
             detail: { properties: embeddedPropertiesData.properties } 

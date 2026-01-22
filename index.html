@@ -2853,15 +2853,14 @@
                 }
             });
             
-            // 最終檢查：確保已售物件分頁系統已初始化（備用機制）
+            // 🚀 性能優化：減少最終檢查延遲時間
             setTimeout(() => {
                 if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties && embeddedPropertiesData.properties.length > 0) {
                     if (!soldPaginationSystem && typeof SoldPropertyPaginationSystem !== 'undefined') {
-                        console.log('⏰ 最終檢查：初始化已售物件分頁系統');
                         soldPaginationSystem = new SoldPropertyPaginationSystem();
                     }
                 }
-            }, 3000);
+            }, 1500); // 從 3000ms 減少到 1500ms
             
             // 載入相關連結（從後端 API，使用與備份檔案一致的樣式）
             // 🔥 防止重複載入：使用全域標記
@@ -2869,8 +2868,8 @@
                 window.relatedLinksLoading = true;
                 
                 function loadRelatedLinksOnPage() {
-                    console.log('🔄 開始初始化相關連結載入器...');
-                    const maxRetries = 30; // 最多重試 15 秒
+                    // 🔇 移除初始化訊息
+                    const maxRetries = 40; // 增加重試次數，但減少間隔
                     let retries = 0;
                     let hasLoaded = false;
                     let tryLoadTimer = null;
@@ -2887,12 +2886,12 @@
                                          typeof RelatedLinksFrontend.renderRelatedLinks === 'function';
                         
                         if (hasModule) {
-                            console.log('✅ 開始載入相關連結（從後端 API，使用 contact-button 樣式）');
+                            // 🔇 移除載入訊息
                             RelatedLinksFrontend.renderRelatedLinks('related-links-container')
                                 .then(() => {
                                     hasLoaded = true;
                                     if (tryLoadTimer) clearTimeout(tryLoadTimer);
-                                    console.log('✅ 相關連結載入完成');
+                                    // 🔇 移除完成訊息
                                 })
                                 .catch(error => {
                                     console.error('❌ 載入相關連結失敗:', error);
@@ -2903,10 +2902,8 @@
                                 });
                         } else if (retries < maxRetries) {
                             retries++;
-                            if (retries % 5 === 0) {
-                                console.log(`ℹ️ RelatedLinksFrontend 尚未載入 (${retries}/${maxRetries})`);
-                            }
-                            tryLoadTimer = setTimeout(tryLoad, 500);
+                            // 🚀 性能優化：減少檢查間隔到 200ms
+                            tryLoadTimer = setTimeout(tryLoad, 200);
                         } else {
                             console.error('❌ 載入相關連結超時');
                             const container = document.getElementById('related-links-container');
@@ -2926,17 +2923,16 @@
                     window.addEventListener('relatedLinksFrontendReady', function handler() {
                         if (eventHandled) return;
                         eventHandled = true;
-                        console.log('📢 收到 relatedLinksFrontendReady 事件');
+                        // 🔇 移除事件訊息
                         window.removeEventListener('relatedLinksFrontendReady', handler);
                         if (!hasLoaded) {
-                            tryLoadTimer = setTimeout(tryLoad, 100);
+                            // 🚀 立即執行，不延遲
+                            tryLoad();
                         }
                     }, { once: true });
                     
-                    // 只執行一次初始檢查
-                    if (!hasLoaded) {
-                        tryLoadTimer = setTimeout(tryLoad, 500);
-                    }
+                    // 🚀 立即檢查一次（不延遲）
+                    tryLoad();
                 }
                 
                 loadRelatedLinksOnPage();

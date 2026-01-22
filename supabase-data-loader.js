@@ -425,39 +425,36 @@ const MIN_LOAD_INTERVAL = 1000; // 最小載入間隔 1 秒
     window.supabaseDataLoaderInitialized = true;
     
     // 🔥 確保 Supabase SDK 已載入後再執行
+    // 🚀 性能優化：如果 SDK 已載入，立即執行；否則快速檢查
     let supabaseWaitRetries = 0;
-    const MAX_SUPABASE_WAIT_RETRIES = 50; // 最多等待 5 秒（50 * 100ms）
+    const MAX_SUPABASE_WAIT_RETRIES = 30; // 減少到 3 秒（30 * 100ms）
+    const CHECK_INTERVAL = 50; // 減少檢查間隔到 50ms，加快響應
     
     function waitForSupabaseAndInit() {
-        if (typeof supabase === 'undefined') {
-            supabaseWaitRetries++;
-            if (supabaseWaitRetries >= MAX_SUPABASE_WAIT_RETRIES) {
-                console.error('❌ Supabase SDK 載入超時，已重試 ' + MAX_SUPABASE_WAIT_RETRIES + ' 次');
-                console.error('   請檢查網路連接或 Supabase SDK CDN 是否可訪問');
-                return;
+        // 🚀 如果 SDK 已載入，立即執行（不等待）
+        if (typeof supabase !== 'undefined') {
+            // 如果 DOM 已經載入完成，立即執行
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                initDataLoader();
+            } else {
+                // 等待 DOM 載入完成
+                document.addEventListener('DOMContentLoaded', function() {
+                    initDataLoader();
+                }, { once: true });
             }
-            // 🔇 移除等待訊息，避免在刷新時顯示（只在開發模式顯示）
-            if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && supabaseWaitRetries % 10 === 0) {
-                console.warn(`⏳ Supabase SDK 尚未載入，等待載入... (${supabaseWaitRetries}/${MAX_SUPABASE_WAIT_RETRIES})`);
-            }
-            setTimeout(waitForSupabaseAndInit, 100);
             return;
         }
         
-        // 🔇 移除訊息，避免在刷新時顯示
-        
-        // 如果 DOM 已經載入完成，立即執行
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            // 🔇 移除訊息，避免在刷新時顯示
-            initDataLoader();
-        } else {
-            // 等待 DOM 載入完成
-            // 🔇 移除訊息，避免在刷新時顯示
-            document.addEventListener('DOMContentLoaded', function() {
-                // 🔇 移除訊息，避免在刷新時顯示
-                initDataLoader();
-            }, { once: true }); // 🔥 使用 once: true 防止重複觸發
+        // SDK 尚未載入，繼續等待
+        supabaseWaitRetries++;
+        if (supabaseWaitRetries >= MAX_SUPABASE_WAIT_RETRIES) {
+            console.error('❌ Supabase SDK 載入超時，已重試 ' + MAX_SUPABASE_WAIT_RETRIES + ' 次');
+            console.error('   請檢查網路連接或 Supabase SDK CDN 是否可訪問');
+            return;
         }
+        
+        // 🚀 使用更短的間隔快速檢查
+        setTimeout(waitForSupabaseAndInit, CHECK_INTERVAL);
     }
     
     // 開始等待 Supabase SDK

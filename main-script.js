@@ -1328,7 +1328,7 @@ window.addEventListener('supabaseDataLoaded', function(event) {
         } else if (typeof EmbeddedPropertyPaginationSystem !== 'undefined') {
             // 🔥 防止重複初始化：檢查是否已經初始化
             if (!embeddedPaginationSystem) {
-                console.log('🚀 資料已載入，立即初始化分頁系統（從事件）');
+                // 🔇 移除訊息，避免在刷新時顯示
                 embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
                 window.paginationSystem = embeddedPaginationSystem;
                 
@@ -1393,7 +1393,7 @@ window.addEventListener('apiDataLoaded', function() {
         } else if (typeof EmbeddedPropertyPaginationSystem !== 'undefined') {
             // 🔥 防止重複初始化：檢查是否已經初始化
             if (!embeddedPaginationSystem) {
-                console.log('🚀 API 資料已載入，立即初始化分頁系統（從事件）');
+                // 🔇 移除訊息，避免在刷新時顯示
                 embeddedPaginationSystem = new EmbeddedPropertyPaginationSystem();
                 window.paginationSystem = embeddedPaginationSystem;
             } else {

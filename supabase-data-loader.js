@@ -102,14 +102,14 @@ window.formatAddressForDisplay = formatAddressForDisplay;
 // 從 Supabase 載入已上架的物件資料
 async function loadPropertiesFromSupabase() {
     try {
-        console.log('🔄 正在從 Supabase 載入已上架的物件資料...');
+        // 🔇 移除載入訊息，避免在刷新時顯示
         const loadStartTime = Date.now();
         
         // 初始化 Supabase 客戶端（使用單例模式，避免多個實例）
         if (!supabaseClient) {
             // 🔥 優先使用全域客戶端（單例模式）
             if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient) {
-                console.log('🔄 使用現有的 Supabase 客戶端（避免多個實例）');
+                // 🔇 移除訊息，避免在刷新時顯示
                 supabaseClient = window.supabaseClient;
             } else if (typeof supabase === 'undefined') {
                 console.error('❌ Supabase SDK 未載入，無法創建客戶端');
@@ -127,7 +127,7 @@ async function loadPropertiesFromSupabase() {
                     if (supabaseClient) {
                         window.supabaseClient = supabaseClient;
                     }
-                    console.log('✅ Supabase 客戶端創建成功（單例模式）');
+                    // 🔇 移除訊息，避免在刷新時顯示
                 } catch (error) {
                     console.error('❌ 創建 Supabase 客戶端失敗:', error);
                     throw error;
@@ -149,7 +149,7 @@ async function loadPropertiesFromSupabase() {
             throw error;
         }
         
-        console.log(`📥 從 Supabase 收到 ${data ? data.length : 0} 筆資料`);
+        // 🔇 移除訊息，避免在刷新時顯示
         
         if (!data) {
             console.error('❌ Supabase 返回 null 或 undefined');
@@ -189,9 +189,13 @@ async function loadPropertiesFromSupabase() {
         const loadEndTime = Date.now();
         const loadDuration = loadEndTime - loadStartTime;
         
-        console.log(`✅ 成功從 Supabase 載入 ${data.length} 個已上架的物件（耗時 ${loadDuration}ms）`);
-        if (data.length > 0) {
-            console.log('📋 物件列表（前5個）:', data.slice(0, 5).map((p, idx) => `${idx + 1}. ${p.title || p.id} (${p.type || 'N/A'}) - is_published: ${p.is_published}, status: ${p.status || 'N/A'}`));
+        // 🔇 移除載入成功訊息，避免在刷新時顯示
+        // 只在開發模式下顯示詳細資訊
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log(`✅ 成功從 Supabase 載入 ${data.length} 個已上架的物件（耗時 ${loadDuration}ms）`);
+            if (data.length > 0) {
+                console.log('📋 物件列表（前5個）:', data.slice(0, 5).map((p, idx) => `${idx + 1}. ${p.title || p.id} (${p.type || 'N/A'}) - is_published: ${p.is_published}, status: ${p.status || 'N/A'}`));
+            }
         }
         
         // 🔥 檢查資料一致性
@@ -296,8 +300,12 @@ async function loadPropertiesFromSupabase() {
             }
         };
         
-        console.log(`✅ 已載入 ${formattedProperties.length} 個 Supabase 物件（已上架）`);
-        console.log(`📊 資料統計：總數 ${formattedProperties.length}，未售 ${formattedProperties.filter(p => p.status !== 'sold').length}，已售 ${formattedProperties.filter(p => p.status === 'sold').length}`);
+        // 🔇 移除載入訊息，避免在刷新時顯示
+        // 只在開發模式下顯示統計資訊
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log(`✅ 已載入 ${formattedProperties.length} 個 Supabase 物件（已上架）`);
+            console.log(`📊 資料統計：總數 ${formattedProperties.length}，未售 ${formattedProperties.filter(p => p.status !== 'sold').length}，已售 ${formattedProperties.filter(p => p.status === 'sold').length}`);
+        }
         console.log(`✅ window.embeddedPropertiesData 已設置，包含 ${window.embeddedPropertiesData.properties.length} 個物件`);
         
         // 🔥 驗證資料是否正確設置
@@ -334,7 +342,7 @@ async function loadPropertiesFromSupabase() {
         const apiEvent = new CustomEvent('apiDataLoaded');
         window.dispatchEvent(apiEvent);
         
-        console.log('✅ Supabase 資料載入完成，已觸發事件通知分頁系統');
+        // 🔇 移除訊息，避免在刷新時顯示
         
         // 🔥 重要：不在此處直接更新分頁系統，而是通過事件讓 main-script.js 統一處理
         // 這樣可以避免重複更新和競態條件
@@ -383,35 +391,35 @@ const MIN_LOAD_INTERVAL = 1000; // 最小載入間隔 1 秒
         
         // 防止短時間內重複載入
         if (isLoadingData) {
-            console.log('⏳ 資料正在載入中，跳過重複請求');
+            // 🔇 移除訊息，避免在刷新時顯示
             return;
         }
         
         if (now - lastLoadTime < MIN_LOAD_INTERVAL) {
-            console.log(`⏳ 距離上次載入時間太短（${now - lastLoadTime}ms），跳過重複請求`);
+            // 🔇 移除訊息，避免在刷新時顯示
             return;
         }
         
         isLoadingData = true;
         lastLoadTime = now;
-        console.log('📦 開始載入 Supabase 資料...');
+        // 🔇 移除載入訊息，避免在刷新時顯示
         
         loadPropertiesFromSupabase()
             .then(() => {
-                console.log('✅ Supabase 資料載入 Promise 完成');
+                // 🔇 移除訊息，避免在刷新時顯示
             })
             .catch((error) => {
                 console.error('❌ Supabase 資料載入 Promise 失敗:', error);
             })
             .finally(() => {
                 isLoadingData = false;
-                console.log('📦 Supabase 資料載入流程結束');
+                // 🔇 移除訊息，避免在刷新時顯示
             });
     }
     
     // 🔥 防止重複初始化：使用標記確保只初始化一次
     if (window.supabaseDataLoaderInitialized) {
-        console.log('⏭️ Supabase 資料載入器已初始化，跳過重複初始化');
+        // 🔇 移除訊息，避免在刷新時顯示
         return;
     }
     window.supabaseDataLoaderInitialized = true;
@@ -428,7 +436,8 @@ const MIN_LOAD_INTERVAL = 1000; // 最小載入間隔 1 秒
                 console.error('   請檢查網路連接或 Supabase SDK CDN 是否可訪問');
                 return;
             }
-            if (supabaseWaitRetries % 10 === 0) {
+            // 🔇 移除等待訊息，避免在刷新時顯示（只在開發模式顯示）
+            if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && supabaseWaitRetries % 10 === 0) {
                 console.warn(`⏳ Supabase SDK 尚未載入，等待載入... (${supabaseWaitRetries}/${MAX_SUPABASE_WAIT_RETRIES})`);
             }
             setTimeout(waitForSupabaseAndInit, 100);

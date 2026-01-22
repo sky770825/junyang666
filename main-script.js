@@ -1284,7 +1284,10 @@ window.addEventListener('supabaseDataLoaded', function(event) {
         return;
     }
     
-    console.log(`📦 收到 Supabase 資料載入事件，更新分頁系統... (物件數: ${propertyCount})`);
+    // 🔇 移除訊息，避免在刷新時顯示（只在開發模式顯示）
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.log(`📦 收到 Supabase 資料載入事件，更新分頁系統... (物件數: ${propertyCount})`);
+    }
     
     // 🔥 檢查資料數量變化
     if (window.lastPropertyCount !== undefined && window.lastPropertyCount !== propertyCount) {

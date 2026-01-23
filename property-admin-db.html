@@ -16,17 +16,26 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 2rem;
-            /* 優化滾動性能 */
-            -webkit-overflow-scrolling: touch;
-            will-change: scroll-position;
-            /* 禁用文字選擇，避免快速滾動時出現反白 */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            /* 優化觸控響應 */
-            -webkit-tap-highlight-color: transparent;
-            touch-action: pan-y;
+            /* 桌面版：允許正常滾動 */
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        /* 手機版專用樣式 */
+        @media (max-width: 768px) {
+            body {
+                /* 優化滾動性能（僅手機版） */
+                -webkit-overflow-scrolling: touch;
+                will-change: scroll-position;
+                /* 禁用文字選擇，避免快速滾動時出現反白（僅手機版） */
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                /* 優化觸控響應（僅手機版） */
+                -webkit-tap-highlight-color: transparent;
+                touch-action: pan-y;
+            }
         }
         
         /* 允許輸入框選擇文字 */
@@ -45,15 +54,11 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+            /* 桌面版允許滾動 */
+            overflow: visible;
             /* 優化渲染性能 */
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
-            /* 禁用文字選擇 */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
         }
         
         .header {
@@ -105,16 +110,24 @@
             padding: 2rem;
             /* 優化顯示性能 */
             contain: layout style paint;
-            /* 禁用文字選擇，避免快速滾動時出現反白 */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            /* 優化滾動性能 */
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            /* 防止滾動時出現選取高亮 */
-            -webkit-tap-highlight-color: transparent;
+            /* 桌面版：允許正常滾動 */
+            overflow: visible;
+        }
+        
+        /* 手機版：優化滾動性能 */
+        @media (max-width: 768px) {
+            .tab-content {
+                /* 禁用文字選擇，避免快速滾動時出現反白（僅手機版） */
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                /* 優化滾動性能（僅手機版） */
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                /* 防止滾動時出現選取高亮（僅手機版） */
+                -webkit-tap-highlight-color: transparent;
+            }
         }
         
         .tab-content.active {
@@ -133,11 +146,16 @@
             contain: layout style;
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
-            /* 禁用文字選擇，避免快速滾動時出現反白 */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+        }
+        
+        /* 手機版：禁用文字選擇，避免快速滾動時出現反白 */
+        @media (max-width: 768px) {
+            .form-section {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
         }
         
         .form-section h3 {
@@ -247,7 +265,7 @@
                 min-height: 44px !important;
             }
             
-            /* 按鈕組優化 - Sticky 儲存按鈕 */
+            /* 按鈕組優化 - Sticky 儲存按鈕（僅手機版） */
             .btn-group {
                 position: sticky !important;
                 bottom: 0 !important;
@@ -265,7 +283,7 @@
                 flex-direction: column !important;
             }
             
-            /* 確保表單底部有足夠空間，不被 sticky 按鈕遮擋 */
+            /* 確保表單底部有足夠空間，不被 sticky 按鈕遮擋（僅手機版） */
             form {
                 padding-bottom: 0 !important;
                 margin-bottom: 0 !important;
@@ -1539,9 +1557,11 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>格局 *</label>
-                            <input type="text" id="layout" placeholder="例如: 3/2/2 或 3房2廳2衛" required onblur="formatLayoutInput(this)">
+                            <input type="text" id="layout" placeholder="例如: 3/2/2 或 3房2廳2衛 或 0/4/3（開放式）" required onblur="formatLayoutInput(this)">
                             <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
-                                💡 提示：可輸入「3/2/2」自動轉換為「3房2廳2衛」
+                                💡 提示：可輸入「3/2/2」自動轉換為「3房2廳2衛」<br>
+                                💡 開放式格局：輸入「0/4/3」會自動轉換為「0房4廳3衛（開放式）」<br>
+                                💡 套房格局：輸入「1/0/1」會自動轉換為「1房0廳1衛（套房）」
                             </small>
                         </div>
                         <div class="form-group">
@@ -2052,36 +2072,46 @@
             }
         }
         
-        // 優化：點擊標題時才摺疊，點擊表單內容不摺疊
+        // 優化：點擊標題時才摺疊，點擊表單內容不摺疊（僅手機版）
         document.addEventListener('DOMContentLoaded', function() {
-            // 為所有表單區塊的標題添加點擊事件
-            const sections = document.querySelectorAll('.form-section');
-            sections.forEach(section => {
-                const h3 = section.querySelector('h3');
-                if (h3) {
-                    h3.addEventListener('click', function(e) {
-                        if (window.innerWidth <= 768) {
+            // 只在手機版啟用摺疊功能
+            if (window.innerWidth <= 768) {
+                // 為所有表單區塊的標題添加點擊事件
+                const sections = document.querySelectorAll('.form-section');
+                sections.forEach(section => {
+                    const h3 = section.querySelector('h3');
+                    if (h3) {
+                        h3.addEventListener('click', function(e) {
                             e.stopPropagation();
                             section.classList.toggle('collapsed');
-                        }
-                    });
-                }
-            });
+                        });
+                    }
+                });
+            }
             
-            // 初始化表單進度追蹤和自動儲存草稿
-            initFormProgress();
-            initAutoSave();
+            // 初始化表單進度追蹤和自動儲存草稿（僅手機版）
+            if (window.innerWidth <= 768) {
+                initFormProgress();
+                initAutoSave();
+            }
+            // 表單驗證在所有版本都啟用
             initFormValidation();
         });
         
-        // 表單填寫進度追蹤
+        // 表單填寫進度追蹤（僅手機版）
         function initFormProgress() {
             // 只在手機版顯示進度
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth > 768) {
                 const progressDiv = document.getElementById('form-progress');
                 if (progressDiv) {
-                    progressDiv.style.display = 'block';
+                    progressDiv.style.display = 'none';
                 }
+                return; // 桌面版不執行
+            }
+            
+            const progressDiv = document.getElementById('form-progress');
+            if (progressDiv) {
+                progressDiv.style.display = 'block';
             }
             
             // 監聽表單欄位變化
@@ -2136,10 +2166,14 @@
             }
         }
         
-        // 自動儲存草稿功能
+        // 自動儲存草稿功能（僅手機版）
         let autoSaveTimer = null;
         function initAutoSave() {
             // 只在手機版啟用自動儲存
+            if (window.innerWidth > 768) {
+                return; // 桌面版不啟用
+            }
+            
             if (window.innerWidth <= 768) {
                 const form = document.getElementById('property-form');
                 if (form) {
@@ -3726,7 +3760,20 @@
                         const layoutPattern = /^(\d+)\/(\d+)\/(\d+)$/;
                         const match = layoutValue.match(layoutPattern);
                         if (match) {
-                            layoutValue = `${match[1]}房${match[2]}廳${match[3]}衛`;
+                            const room = parseInt(match[1], 10);
+                            const living = parseInt(match[2], 10);
+                            const bath = parseInt(match[3], 10);
+                            
+                            // 處理特殊格局
+                            if (room === 0 && living > 0) {
+                                layoutValue = `0房${living}廳${bath}衛（開放式）`;
+                            } else if (room === 0 && living === 0 && bath > 0) {
+                                layoutValue = `0房0廳${bath}衛（開放式）`;
+                            } else if (room === 1 && living === 0 && bath === 1) {
+                                layoutValue = `1房0廳1衛（套房）`;
+                            } else {
+                                layoutValue = `${room}房${living}廳${bath}衛`;
+                            }
                         }
                         return layoutValue;
                     })(),
@@ -5749,7 +5796,7 @@
             }
         }
         
-        // 格式化格局輸入（例如：3/2/2 → 3房2廳2衛）
+        // 格式化格局輸入（例如：3/2/2 → 3房2廳2衛，0/4/3 → 0房4廳3衛）
         function formatLayoutInput(input) {
             if (!input) return;
             let value = input.value.trim();
@@ -5760,15 +5807,29 @@
                 return;
             }
             
-            // 檢查是否符合 數字/數字/數字 格式（例如：3/2/2）
+            // 檢查是否符合 數字/數字/數字 格式（例如：3/2/2 或 0/4/3）
             const layoutPattern = /^(\d+)\/(\d+)\/(\d+)$/;
             const match = value.match(layoutPattern);
             
             if (match) {
-                const room = match[1];
-                const living = match[2];
-                const bath = match[3];
-                input.value = `${room}房${living}廳${bath}衛`;
+                const room = parseInt(match[1], 10);
+                const living = parseInt(match[2], 10);
+                const bath = parseInt(match[3], 10);
+                
+                // 處理特殊格局
+                if (room === 0 && living > 0) {
+                    // 0房但有廳，可能是開放式格局
+                    input.value = `0房${living}廳${bath}衛（開放式）`;
+                } else if (room === 0 && living === 0 && bath > 0) {
+                    // 只有衛浴，可能是特殊格局
+                    input.value = `0房0廳${bath}衛（開放式）`;
+                } else if (room === 1 && living === 0 && bath === 1) {
+                    // 1房1衛，可能是套房
+                    input.value = `1房0廳1衛（套房）`;
+                } else {
+                    // 一般格局
+                    input.value = `${room}房${living}廳${bath}衛`;
+                }
             }
         }
         

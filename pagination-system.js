@@ -700,7 +700,7 @@ class EmbeddedPropertyPaginationSystem {
                         })())}
                 </div>
                 
-                ${property.layout ? `
+                ${property.layout && property.layout.trim() !== '' ? `
                 <div style="margin-bottom: 0.6rem; display: flex; gap: 0.3rem;">
                     <div style="flex: 1; padding: 0.4rem 0.3rem; background: #e8f5e8; border-radius: 4px; text-align: center; font-size: 0.95rem; font-weight: 600; color: #2d5016;">
                         <div style="font-size: 0.75rem; opacity: 0.8; margin-bottom: 0.2rem;">格局</div>
@@ -861,7 +861,7 @@ class EmbeddedPropertyPaginationSystem {
                             </div>
                             ` : ''}
                         </div>
-                        ${property.layout ? `
+                        ${property.layout && property.layout.trim() !== '' ? `
                         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; flex-shrink: 0;">
                             <span style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: clamp(0.75rem, 2vw, 0.85rem); white-space: nowrap;">
                                 ${property.layout}
@@ -1985,18 +1985,20 @@ class SoldPropertyPaginationSystem {
         infoGrid.appendChild(priceItem);
 
         // 格局
-        const layoutItem = document.createElement('div');
-        layoutItem.className = 'info-item';
-        layoutItem.innerHTML = `<strong>格局：</strong>${property.layout}`;
-        layoutItem.style.cssText = `
-            background: rgba(108, 117, 125, 0.1);
-            padding: 0.3rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            text-align: center;
-            color: #6c757d;
-        `;
-        infoGrid.appendChild(layoutItem);
+        if (property.layout && property.layout.trim() !== '') {
+            const layoutItem = document.createElement('div');
+            layoutItem.className = 'info-item';
+            layoutItem.innerHTML = `<strong>格局：</strong>${property.layout}`;
+            layoutItem.style.cssText = `
+                background: rgba(108, 117, 125, 0.1);
+                padding: 0.3rem;
+                border-radius: 4px;
+                font-size: 0.8rem;
+                text-align: center;
+                color: #6c757d;
+            `;
+            infoGrid.appendChild(layoutItem);
+        }
 
         // 屋齡
         const ageItem = document.createElement('div');
@@ -2231,18 +2233,20 @@ class SoldPropertyPaginationSystem {
         infoGrid.appendChild(priceItem);
 
         // 格局
-        const layoutItem = document.createElement('div');
-        layoutItem.className = 'info-item';
-        layoutItem.innerHTML = `<strong>格局：</strong>${property.layout}`;
-        layoutItem.style.cssText = `
-            background: rgba(108, 117, 125, 0.1);
-            padding: 0.15rem;
-            border-radius: 2px;
-            font-size: 0.65rem;
-            text-align: center;
-            color: #6c757d;
-        `;
-        infoGrid.appendChild(layoutItem);
+        if (property.layout && property.layout.trim() !== '') {
+            const layoutItem = document.createElement('div');
+            layoutItem.className = 'info-item';
+            layoutItem.innerHTML = `<strong>格局：</strong>${property.layout}`;
+            layoutItem.style.cssText = `
+                background: rgba(108, 117, 125, 0.1);
+                padding: 0.15rem;
+                border-radius: 2px;
+                font-size: 0.65rem;
+                text-align: center;
+                color: #6c757d;
+            `;
+            infoGrid.appendChild(layoutItem);
+        }
 
         // 屋齡
         const ageItem = document.createElement('div');

@@ -44,7 +44,7 @@ function createPropertyCard(property) {
                     : property.address || '')}
             </div>
             
-            ${property.layout ? `
+            ${property.layout && property.layout.trim() !== '' ? `
             <div style="margin-bottom: 0.6rem; display: flex; gap: 0.3rem;">
                 <div style="flex: 1; text-align: center; padding: 0.2rem 0.1rem; background: #e8f5e8; border-radius: 4px; font-size: 0.8rem;">
                     <strong>格局：</strong>${property.layout}

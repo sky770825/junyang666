@@ -72,6 +72,8 @@ class EmbeddedPropertyPaginationSystem {
         // 確保有資料才渲染
         if (this.properties && this.properties.length > 0) {
             console.log(`✅ 初始化時有 ${this.properties.length} 個物件，立即渲染`);
+            // 動態生成房型篩選按鈕
+            this.updateRoomFilterButtons();
             this.renderProperties();
         } else {
             console.warn('⚠️ 初始化時沒有物件資料，顯示載入中狀態');
@@ -208,7 +210,33 @@ class EmbeddedPropertyPaginationSystem {
         
         // 🔥 房型篩選
         if (this.roomFilter !== 'all') {
-            filtered = filtered.filter(property => property.type === this.roomFilter);
+            filtered = filtered.filter(property => {
+                // 處理「開放式」篩選
+                if (this.roomFilter === '開放式') {
+                    if (property.layout) {
+                        const layout = property.layout.trim();
+                        return layout.includes('0房') || layout.includes('開放式');
+                    }
+                    return false;
+                }
+                
+                // 處理「1房」篩選（包括套房）
+                if (this.roomFilter === '1房') {
+                    // 如果 type 是「套房」，直接匹配
+                    if (property.type === '套房') {
+                        return true;
+                    }
+                    // 如果格局包含「1房」或「套房」，也匹配
+                    if (property.layout) {
+                        const layout = property.layout.trim();
+                        return layout.includes('1房') || layout.includes('套房');
+                    }
+                    return false;
+                }
+                
+                // 一般房型篩選
+                return property.type === this.roomFilter;
+            });
         }
         
         // 搜尋功能
@@ -1227,21 +1255,42 @@ class EmbeddedPropertyPaginationSystem {
             '透天別墅': 0
         };
 
-        // 房型統計 - 需考慮當前建築類型篩選
-        const roomCounts = {
-            'all': 0,
-            '2房': 0,
-            '3房': 0,
-            '4房': 0
-        };
-
         // 先取得基礎篩選結果
         let baseFiltered = this.properties;
+        
+        // 房型統計 - 動態統計所有存在的房型
+        const roomCounts = {
+            'all': 0,
+            '開放式': 0,
+            '1房': 0
+        };
 
         // 統計建築類型數量（考慮房型篩選）
         baseFiltered.forEach(property => {
-            // 檢查是否符合當前房型篩選
-            const matchRoomFilter = this.roomFilter === 'all' || property.type === this.roomFilter;
+            // 檢查是否符合當前房型篩選（包括開放式和1房）
+            let matchRoomFilter = this.roomFilter === 'all';
+            
+            if (!matchRoomFilter) {
+                if (this.roomFilter === '開放式') {
+                    if (property.layout) {
+                        const layout = property.layout.trim();
+                        matchRoomFilter = layout.includes('0房') || layout.includes('開放式');
+                    }
+                } else if (this.roomFilter === '1房') {
+                    // 如果 type 是「套房」，直接匹配
+                    if (property.type === '套房') {
+                        matchRoomFilter = true;
+                    } else if (property.layout) {
+                        // 如果格局包含「1房」或「套房」，也匹配
+                        const layout = property.layout.trim();
+                        matchRoomFilter = layout.includes('1房') || layout.includes('套房');
+                    } else {
+                        matchRoomFilter = false;
+                    }
+                } else {
+                    matchRoomFilter = property.type === this.roomFilter;
+                }
+            }
             
             if (matchRoomFilter) {
                 buildingCounts['all']++;
@@ -1275,8 +1324,31 @@ class EmbeddedPropertyPaginationSystem {
             
             if (matchBuildingFilter) {
                 roomCounts['all']++;
+                
+                // 根據格局判斷開放式和1房
+                if (property.layout) {
+                    const layout = property.layout.trim();
+                    // 判斷是否為開放式（0房）
+                    if (layout.includes('0房') || layout.includes('開放式')) {
+                        roomCounts['開放式'] = (roomCounts['開放式'] || 0) + 1;
+                    }
+                    // 判斷是否為1房（套房）- 放寬條件
+                    if (layout.includes('1房') || layout.includes('套房')) {
+                        roomCounts['1房'] = (roomCounts['1房'] || 0) + 1;
+                    }
+                }
+                
+                // 如果 type 是「套房」，也應該算作「1房」
+                if (property.type === '套房') {
+                    roomCounts['1房'] = (roomCounts['1房'] || 0) + 1;
+                }
+                
+                // 統計一般房型（排除建築類型和套房，因為套房已經算作1房）
                 if (property.type) {
-                    roomCounts[property.type] = (roomCounts[property.type] || 0) + 1;
+                    const buildingTypes = ['透天', '別墅', '華廈', '公寓'];
+                    if (!buildingTypes.includes(property.type) && property.type !== '套房') {
+                        roomCounts[property.type] = (roomCounts[property.type] || 0) + 1;
+                    }
                 }
             }
         });
@@ -1293,7 +1365,7 @@ class EmbeddedPropertyPaginationSystem {
             }
         });
 
-        // 更新房型按鈕數量
+        // 更新房型按鈕數量（如果按鈕存在）
         document.querySelectorAll('.room-filter-button').forEach(button => {
             const room = button.getAttribute('data-room');
             const count = roomCounts[room] || 0;
@@ -1303,6 +1375,169 @@ class EmbeddedPropertyPaginationSystem {
                 countSpan.style.opacity = '0.8';
                 countSpan.style.fontSize = '0.85em';
             }
+        });
+        
+        // 返回房型統計，供動態生成按鈕使用
+        return { roomCounts, existingRoomTypes: Array.from(existingRoomTypes) };
+    }
+    
+    // 🚀 新增：動態生成房型篩選按鈕
+    updateRoomFilterButtons() {
+        const roomFilterContainer = document.querySelector('.room-filter');
+        if (!roomFilterContainer) {
+            console.warn('⚠️ 房型篩選容器不存在');
+            return;
+        }
+        
+        // 定義真正的房型（排除建築類型）
+        const validRoomTypes = ['套房', '1房', '2房', '3房', '4房', '店住', '店面'];
+        const buildingTypes = ['透天', '別墅', '華廈', '公寓']; // 這些是建築類型，不是房型
+        
+        // 收集所有存在的房型（排除建築類型）
+        const existingRoomTypes = new Set();
+        const openLayoutTypes = new Set(); // 開放式格局
+        const oneRoomTypes = new Set(); // 1房格局
+        
+        this.properties.forEach(property => {
+            if (property.type && property.type.trim() !== '') {
+                // 排除建築類型
+                if (!buildingTypes.includes(property.type)) {
+                    existingRoomTypes.add(property.type);
+                }
+            }
+            
+            // 根據格局判斷開放式和1房
+            if (property.layout) {
+                const layout = property.layout.trim();
+                // 判斷是否為開放式（0房）
+                if (layout.includes('0房') || layout.includes('開放式')) {
+                    openLayoutTypes.add(property.type || '店住');
+                }
+                // 判斷是否為1房（套房）- 放寬條件
+                if (layout.includes('1房') || layout.includes('套房')) {
+                    oneRoomTypes.add(property.type || '套房');
+                }
+            }
+            
+            // 如果 type 是「套房」，也應該算作「1房」
+            if (property.type === '套房') {
+                oneRoomTypes.add('套房');
+            }
+        });
+        
+        // 定義房型顯示順序和顯示名稱
+        const roomTypeOrder = ['2房', '3房', '4房', '1房', '開放式', '店住', '店面'];
+        const roomTypeNames = {
+            '2房': '2房',
+            '3房': '3房',
+            '4房': '4房',
+            '套房': '1房', // 套房顯示為1房
+            '1房': '1房',
+            '開放式': '開放式',
+            '店住': '店住',
+            '店面': '店面'
+        };
+        
+        // 如果有開放式格局，添加「開放式」選項
+        if (openLayoutTypes.size > 0) {
+            existingRoomTypes.add('開放式');
+        }
+        
+        // 如果有1房格局或套房類型，添加「1房」選項
+        if (oneRoomTypes.size > 0) {
+            existingRoomTypes.add('1房');
+        }
+        
+        // 將「套房」類型映射為「1房」（不顯示「套房」按鈕，只顯示「1房」）
+        if (existingRoomTypes.has('套房')) {
+            existingRoomTypes.delete('套房');
+            existingRoomTypes.add('1房');
+        }
+        
+        // 按順序排列房型
+        const sortedRoomTypes = roomTypeOrder.filter(type => existingRoomTypes.has(type));
+        // 添加其他未在順序列表中的房型（但排除建築類型）
+        existingRoomTypes.forEach(type => {
+            if (!roomTypeOrder.includes(type) && !buildingTypes.includes(type)) {
+                sortedRoomTypes.push(type);
+            }
+        });
+        
+        // 保留「全部房型」按鈕，清除其他按鈕
+        const allButton = roomFilterContainer.querySelector('[data-room="all"]');
+        roomFilterContainer.innerHTML = '';
+        
+        // 重新添加「全部房型」按鈕
+        if (allButton) {
+            roomFilterContainer.appendChild(allButton);
+        } else {
+            const allBtn = document.createElement('button');
+            allBtn.className = 'room-filter-button active';
+            allBtn.setAttribute('data-room', 'all');
+            allBtn.style.cssText = 'background: linear-gradient(45deg, #10b981, #3b82f6); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);';
+            allBtn.innerHTML = '全部房型 <span class="count"></span>';
+            roomFilterContainer.appendChild(allBtn);
+        }
+        
+        // 動態生成其他房型按鈕
+        sortedRoomTypes.forEach(roomType => {
+            const button = document.createElement('button');
+            button.className = 'room-filter-button';
+            button.setAttribute('data-room', roomType);
+            button.style.cssText = 'background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;';
+            button.innerHTML = `${roomTypeNames[roomType] || roomType} <span class="count"></span>`;
+            roomFilterContainer.appendChild(button);
+        });
+        
+        // 重新設置事件監聽器
+        this.setupRoomFilterListeners();
+    }
+    
+    // 🚀 新增：設置房型篩選事件監聽器
+    setupRoomFilterListeners() {
+        const roomButtons = document.querySelectorAll('.room-filter-button');
+        roomButtons.forEach(button => {
+            // 移除舊的事件監聽器（如果有的話）
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            
+            // 添加新的事件監聽器
+            newButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                try {
+                    // 🔥 修正：確保獲取按鈕元素，而不是子元素（如 span）
+                    const clickedButton = e.target.closest('.room-filter-button');
+                    if (!clickedButton) return;
+                    
+                    // 🚀 防抖動：避免快速連續點擊
+                    if (this.isFiltering) {
+                        console.log('⏳ 篩選進行中，忽略重複點擊');
+                        return;
+                    }
+                    
+                    const roomType = clickedButton.getAttribute('data-room');
+                    
+                    // 🚀 同步執行 - 按鈕狀態和篩選同時進行
+                    this.roomFilter = roomType;
+                    this.currentPage = 1;
+                    
+                    // 立即更新按鈕狀態
+                    this.updateRoomButtonStates(roomButtons, clickedButton);
+                    
+                    // 立即執行篩選
+                    this.renderProperties();
+                    this.updateFilterCounts();
+                    
+                    // 篩選後滾動到頂部
+                    setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 30);
+                } catch (error) {
+                    console.error('房型篩選錯誤:', error);
+                }
+            });
         });
     }
 
@@ -1434,6 +1669,9 @@ class EmbeddedPropertyPaginationSystem {
                 
                 // 初始化時更新行政區選項
                 this.updateDistrictOptions();
+                
+                // 初始化時動態生成房型篩選按鈕
+                this.updateRoomFilterButtons();
             } else {
                 console.warn('⚠️ district-filter 元素不存在');
             }

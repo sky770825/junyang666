@@ -1321,6 +1321,11 @@ window.addEventListener('supabaseDataLoaded', function(event) {
                 embeddedPaginationSystem.updateDistrictOptions();
             }
             
+            // 動態生成房型篩選按鈕（只顯示有物件的房型）
+            if (typeof embeddedPaginationSystem.updateRoomFilterButtons === 'function') {
+                embeddedPaginationSystem.updateRoomFilterButtons();
+            }
+            
             // 重新渲染
             embeddedPaginationSystem.renderProperties();
             

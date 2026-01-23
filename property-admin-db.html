@@ -733,6 +733,9 @@
             /* 優化網格渲染 */
             contain: layout;
             will-change: contents;
+            /* 確保可以接收拖曳事件 */
+            min-height: 100px;
+            position: relative;
         }
         
         .image-preview-item {
@@ -862,6 +865,57 @@
             height: 100%;
             background: linear-gradient(90deg, #667eea, #764ba2);
             transition: width 0.3s ease;
+        }
+        
+        /* 拖曳排序：絲滑過渡 */
+        .image-preview-grid {
+            transition: gap 0.2s ease;
+        }
+        
+        .image-preview-item[draggable="true"] {
+            cursor: grab;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.2s ease,
+                        opacity 0.2s ease;
+        }
+        
+        .image-preview-item[draggable="true"]:active {
+            cursor: grabbing;
+        }
+        
+        .image-preview-item.dragging {
+            opacity: 0.4;
+            transform: scale(0.96);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
+            cursor: grabbing;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .image-preview-item.drag-over {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.5);
+        }
+        
+        /* 拖曳放置預覽位置（插槽） */
+        .image-drag-placeholder {
+            aspect-ratio: 1;
+            min-height: 100px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+            border: 2px dashed rgba(102, 126, 234, 0.6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+        
+        .image-drag-placeholder::before {
+            content: '放置於此';
         }
         
         .btn-group {
@@ -1682,7 +1736,7 @@
                     </div>
                     <div id="image-preview-grid" class="image-preview-grid"></div>
                     <p style="text-align: center; color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
-                        💡 提示：可上傳最多 10 張圖片，點擊「儲存到資料庫」時才會上傳
+                        💡 提示：可上傳最多 10 張圖片，點擊「儲存到資料庫」時才會上傳；拖曳圖片可調整排序
                     </p>
                 </div>
                 
@@ -2573,6 +2627,13 @@
                     resetForm();
                 });
             }
+            
+            // 確保圖片拖曳功能已初始化（當切換到新增/編輯標籤時）
+            if (tabName === 'add') {
+                requestAnimationFrame(() => {
+                    initImageSortable();
+                });
+            }
             });
         }
         
@@ -2586,10 +2647,11 @@
             
             if (!uploadArea || !fileInput) return;
             
-            // 拖曳上傳
+            // 拖曳上傳（若為圖片排序拖曳則略過）
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (e.dataTransfer.types.includes('application/x-image-sort')) return;
                 uploadArea.classList.add('dragover');
             });
             
@@ -2603,6 +2665,7 @@
                 e.preventDefault();
                 e.stopPropagation();
                 uploadArea.classList.remove('dragover');
+                if (e.dataTransfer.types.includes('application/x-image-sort')) return;
                 
                 if (isUploading) {
                     console.log('⏳ 正在上傳中，請稍候...');
@@ -2682,6 +2745,9 @@
                     isFileDialogOpen = false;
                 }, 100);
             });
+            
+            // 圖片拖曳排序（絲滑預覽）
+            initImageSortable();
         });
         
         // 處理檔案（只預覽，不上傳）
@@ -2836,6 +2902,9 @@
                             imageData.isCover = true;
                         }
                     }
+                    
+                    // 確保拖曳功能已初始化（在添加圖片後）
+                    initImageSortable();
                     
                     return true;
                 } else {
@@ -3013,6 +3082,7 @@
                 item.classList.add('cover-image');
             }
             item.dataset.imageId = imageId;
+            item.draggable = true;
             item.style.position = 'relative';
             
             const img = document.createElement('img');
@@ -3088,6 +3158,7 @@
             const item = document.createElement('div');
             item.className = 'image-preview-item';
             item.dataset.imageId = imageId;
+            item.draggable = true;
             
             const img = document.createElement('img');
             // 使用異步載入圖片
@@ -3243,6 +3314,357 @@
                 }
             }
             item.remove();
+        }
+        
+        // 圖片拖曳排序：絲滑拖曳 + 即時預覽放置位置
+        let sortDragPlaceholder = null;
+        let sortDraggedId = null;
+        let sortDraggedEl = null;
+        let sortDropIndex = -1;
+        
+        // 使用混合模式：document 級別 + grid 級別事件
+        let imageSortableInitialized = false;
+        let gridEventHandlers = null;
+        
+        function initImageSortable() {
+            // 先綁定 document 級別的 dragstart（用於捕獲所有拖曳開始）
+            if (!imageSortableInitialized) {
+                document.addEventListener('dragstart', function(e) {
+                    const item = e.target.closest('.image-preview-item');
+                    if (item && item.dataset.imageId && (item.draggable === true || item.getAttribute('draggable') === 'true')) {
+                        console.log('🖱️ 檢測到拖曳開始:', item.dataset.imageId);
+                        onImageDragStart(e);
+                    }
+                }, false);
+                
+                document.addEventListener('dragend', function(e) {
+                    if (sortDraggedEl) {
+                        onImageDragEnd(e);
+                    }
+                }, false);
+                
+                imageSortableInitialized = true;
+            }
+            
+            // 為 grid 綁定 dragover 和 drop（必須在 grid 上才能正確觸發）
+            const grid = document.getElementById('image-preview-grid');
+            if (!grid) {
+                console.warn('⚠️ image-preview-grid 尚未存在');
+                return;
+            }
+            
+            // 移除舊的事件監聽器（如果存在）
+            if (gridEventHandlers) {
+                grid.removeEventListener('dragover', gridEventHandlers.dragover);
+                grid.removeEventListener('drop', gridEventHandlers.drop);
+            }
+            
+            // 創建新的事件處理器
+            gridEventHandlers = {
+                dragover: function(e) {
+                    if (!sortDraggedEl) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.dataTransfer.dropEffect = 'move';
+                    // 添加調試信息（每 10 次輸出一次，避免過多日誌）
+                    if (!gridEventHandlers.dragoverCount) gridEventHandlers.dragoverCount = 0;
+                    gridEventHandlers.dragoverCount++;
+                    if (gridEventHandlers.dragoverCount % 10 === 0) {
+                        console.log('🔄 dragover 觸發中...', gridEventHandlers.dragoverCount);
+                    }
+                    onImageDragOver(e);
+                },
+                drop: function(e) {
+                    if (!sortDraggedEl) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('📦 檢測到 drop 事件在 grid 上');
+                    gridEventHandlers.dragoverCount = 0; // 重置計數
+                    onImageDrop(e);
+                }
+            };
+            gridEventHandlers.dragoverCount = 0;
+            
+            // 綁定到 grid
+            grid.addEventListener('dragover', gridEventHandlers.dragover, false);
+            grid.addEventListener('drop', gridEventHandlers.drop, false);
+            
+            console.log('✅ 圖片拖曳排序功能已初始化（grid 綁定模式）');
+            
+            // 驗證現有圖片項目是否可拖曳
+            setTimeout(() => {
+                const items = grid.querySelectorAll('.image-preview-item');
+                console.log(`📊 檢查圖片項目: 共 ${items.length} 個`);
+                items.forEach((item, idx) => {
+                    const hasDraggable = item.draggable === true || item.getAttribute('draggable') === 'true';
+                    const hasImageId = !!item.dataset.imageId;
+                    if (!hasDraggable) {
+                        console.warn(`⚠️ 項目 ${idx + 1} 缺少 draggable 屬性，正在修復...`);
+                        item.draggable = true;
+                    }
+                    if (!hasImageId) {
+                        console.warn(`⚠️ 項目 ${idx + 1} 缺少 imageId`);
+                    }
+                });
+            }, 500);
+        }
+        
+        function onImageDragStart(e) {
+            // 確保事件在正確的元素上觸發
+            let item = e.target;
+            if (!item.classList.contains('image-preview-item')) {
+                item = e.target.closest('.image-preview-item');
+            }
+            
+            if (!item || !item.dataset.imageId) {
+                console.log('⚠️ 拖曳開始：找不到有效的圖片項目', e.target);
+                return;
+            }
+            
+            // 如果點擊的是按鈕，不觸發拖曳
+            if (e.target.closest('button')) {
+                console.log('⚠️ 拖曳開始：點擊的是按鈕，取消拖曳');
+                return;
+            }
+            
+            const grid = document.getElementById('image-preview-grid');
+            if (!grid) {
+                console.warn('⚠️ 找不到 image-preview-grid');
+                return;
+            }
+            
+            const id = item.dataset.imageId;
+            const items = [].slice.call(grid.querySelectorAll('.image-preview-item'));
+            const idx = items.indexOf(item);
+            if (idx === -1) {
+                console.warn('⚠️ 找不到圖片項目的索引');
+                return;
+            }
+            
+            console.log('🖱️ 開始拖曳圖片:', id, '索引:', idx);
+            
+            e.dataTransfer.setData('application/x-image-sort', id);
+            e.dataTransfer.effectAllowed = 'move';
+            
+            // 創建自訂拖曳圖片
+            try {
+                e.dataTransfer.setDragImage(item, item.offsetWidth / 2, item.offsetHeight / 2);
+            } catch (err) {
+                console.warn('⚠️ 無法設置自訂拖曳圖片:', err);
+            }
+            
+            sortDraggedId = id;
+            sortDraggedEl = item;
+            sortDropIndex = idx;
+            item.classList.add('dragging');
+            
+            // 創建放置預覽位置
+            sortDragPlaceholder = document.createElement('div');
+            sortDragPlaceholder.className = 'image-drag-placeholder';
+            const itemsOrdered = [].slice.call(grid.querySelectorAll('.image-preview-item'));
+            const insertBefore = itemsOrdered[idx + 1] || null;
+            if (insertBefore) {
+                grid.insertBefore(sortDragPlaceholder, insertBefore);
+            } else {
+                grid.appendChild(sortDragPlaceholder);
+            }
+            
+            console.log('✅ 拖曳初始化完成');
+        }
+        
+        function onImageDragOver(e) {
+            const grid = document.getElementById('image-preview-grid');
+            if (!sortDraggedEl || !sortDragPlaceholder || !grid) {
+                return; // 靜默返回，避免過多日誌
+            }
+            
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            // 使用 document.elementFromPoint 來獲取當前滑鼠位置下的元素
+            let targetElement = document.elementFromPoint(e.clientX, e.clientY);
+            if (!targetElement) {
+                // 如果 elementFromPoint 失敗，使用 e.target
+                targetElement = e.target;
+            }
+            
+            const item = targetElement.closest('.image-preview-item');
+            const overPlaceholder = targetElement.closest('.image-drag-placeholder');
+            const itemsOrdered = [].slice.call(grid.querySelectorAll('.image-preview-item'));
+            
+            // 清除所有 drag-over 狀態
+            itemsOrdered.forEach(el => el.classList.remove('drag-over'));
+            
+            // 如果滑鼠在其他項目上，添加 drag-over 效果
+            if (item && item !== sortDraggedEl && !overPlaceholder) {
+                item.classList.add('drag-over');
+            }
+            
+            let newIndex;
+            if (overPlaceholder) {
+                // 滑鼠在 placeholder 上
+                let count = 0;
+                for (let i = 0; i < grid.children.length; i++) {
+                    const ch = grid.children[i];
+                    if (ch === sortDragPlaceholder) {
+                        newIndex = count;
+                        break;
+                    }
+                    if (ch.classList.contains('image-preview-item')) count++;
+                }
+                if (newIndex === undefined) newIndex = itemsOrdered.length;
+            } else if (item && item !== sortDraggedEl) {
+                // 滑鼠在其他圖片項目上，根據位置決定插入點
+                const rect = item.getBoundingClientRect();
+                const mid = rect.left + rect.width / 2;
+                const i = itemsOrdered.indexOf(item);
+                newIndex = e.clientX < mid ? i : i + 1;
+            } else {
+                // 滑鼠在 grid 空白區域，計算最接近的位置
+                const gridRect = grid.getBoundingClientRect();
+                const items = grid.querySelectorAll('.image-preview-item:not(.dragging)');
+                
+                if (items.length === 0) {
+                    newIndex = 0;
+                } else {
+                    // 找到最接近的項目
+                    let closestItem = null;
+                    let minDistance = Infinity;
+                    
+                    items.forEach((it) => {
+                        const itRect = it.getBoundingClientRect();
+                        const centerX = itRect.left + itRect.width / 2;
+                        const centerY = itRect.top + itRect.height / 2;
+                        const distance = Math.sqrt(
+                            Math.pow(e.clientX - centerX, 2) + 
+                            Math.pow(e.clientY - centerY, 2)
+                        );
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            closestItem = it;
+                        }
+                    });
+                    
+                    if (closestItem) {
+                        const i = itemsOrdered.indexOf(closestItem);
+                        const rect = closestItem.getBoundingClientRect();
+                        newIndex = e.clientX < rect.left + rect.width / 2 ? i : i + 1;
+                    } else {
+                        newIndex = itemsOrdered.length;
+                    }
+                }
+            }
+            
+            newIndex = Math.max(0, Math.min(newIndex, itemsOrdered.length));
+            
+            // 只在索引改變時更新 placeholder 位置（避免頻繁 DOM 操作）
+            if (newIndex !== sortDropIndex) {
+                sortDropIndex = newIndex;
+                
+                const insertBefore = itemsOrdered[newIndex] || null;
+                if (insertBefore && insertBefore !== sortDragPlaceholder) {
+                    grid.insertBefore(sortDragPlaceholder, insertBefore);
+                } else if (!insertBefore && sortDragPlaceholder.parentNode !== grid) {
+                    grid.appendChild(sortDragPlaceholder);
+                } else if (insertBefore && sortDragPlaceholder.nextSibling !== insertBefore) {
+                    grid.insertBefore(sortDragPlaceholder, insertBefore);
+                }
+            }
+        }
+        
+        function onImageDrop(e) {
+            const grid = document.getElementById('image-preview-grid');
+            if (!sortDraggedId || !sortDraggedEl || !sortDragPlaceholder || !grid) {
+                console.warn('⚠️ drop 條件不滿足:', {
+                    hasDraggedId: !!sortDraggedId,
+                    hasDraggedEl: !!sortDraggedEl,
+                    hasPlaceholder: !!sortDragPlaceholder,
+                    hasGrid: !!grid
+                });
+                return;
+            }
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('📦 執行 drop，從索引', sortDropIndex, '移動到', sortDropIndex);
+            
+            const fromIdx = uploadedImages.findIndex(img => img.imageId === sortDraggedId);
+            if (fromIdx === -1) {
+                console.error('❌ 找不到要移動的圖片:', sortDraggedId);
+                return;
+            }
+            
+            const entry = uploadedImages.splice(fromIdx, 1)[0];
+            let toIdx = sortDropIndex;
+            if (toIdx > fromIdx) toIdx--;
+            uploadedImages.splice(toIdx, 0, entry);
+            
+            console.log('✅ 已重新排序 uploadedImages，從', fromIdx, '到', toIdx);
+            
+            // 移除 placeholder
+            if (sortDragPlaceholder && sortDragPlaceholder.parentNode) {
+                sortDragPlaceholder.remove();
+            }
+            sortDragPlaceholder = null;
+            
+            // 移除 dragging 狀態
+            sortDraggedEl.classList.remove('dragging');
+            
+            // 清除所有 drag-over 狀態
+            grid.querySelectorAll('.image-preview-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+            
+            // 重新排列 DOM 以匹配新的順序
+            const itemsOrdered = [].slice.call(grid.querySelectorAll('.image-preview-item'));
+            const moved = itemsOrdered.find(el => el.dataset.imageId === sortDraggedId);
+            
+            if (moved) {
+                // 找到新位置應該插入在哪個元素之前
+                const afterId = uploadedImages[toIdx + 1] && uploadedImages[toIdx + 1].imageId;
+                const before = afterId
+                    ? itemsOrdered.find(el => el.dataset.imageId === afterId && el !== moved)
+                    : null;
+                
+                if (before && moved.nextSibling !== before) {
+                    grid.insertBefore(moved, before);
+                    console.log('✅ 已移動 DOM 元素到新位置（before）');
+                } else if (!before && moved.nextSibling !== null) {
+                    grid.appendChild(moved);
+                    console.log('✅ 已移動 DOM 元素到新位置（append）');
+                } else {
+                    console.log('ℹ️ DOM 元素已在正確位置');
+                }
+            }
+            
+            // 更新封面（第一張為封面）
+            uploadedImages.forEach((img, i) => { 
+                img.isCover = i === 0; 
+            });
+            updateImagePreviewDisplay();
+            
+            console.log('✅ 拖曳排序完成！新順序:', uploadedImages.map((img, i) => `${i}: ${img.imageId}`).join(', '));
+            
+            // 清理狀態
+            sortDraggedId = null;
+            sortDraggedEl = null;
+            sortDropIndex = -1;
+        }
+        
+        function onImageDragEnd(e) {
+            if (sortDragPlaceholder && sortDragPlaceholder.parentNode) {
+                sortDragPlaceholder.remove();
+            }
+            sortDragPlaceholder = null;
+            if (sortDraggedEl) {
+                sortDraggedEl.classList.remove('dragging');
+            }
+            const grid = document.getElementById('image-preview-grid');
+            if (grid) {
+                grid.querySelectorAll('.image-preview-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+            }
+            sortDraggedId = null;
+            sortDraggedEl = null;
+            sortDropIndex = -1;
         }
         
         // 上傳並整理圖片：將本地預覽的圖片上傳到正確的物件資料夾
@@ -4052,30 +4474,42 @@
                 // 整理圖片：將本地預覽的圖片上傳到正確的物件資料夾
                 let organizedImageUrls = [];
                 if (uploadedImages && uploadedImages.length > 0) {
-                    saveBtn.textContent = `⏳ 上傳圖片中 (0/${uploadedImages.length})...`;
-                    console.log('📤 開始上傳圖片，物件編號:', propertyNumber);
-                    console.log('📊 待上傳圖片數量:', uploadedImages.length);
+                    // 檢查是否有新上傳的圖片（有 file 屬性的）
+                    const hasNewImages = uploadedImages.some(img => img.file);
+                    const hasOnlyExistingImages = uploadedImages.every(img => img.url && !img.file && !img.tempKey);
                     
-                    try {
-                        // 顯示上傳進度
-                        const progressCallback = (current, total) => {
-                            saveBtn.textContent = `⏳ 上傳圖片中 (${current}/${total})...`;
-                        };
+                    if (hasOnlyExistingImages) {
+                        // 只有已上傳的圖片，直接使用重新排序後的順序
+                        console.log('📋 使用已上傳圖片（已重新排序）:', uploadedImages.length, '張');
+                        saveBtn.textContent = `⏳ 儲存圖片順序中...`;
+                        organizedImageUrls = uploadedImages.map(img => img.url || img);
+                        console.log('✅ 圖片順序已更新');
+                    } else {
+                        // 有新圖片需要上傳，或混合情況
+                        saveBtn.textContent = `⏳ 上傳圖片中 (0/${uploadedImages.length})...`;
+                        console.log('📤 開始上傳圖片，物件編號:', propertyNumber);
+                        console.log('📊 待上傳圖片數量:', uploadedImages.length);
                         
-                        organizedImageUrls = await uploadAndOrganizeImages(propertyNumber, progressCallback);
-                        console.log('✅ 圖片上傳完成，成功上傳:', organizedImageUrls.length, '張');
-                        propertyData.images = organizedImageUrls;
-                    } catch (imageError) {
-                        console.error('❌ 圖片上傳過程中發生錯誤:', imageError);
-                        // 即使圖片上傳失敗，也繼續儲存其他資料（但記錄警告）
-                        propertyData.images = [];
-                        showAlert('warning', `圖片上傳失敗，但將繼續儲存物件資料。錯誤: ${imageError.message}`);
+                        try {
+                            // 顯示上傳進度
+                            const progressCallback = (current, total) => {
+                                saveBtn.textContent = `⏳ 上傳圖片中 (${current}/${total})...`;
+                            };
+                            
+                            organizedImageUrls = await uploadAndOrganizeImages(propertyNumber, progressCallback);
+                            console.log('✅ 圖片上傳完成，成功上傳:', organizedImageUrls.length, '張');
+                        } catch (imageError) {
+                            console.error('❌ 圖片上傳過程中發生錯誤:', imageError);
+                            // 即使圖片上傳失敗，也繼續儲存其他資料（但記錄警告）
+                            organizedImageUrls = [];
+                            showAlert('warning', `圖片上傳失敗，但將繼續儲存物件資料。錯誤: ${imageError.message}`);
+                        }
                     }
+                    
+                    propertyData.images = organizedImageUrls;
                 } else {
-                    // 沒有新圖片，使用現有圖片或空陣列
-                    propertyData.images = uploadedImages && uploadedImages.length > 0 
-                        ? uploadedImages.map(img => img.url || img) 
-                        : [];
+                    // 沒有圖片
+                    propertyData.images = [];
                 }
                 
                 // 添加時間戳
@@ -4697,27 +5131,39 @@
                 }
                 
                 if (images && images.length > 0) {
-                    uploadedImages = images.map(img => {
+                    uploadedImages = images.map((img, index) => {
                         const imgUrl = typeof img === 'string' ? img : (img.url || img);
-                        return { url: imgUrl, key: typeof img === 'object' ? img.key : null };
+                        const imageId = 'edit_' + Date.now() + '_' + index;
+                        return { url: imgUrl, key: typeof img === 'object' ? img.key : null, imageId };
                     });
                     
                     const imagePreviewGrid = document.getElementById('image-preview-grid');
                     if (imagePreviewGrid) {
                         imagePreviewGrid.innerHTML = '';
                         uploadedImages.forEach((imgData, index) => {
-                        const item = document.createElement('div');
-                        item.className = 'image-preview-item';
-                        const img = document.createElement('img');
+                            const item = document.createElement('div');
+                            item.className = 'image-preview-item';
+                            item.dataset.imageId = imgData.imageId;
+                            item.draggable = true;
+                            item.style.position = 'relative';
+                            const img = document.createElement('img');
                             img.src = imgData.url || imgData;
-                        const removeBtn = document.createElement('button');
-                        removeBtn.className = 'image-remove';
-                        removeBtn.innerHTML = '×';
-                        removeBtn.onclick = () => removeImage(item, index);
+                            img.style.width = '100%';
+                            img.style.height = '100%';
+                            img.style.objectFit = 'cover';
+                            img.style.pointerEvents = 'none';
+                            const removeBtn = document.createElement('button');
+                            removeBtn.className = 'image-remove';
+                            removeBtn.innerHTML = '×';
+                            removeBtn.onclick = () => removeImage(item, imgData.imageId);
                             item.appendChild(img);
                             item.appendChild(removeBtn);
                             imagePreviewGrid.appendChild(item);
+                            console.log('✅ 已載入圖片項目（可拖曳）:', imgData.imageId);
                         });
+                        
+                        // 確保拖曳功能已初始化
+                        initImageSortable();
                     }
                 }
                 
@@ -5948,10 +6394,8 @@
                 alertContainer.innerHTML = '';
                 alertContainer.appendChild(alert);
                 
-                // 滾動到 alert 位置（確保可見）
-                setTimeout(() => {
-                    alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 100);
+                // 不自動滾動到 alert 位置，保持頁面在當前位置
+                // 移除 scrollIntoView 調用，避免上傳圖片時頁面跳轉
                 
                 setTimeout(() => {
                     alert.classList.remove('show');

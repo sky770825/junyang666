@@ -203,60 +203,120 @@
             return;
         }
         
-        listContainer.innerHTML = `
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">順序</th>
-                        <th>標題</th>
-                        <th>網址</th>
-                        <th>類型</th>
-                        <th>狀態</th>
-                        <th style="width: 200px;">操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${links.map(link => `
-                        <tr>
-                            <td>${link.display_order || 0}</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.2rem;">${link.icon || ''}</span>
-                                    <span>${escapeHtml(link.title)}</span>
+        // 檢測是否為手機版
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile) {
+            // 手機版：使用網格卡片佈局
+            listContainer.innerHTML = `
+                <div class="links-grid-mobile">
+                    ${links.map(link => {
+                        const safeTitle = escapeHtml(link.title);
+                        const safeUrl = escapeHtml(link.url);
+                        const safeId = escapeHtml(link.id);
+                        const itemsCount = link.link_type === 'dropdown' && itemsByParent[link.id] ? itemsByParent[link.id].length : 0;
+                        const urlDisplay = safeUrl.length > 40 ? safeUrl.substring(0, 40) + '...' : safeUrl;
+                        
+                        return `
+                            <div class="link-card-mobile">
+                                <div class="link-card-mobile-header">
+                                    <div class="link-card-mobile-order">#${link.display_order || 0}</div>
+                                    <div class="link-card-mobile-title">
+                                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">${link.icon || ''}</span>
+                                        <span>${safeTitle}</span>
+                                    </div>
                                 </div>
-                            </td>
-                            <td>
-                                <a href="${escapeHtml(link.url)}" target="_blank" style="color: #667eea; text-decoration: none; max-width: 300px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                    ${escapeHtml(link.url)}
-                                </a>
-                            </td>
-                            <td>
-                                <span class="badge ${link.link_type === 'dropdown' ? 'badge-warning' : 'badge-success'}">
-                                    ${link.link_type === 'dropdown' ? '下拉選單' : '按鈕'}
-                                </span>
-                                ${link.link_type === 'dropdown' && itemsByParent[link.id] ? 
-                                    `(${itemsByParent[link.id].length} 個項目)` : ''}
-                            </td>
-                            <td>
-                                <span class="badge ${link.is_active ? 'badge-success' : 'badge-secondary'}">
-                                    ${link.is_active ? '啟用' : '停用'}
-                                </span>
-                            </td>
-                            <td>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <button class="btn btn-primary btn-small" onclick="RelatedLinksBackend.editLink('${link.id}')">
+                                <div class="link-card-mobile-content">
+                                    <div class="link-card-mobile-item">
+                                        <span class="link-card-mobile-label">網址：</span>
+                                        <a href="${safeUrl}" target="_blank" class="link-card-mobile-url" title="${safeUrl}">
+                                            ${urlDisplay}
+                                        </a>
+                                    </div>
+                                    <div class="link-card-mobile-item">
+                                        <span class="link-card-mobile-label">類型：</span>
+                                        <span class="badge ${link.link_type === 'dropdown' ? 'badge-warning' : 'badge-success'}">
+                                            ${link.link_type === 'dropdown' ? '下拉選單' : '按鈕'}
+                                        </span>
+                                        ${itemsCount > 0 ? `<span style="color: #666; font-size: 0.85rem; margin-left: 0.5rem;">(${itemsCount} 個項目)</span>` : ''}
+                                    </div>
+                                    <div class="link-card-mobile-item">
+                                        <span class="link-card-mobile-label">狀態：</span>
+                                        <span class="badge ${link.is_active ? 'badge-success' : 'badge-danger'}">
+                                            ${link.is_active ? '啟用' : '停用'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="link-card-mobile-actions">
+                                    <button class="btn btn-primary btn-small" onclick="RelatedLinksBackend.editLink('${safeId}')" style="flex: 1;">
                                         ✏️ 編輯
                                     </button>
-                                    <button class="btn btn-danger btn-small" onclick="RelatedLinksBackend.deleteLink('${link.id}')">
+                                    <button class="btn btn-danger btn-small" onclick="RelatedLinksBackend.deleteLink('${safeId}')" style="flex: 1;">
                                         🗑️ 刪除
                                     </button>
                                 </div>
-                            </td>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        } else {
+            // 桌面版：使用表格佈局
+            listContainer.innerHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">順序</th>
+                            <th>標題</th>
+                            <th>網址</th>
+                            <th>類型</th>
+                            <th>狀態</th>
+                            <th style="width: 200px;">操作</th>
                         </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
+                    </thead>
+                    <tbody>
+                        ${links.map(link => `
+                            <tr>
+                                <td>${link.display_order || 0}</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="font-size: 1.2rem;">${link.icon || ''}</span>
+                                        <span>${escapeHtml(link.title)}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="${escapeHtml(link.url)}" target="_blank" style="color: #667eea; text-decoration: none; max-width: 300px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        ${escapeHtml(link.url)}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge ${link.link_type === 'dropdown' ? 'badge-warning' : 'badge-success'}">
+                                        ${link.link_type === 'dropdown' ? '下拉選單' : '按鈕'}
+                                    </span>
+                                    ${link.link_type === 'dropdown' && itemsByParent[link.id] ? 
+                                        `(${itemsByParent[link.id].length} 個項目)` : ''}
+                                </td>
+                                <td>
+                                    <span class="badge ${link.is_active ? 'badge-success' : 'badge-secondary'}">
+                                        ${link.is_active ? '啟用' : '停用'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <button class="btn btn-primary btn-small" onclick="RelatedLinksBackend.editLink('${link.id}')">
+                                            ✏️ 編輯
+                                        </button>
+                                        <button class="btn btn-danger btn-small" onclick="RelatedLinksBackend.deleteLink('${link.id}')">
+                                            🗑️ 刪除
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
     }
     
     // HTML 轉義函數

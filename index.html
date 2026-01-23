@@ -2212,6 +2212,77 @@
         .room-filter-button {
             transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        /* 收合/展開功能樣式 */
+        .collapsible-section {
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            cursor: pointer;
+            user-select: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .collapsible-header:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        }
+        
+        .collapsible-header .section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .collapsible-header .toggle-icon {
+            font-size: 1rem;
+            color: #667eea;
+            transition: transform 0.3s ease;
+        }
+        
+        .collapsible-section.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .collapsible-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+            opacity: 1;
+            padding: 1rem;
+        }
+        
+        .collapsible-section.collapsed .collapsible-content {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 1rem;
+        }
+        
+        .collapsible-section.collapsed {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* 確保篩選按鈕在收合時也能正常顯示 */
+        .collapsible-content .filter-buttons {
+            margin: 0;
+        }
+        
+        /* 統計資訊樣式 */
+        #stats-container {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -2231,80 +2302,91 @@
             </div>
             
             <!-- 搜尋和篩選區域 -->
-            <div class="search-filter-container" style="text-align: center; margin: 1rem 0 2rem 0;">
-                <!-- 預覽模式切換 -->
-                <div style="margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
-                    <span style="font-size: 0.9rem; color: #666; margin-right: 0.5rem;">預覽模式：</span>
-                    <button id="view-mode-grid" class="view-mode-btn active" data-mode="grid" 
-                            style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
-                        <i class="bi bi-grid-3x3-gap"></i> 網格
-                    </button>
-                    <button id="view-mode-card" class="view-mode-btn" data-mode="card" 
-                            style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                        <i class="bi bi-card-text"></i> 卡片
-                    </button>
-                </div>
-                
-                <!-- 搜尋框和行政區篩選 -->
-                <div style="margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-                    <input type="text" id="property-search" placeholder="搜尋物件名稱、地址、社區..." 
-                           style="width: 300px; max-width: 90%; padding: 0.8rem 1rem; border: 2px solid #e9ecef; border-radius: 25px; font-size: 1rem; outline: none; transition: all 0.3s ease;"
-                           onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
-                           onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
-                    
-                    <!-- 地址社區篩選 -->
-                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
-                        <span style="font-size: 0.9rem; color: #666; font-weight: 500;">📍 地址社區：</span>
-                        <span style="font-size: 0.9rem; color: #667eea; font-weight: 600; padding: 0.3rem 0.8rem; background: #f0f4ff; border-radius: 8px;">桃園市</span>
-                        <select id="district-filter" 
-                                style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 12px; font-size: 0.9rem; outline: none; transition: all 0.3s ease; cursor: pointer; min-width: 120px;"
-                                onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
-                                onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
-                            <option value="">全部行政區</option>
-                            <!-- 行政區選項將由 JavaScript 動態生成 -->
-                        </select>
+            <div class="collapsible-section" id="filter-section" style="margin: 1rem 0 2rem 0;">
+                <div class="collapsible-header" onclick="toggleCollapsible('filter-section')">
+                    <div class="section-title">
+                        <span>🔍</span>
+                        <span>搜尋與篩選</span>
                     </div>
+                    <span class="toggle-icon">▼</span>
                 </div>
-                
-                <!-- 建築類型篩選 -->
-                <div style="margin-bottom: 0.5rem;">
-                    <div class="filter-buttons building-filter" style="gap: 0.4rem;">
-                        <button class="building-filter-button active" data-building="all" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
-                            全部 <span class="count"></span>
-                        </button>
-                        <button class="building-filter-button" data-building="電梯大樓" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                            電梯大樓 <span class="count"></span>
-                        </button>
-                        <button class="building-filter-button" data-building="華廈" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                            華廈 <span class="count"></span>
-                        </button>
-                        <button class="building-filter-button" data-building="透天別墅" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                            透天別墅 <span class="count"></span>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- 房型篩選 -->
-                <div style="margin-bottom: 0.8rem;">
-                    <div class="filter-buttons room-filter" style="gap: 0.4rem;">
-                        <button class="room-filter-button active" data-room="all" style="background: linear-gradient(45deg, #10b981, #3b82f6); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
-                            全部房型 <span class="count"></span>
-                        </button>
-                        <button class="room-filter-button" data-room="2房" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                            2房 <span class="count"></span>
-                        </button>
-                        <button class="room-filter-button" data-room="3房" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                            3房 <span class="count"></span>
-                        </button>
-                        <button class="room-filter-button" data-room="4房" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                            4房 <span class="count"></span>
-                        </button>
+                <div class="collapsible-content">
+                    <div class="search-filter-container" style="text-align: center;">
+                        <!-- 預覽模式切換 -->
+                        <div style="margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                            <span style="font-size: 0.9rem; color: #666; margin-right: 0.5rem;">預覽模式：</span>
+                            <button id="view-mode-grid" class="view-mode-btn active" data-mode="grid" 
+                                    style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
+                                <i class="bi bi-grid-3x3-gap"></i> 網格
+                            </button>
+                            <button id="view-mode-card" class="view-mode-btn" data-mode="card" 
+                                    style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="bi bi-card-text"></i> 卡片
+                            </button>
+                        </div>
+                        
+                        <!-- 搜尋框和行政區篩選 -->
+                        <div style="margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                            <input type="text" id="property-search" placeholder="搜尋物件名稱、地址、社區..." 
+                                   style="width: 300px; max-width: 90%; padding: 0.8rem 1rem; border: 2px solid #e9ecef; border-radius: 25px; font-size: 1rem; outline: none; transition: all 0.3s ease;"
+                                   onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                                   onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
+                            
+                            <!-- 地址社區篩選 -->
+                            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
+                                <span style="font-size: 0.9rem; color: #666; font-weight: 500;">📍 地址社區：</span>
+                                <span style="font-size: 0.9rem; color: #667eea; font-weight: 600; padding: 0.3rem 0.8rem; background: #f0f4ff; border-radius: 8px;">桃園市</span>
+                                <select id="district-filter" 
+                                        style="padding: 0.6rem 1rem; border: 2px solid #e9ecef; border-radius: 12px; font-size: 0.9rem; outline: none; transition: all 0.3s ease; cursor: pointer; min-width: 120px;"
+                                        onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                                        onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
+                                    <option value="">全部行政區</option>
+                                    <!-- 行政區選項將由 JavaScript 動態生成 -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- 建築類型篩選 -->
+                        <div style="margin-bottom: 0.5rem;">
+                            <div class="filter-buttons building-filter" style="gap: 0.4rem; display: flex; flex-wrap: wrap; justify-content: center;">
+                                <button class="building-filter-button active" data-building="all" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
+                                    全部 <span class="count"></span>
+                                </button>
+                                <button class="building-filter-button" data-building="電梯大樓" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                                    電梯大樓 <span class="count"></span>
+                                </button>
+                                <button class="building-filter-button" data-building="華廈" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                                    華廈 <span class="count"></span>
+                                </button>
+                                <button class="building-filter-button" data-building="透天別墅" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                                    透天別墅 <span class="count"></span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 房型篩選 -->
+                        <div style="margin-bottom: 0.8rem;">
+                            <div class="filter-buttons room-filter" style="gap: 0.4rem; display: flex; flex-wrap: wrap; justify-content: center;">
+                                <button class="room-filter-button active" data-room="all" style="background: linear-gradient(45deg, #10b981, #3b82f6); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
+                                    全部房型 <span class="count"></span>
+                                </button>
+                                <button class="room-filter-button" data-room="2房" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                                    2房 <span class="count"></span>
+                                </button>
+                                <button class="room-filter-button" data-room="3房" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                                    3房 <span class="count"></span>
+                                </button>
+                                <button class="room-filter-button" data-room="4房" style="background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                                    4房 <span class="count"></span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 統計資訊 -->
+                        <div id="stats-container" style="margin-top: 1rem;"></div>
                     </div>
                 </div>
             </div>
-            
-            <!-- 統計資訊 -->
-            <div id="stats-container"></div>
             
             <!-- 動態物件容器 -->
             <div id="properties-container" class="properties-grid">
@@ -2845,12 +2927,48 @@
     <script src="main-script.js"></script>
     
     <script>
+        // 收合/展開功能
+        function toggleCollapsible(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            
+            const isCollapsed = section.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                section.classList.remove('collapsed');
+                // 保存展開狀態
+                localStorage.setItem(`collapsible_${sectionId}`, 'expanded');
+            } else {
+                section.classList.add('collapsed');
+                // 保存收合狀態
+                localStorage.setItem(`collapsible_${sectionId}`, 'collapsed');
+            }
+        }
+        
+        // 載入保存的收合狀態（預設為展開）
+        function loadCollapsibleStates() {
+            const section = document.getElementById('filter-section');
+            if (!section) return;
+            
+            // 確保預設是展開狀態（移除可能存在的 collapsed class）
+            section.classList.remove('collapsed');
+            
+            // 只有在用戶明確保存了收合狀態時才收合
+            const savedState = localStorage.getItem('collapsible_filter-section');
+            if (savedState === 'collapsed') {
+                section.classList.add('collapsed');
+            }
+        }
+        
         // ✅ 模組化版本初始化
         // 注意：主要初始化邏輯在 main-script.js 中，這裡只處理已售物件分頁系統
         let soldPaginationSystem;
         
         // 頁面載入完成後初始化已售物件分頁系統
         document.addEventListener('DOMContentLoaded', function() {
+            // 載入收合/展開狀態
+            loadCollapsibleStates();
+            
             // 等待資料載入完成後再初始化已售物件分頁系統
             window.addEventListener('supabaseDataLoaded', function() {
                 console.log('📦 Supabase 資料已載入，初始化已售物件分頁系統');

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增物件 - 埔心幸福成家四房車</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 2rem;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .info-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-section h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .info-item {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 6px;
+        }
+        
+        .info-item strong {
+            color: #667eea;
+            margin-right: 0.5rem;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .result h3 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .result pre {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 新增物件 - 埔心幸福成家四房車</h1>
+        
+        <div id="alert-container"></div>
+        
+        <div class="info-section">
+            <h2>📋 物件資訊</h2>
+            <div class="info-item"><strong>案名：</strong>埔心幸福成家四房車</div>
+            <div class="info-item"><strong>社區名稱：</strong>幸福宣言</div>
+            <div class="info-item"><strong>地址：</strong>桃園市楊梅區文化街336號7樓</div>
+            <div class="info-item"><strong>售價：</strong>1438萬</div>
+            <div class="info-item"><strong>格局：</strong>4房2廳2衛</div>
+            <div class="info-item"><strong>總坪數：</strong>50.23坪</div>
+            <div class="info-item"><strong>主建物：</strong>28.84坪</div>
+            <div class="info-item"><strong>附屬建物：</strong>3.44坪</div>
+            <div class="info-item"><strong>公設：</strong>10.83坪</div>
+            <div class="info-item"><strong>車位：</strong>7.13坪</div>
+            <div class="info-item"><strong>持分後地坪：</strong>10.93坪</div>
+            <div class="info-item"><strong>屋齡：</strong>18年</div>
+            <div class="info-item"><strong>建物完成日：</strong>民國95年09月04日</div>
+            <div class="info-item"><strong>樓層：</strong>7樓/13樓</div>
+            <div class="info-item"><strong>座向：</strong>座東北朝西南</div>
+            <div class="info-item"><strong>管理費：</strong>3210元/月</div>
+            <div class="info-item"><strong>車位：</strong>B2-23</div>
+            <div class="info-item"><strong>機車位：</strong>B2-28</div>
+            <div class="info-item"><strong>目前現況：</strong>自住,需提前預約</div>
+            <div class="info-item"><strong>KEY：</strong>洽網發</div>
+        </div>
+        
+        <button type="button" class="btn" onclick="addProperty()" id="add-btn">
+            🚀 新增物件到資料庫
+        </button>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>新增結果</h3>
+            <pre id="result-content"></pre>
+        </div>
+    </div>
+    
+    <script>
+        const supabaseClient = createSupabaseClient();
+        
+        function showAlert(type, message) {
+            const container = document.getElementById('alert-container');
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+        
+        // 獲取類型前綴
+        function getTypePrefix(type) {
+            const prefixMap = {
+                '套房': 'SU',
+                '2房': 'TW',
+                '3房': 'TH',
+                '4房': 'FO',
+                '華廈': 'HS',
+                '公寓': 'AP',
+                '透天': 'TH',
+                '店面': 'ST',
+                '別墅': 'VI',
+                '店住': 'ST'
+            };
+            return prefixMap[type] || 'XX';
+        }
+        
+        // 獲取所有物件編號
+        async function getAllPropertyNumbers() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('properties')
+                    .select('number')
+                    .not('number', 'is', null);
+                
+                if (error) throw error;
+                
+                return (data || []).map(p => p.number).filter(n => n);
+            } catch (error) {
+                console.error('獲取編號失敗:', error);
+                return [];
+            }
+        }
+        
+        // 獲取下一個序號（店內物件）
+        function getNextInternalSequenceNumber(existingNumbers, prefix) {
+            const typeNumbers = existingNumbers
+                .filter(num => {
+                    if (!num || typeof num !== 'string') return false;
+                    if (num.startsWith('EX')) return false;
+                    const pattern = new RegExp(`^${prefix}\\d{5}$`);
+                    return pattern.test(num);
+                })
+                .map(num => {
+                    const match = num.match(new RegExp(`^${prefix}(\\d+)$`));
+                    return match ? parseInt(match[1], 10) : 0;
+                })
+                .filter(num => !isNaN(num) && num > 0)
+                .sort((a, b) => b - a);
+            
+            return typeNumbers.length > 0 ? typeNumbers[0] + 1 : 1;
+        }
+        
+        // 格式化序號
+        function formatSequenceNumber(seq, length) {
+            return String(seq).padStart(length, '0');
+        }
+        
+        // 生成物件編號
+        async function generatePropertyNumber() {
+            // 4房物件使用4房類型
+            const type = '4房';
+            const prefix = getTypePrefix(type);
+            
+            if (!prefix || prefix === 'XX') {
+                throw new Error('無法識別的房型');
+            }
+            
+            const existingNumbers = await getAllPropertyNumbers();
+            const nextSeq = getNextInternalSequenceNumber(existingNumbers, prefix);
+            const formattedSeq = formatSequenceNumber(nextSeq, 5);
+            const newNumber = `${prefix}${formattedSeq}`;
+            
+            if (existingNumbers.includes(newNumber)) {
+                throw new Error('生成的編號重複，請重試');
+            }
+            
+            return newNumber;
+        }
+        
+        async function addProperty() {
+            const btn = document.getElementById('add-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ 新增中...';
+            
+            try {
+                // 生成編號
+                const propertyNumber = await generatePropertyNumber();
+                console.log('生成的編號:', propertyNumber);
+                
+                // 準備物件資料
+                const propertyData = {
+                    number: propertyNumber,
+                    title: '埔心幸福成家四房車',
+                    type: '4房', // 房型
+                    city: '桃園市',
+                    district: '楊梅區',
+                    address: '桃園市楊梅區文化街336號7樓',
+                    address_detail: '文化街336號7樓',
+                    hide_address_number: false,
+                    price: '1438萬',
+                    layout: '4房2廳2衛',
+                    total_area: '50.23坪',
+                    main_area: '28.84坪',
+                    auxiliary_area: '3.44坪',
+                    common_area: '10.83坪',
+                    land_area: '10.93坪', // 持分後地坪
+                    parking_area: '7.13坪', // 車位坪數
+                    age: '18年',
+                    floor: '7樓/13樓',
+                    building_type: '大樓',
+                    orientation: '座東北朝西南',
+                    management_fee: '3210元/月',
+                    parking_type: '坡道平面',
+                    parking_space: 'B2-23',
+                    current_status: '自住,需提前預約',
+                    community: '幸福宣言',
+                    is_published: true,
+                    is_external: false,
+                    status: null,
+                    status_text: null,
+                    description: `埔心幸福成家四房車
+
+屋主用心維護屋況好、精緻裝潢
+一層二戶、戶數單純
+稀有四房、室內空間寬敞、使用坪數達32坪
+雙衛浴皆開窗、通風不怕潮濕
+地段好、近學區公園、商店林立機能完善
+
+房屋型式：大樓
+屋齡：18年（建物完成日：民國95年09月04日）
+管理費：3210元/月
+出售樓層：7樓
+最高樓層：13樓
+地下樓層：2樓
+套房：一間
+警衛管理：有
+座向：座東北朝西南
+天然瓦斯：有
+裝潢：有
+臨路寬：6米
+面寬：0米
+車位：B2-23
+機車位：B2-28
+目前現況：自住,需提前預約
+KEY：洽網發`,
+                    images: [],
+                    transportation: {
+                        facilities: ['四維路商圈', '全聯福利中心', '喜客來五金百貨', '自由聯盟生鮮超市', '大樹藥局'],
+                        transport: ['台1線', '埔心火車站'],
+                        schools: ['瑞坪國中', '四維國小', '瑞埔國小'],
+                        market: '埔心市場、萬大黃昏市場',
+                        park: '四維兒童公園'
+                    },
+                    features: [],
+                    google_maps: null,
+                    tiktok_video_id: null,
+                    tiktok_username: null,
+                    reference_link: null
+                };
+                
+                // 清理空字串，轉換為 null
+                Object.keys(propertyData).forEach(key => {
+                    if (propertyData[key] === '') {
+                        propertyData[key] = null;
+                    }
+                });
+                
+                // 確保 JSONB 欄位格式正確
+                if (!Array.isArray(propertyData.images)) {
+                    propertyData.images = [];
+                }
+                if (typeof propertyData.transportation !== 'object' || Array.isArray(propertyData.transportation)) {
+                    propertyData.transportation = propertyData.transportation || {};
+                }
+                if (!Array.isArray(propertyData.features)) {
+                    propertyData.features = [];
+                }
+                
+                console.log('📤 準備新增物件:', propertyData);
+                
+                // 新增到資料庫
+                const { data: insertData, error: insertError } = await supabaseClient
+                    .from('properties')
+                    .insert([propertyData])
+                    .select();
+                
+                if (insertError) throw insertError;
+                
+                // 取得新增的資料
+                const data = insertData && insertData.length > 0 ? insertData[0] : null;
+                if (!data) {
+                    throw new Error('新增成功但無法取得資料');
+                }
+                
+                console.log('✅ 物件新增成功:', data);
+                
+                // 顯示結果
+                const resultDiv = document.getElementById('result');
+                const resultContent = document.getElementById('result-content');
+                resultDiv.style.display = 'block';
+                resultContent.textContent = JSON.stringify(data, null, 2);
+                
+                showAlert('success', `✅ 物件已成功新增！\n編號: ${propertyNumber}\nID: ${data.id}\n\n您可以前往後台管理系統查看此物件。`);
+                
+                btn.disabled = false;
+                btn.textContent = '✅ 新增成功！';
+                
+            } catch (error) {
+                console.error('❌ 新增失敗:', error);
+                console.error('錯誤詳情:', {
+                    message: error.message,
+                    code: error.code,
+                    details: error.details,
+                    hint: error.hint
+                });
+                
+                let errorMessage = `新增失敗：${error.message}`;
+                if (error.details) {
+                    errorMessage += `\n詳情：${error.details}`;
+                }
+                if (error.hint) {
+                    errorMessage += `\n提示：${error.hint}`;
+                }
+                
+                showAlert('error', errorMessage);
+                btn.disabled = false;
+                btn.textContent = '🚀 新增物件到資料庫';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -124,8 +124,9 @@ class EmbeddedPropertyPaginationSystem {
                             this.cardCache.clear();
                         }
                         
-                        // 更新行政區選項
+                        // 更新行政區選項與房型按鈕（避免非同步載入時只顯示靜態 2/3/4 房）
                         this.updateDistrictOptions();
+                        this.updateRoomFilterButtons();
                         
                         // 重新渲染
                         this.renderProperties();
@@ -135,8 +136,9 @@ class EmbeddedPropertyPaginationSystem {
                         this.properties = this.allProperties.filter(p => p.status !== 'sold');
                         this.soldProperties = this.allProperties.filter(p => p.status === 'sold');
                         
-                        // 更新行政區選項
+                        // 更新行政區選項與房型按鈕
                         this.updateDistrictOptions();
+                        this.updateRoomFilterButtons();
                         
                         this.renderProperties();
                     } else {
@@ -1463,31 +1465,33 @@ class EmbeddedPropertyPaginationSystem {
             }
         });
         
-        // 保留「全部房型」按鈕，清除其他按鈕
+        // 使用 DocumentFragment 一次置換，減少 F5 時閃爍
+        // 重要：用 cloneNode，不要 appendChild(allButton)，否則「全部」會先被移出 DOM，
+        // 在 replaceChildren 前會短暫只剩 2房、3房、4房，連續 F5 時非常明顯
         const allButton = roomFilterContainer.querySelector('[data-room="all"]');
-        roomFilterContainer.innerHTML = '';
+        const frag = document.createDocumentFragment();
         
-        // 重新添加「全部房型」按鈕
         if (allButton) {
-            roomFilterContainer.appendChild(allButton);
+            frag.appendChild(allButton.cloneNode(true));
         } else {
             const allBtn = document.createElement('button');
             allBtn.className = 'room-filter-button active';
             allBtn.setAttribute('data-room', 'all');
             allBtn.style.cssText = 'background: linear-gradient(45deg, #10b981, #3b82f6); color: white; border: none; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);';
             allBtn.innerHTML = '全部房型 <span class="count"></span>';
-            roomFilterContainer.appendChild(allBtn);
+            frag.appendChild(allBtn);
         }
         
-        // 動態生成其他房型按鈕
         sortedRoomTypes.forEach(roomType => {
             const button = document.createElement('button');
             button.className = 'room-filter-button';
             button.setAttribute('data-room', roomType);
             button.style.cssText = 'background: #f8f9fa; color: #666; border: 2px solid #e9ecef; padding: 0.5rem 1rem; border-radius: 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;';
             button.innerHTML = `${roomTypeNames[roomType] || roomType} <span class="count"></span>`;
-            roomFilterContainer.appendChild(button);
+            frag.appendChild(button);
         });
+        
+        roomFilterContainer.replaceChildren(...Array.from(frag.childNodes));
         
         // 重新設置事件監聽器
         this.setupRoomFilterListeners();

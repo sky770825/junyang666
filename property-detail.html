@@ -7,18 +7,25 @@
     <meta http-equiv="Permissions-Policy" content="accelerometer=*, gyroscope=*, geolocation=*">
     <title>物件詳細資訊 | 住商不動產</title>
     
-    <!-- Open Graph / Facebook / LINE 連結預覽 -->
+    <!-- Open Graph / Facebook / LINE 連結預覽（爬蟲不執行 JS，需在 HTML 預設或由 Edge Function 注入） -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="">
     <meta property="og:title" content="物件詳細資訊 | 住商不動產">
     <meta property="og:description" content="查看物件詳細資訊">
-    <meta property="og:image" content="">
+    <meta property="og:image" content="https://placehold.co/1200x630/667eea/ffffff/png?text=Property">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="物件預覽">
+    <meta property="og:site_name" content="住商不動產 濬瑒｜子菲">
+    <meta property="og:locale" content="zh_TW">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="">
     <meta name="twitter:title" content="物件詳細資訊 | 住商不動產">
     <meta name="twitter:description" content="查看物件詳細資訊">
-    <meta name="twitter:image" content="">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/667eea/ffffff/png?text=Property">
+    <meta name="twitter:image:alt" content="物件預覽">
     
     <!-- 標準描述 -->
     <meta name="description" content="查看物件詳細資訊">
@@ -722,6 +729,7 @@
             updateMetaTag('og:title', pageTitle);
             updateMetaTag('og:description', description);
             updateMetaTag('og:url', window.location.href);
+            updateMetaTag('og:image:alt', title);
             
             // 如果有圖片，設置 og:image
             if (property.images && Array.isArray(property.images) && property.images.length > 0) {
@@ -734,8 +742,10 @@
             }
             
             // 更新 Twitter Card 標籤
+            updateMetaTag('twitter:url', window.location.href);
             updateMetaTag('twitter:title', pageTitle);
             updateMetaTag('twitter:description', description);
+            updateMetaTag('twitter:image:alt', title);
             if (property.images && Array.isArray(property.images) && property.images.length > 0) {
                 const firstImage = typeof property.images[0] === 'string' 
                     ? property.images[0] 

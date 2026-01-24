@@ -1426,6 +1426,31 @@
             display: block;
         }
         
+        /* 物件列表可滾動：保留標題/搜尋/篩選在上方，列表區塊獨立滾動 */
+        #property-list-subtab #properties-list {
+            max-height: calc(100vh - 320px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #667eea #f1f5f9;
+            scroll-behavior: smooth;
+        }
+        #property-list-subtab #properties-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        #property-list-subtab #properties-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        #property-list-subtab #properties-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+        #property-list-subtab #properties-list::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+        
         .quick-actions {
             display: flex;
             gap: 1rem;
@@ -3247,8 +3272,9 @@
             renderProperties();
         }
         
-        // 切換手機選單
+        // 切換手機選單（僅手機版：抽屜與 body 鎖定；桌面版點擊 nav 不應鎖住整頁滾動）
         function toggleMobileMenu() {
+            if (!isMobileDevice()) return;
             const nav = document.getElementById('main-nav');
             const overlay = document.querySelector('.nav-overlay');
             

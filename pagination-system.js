@@ -1258,8 +1258,17 @@ class EmbeddedPropertyPaginationSystem {
             '透天別墅': 0
         };
 
-        // 先取得基礎篩選結果
+        // 先取得基礎篩選結果（須先套用行政區，建築類型與房型數量才對應所選行政區）
         let baseFiltered = this.properties;
+        if (this.districtFilter) {
+            baseFiltered = baseFiltered.filter(property => {
+                const propertyDistrict = property.district || '';
+                const propertyAddress = property.address || '';
+                if (propertyDistrict && propertyDistrict.includes(this.districtFilter)) return true;
+                if (propertyAddress.includes(this.districtFilter)) return true;
+                return false;
+            });
+        }
         
         // 房型統計 - 依 getRoomTypeFromProperty 動態累加（含所有建築類型只要有房間數）
         const roomCounts = { 'all': 0 };
@@ -1543,6 +1552,7 @@ class EmbeddedPropertyPaginationSystem {
         this.filteredCache = null; // 清除緩存
         this.cacheKey = '';
         this.renderProperties();
+        this.updateFilterCounts(); // 建築類型、房型數量須對應所選行政區
     }
     
     setupEventListeners() {

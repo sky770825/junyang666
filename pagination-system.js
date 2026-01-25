@@ -160,6 +160,33 @@ class EmbeddedPropertyPaginationSystem {
         }, 100); // 100ms 後立即開始預渲染
     }
 
+    /**
+     * 從 property 取得用於篩選的房型（2房、3房、4房等）。
+     * 透天、別墅、華廈、公寓的 type 是建築類型，需從 layout（如「4房3廳3衛」）解析房間數。
+     * @returns {'開放式'|'1房'|'2房'|'3房'|'4房'|'5房'|'店面'|'店住'|null}
+     */
+    getRoomTypeFromProperty(property) {
+        const type = property.type || '';
+        const layout = (property.layout || '').trim();
+        // type 為套房 → 1房
+        if (type === '套房') return '1房';
+        // type 為店面、店住 → 直接回傳，供房型篩選對應
+        if (type === '店面' || type === '店住') return type;
+        // 從 layout 解析
+        if (layout) {
+            if (layout.includes('0房') || layout.includes('開放式')) return '開放式';
+            if (layout.includes('1房') || layout.includes('套房')) return '1房';
+            const m = layout.match(/(\d+)房/);
+            if (m) {
+                const n = parseInt(m[1], 10);
+                if (n >= 1) return n + '房';
+            }
+        }
+        // 若 layout 無法解析，但 type 已是 X房、開放式、店面、店住，沿用 type
+        if (/^\d+房$/.test(type) || ['開放式', '店面', '店住'].includes(type)) return type;
+        return null;
+    }
+
     getFilteredProperties() {
         // 🔥 新增：檢查緩存（包含雙重篩選和行政區篩選）
         const newCacheKey = `${this.buildingFilter}_${this.roomFilter}_${this.districtFilter}_${this.searchTerm}`;
@@ -210,35 +237,9 @@ class EmbeddedPropertyPaginationSystem {
             });
         }
         
-        // 🔥 房型篩選
+        // 🔥 房型篩選：只要有 layout 或 type 可解析出房間數，全部用 getRoomTypeFromProperty 比對
         if (this.roomFilter !== 'all') {
-            filtered = filtered.filter(property => {
-                // 處理「開放式」篩選
-                if (this.roomFilter === '開放式') {
-                    if (property.layout) {
-                        const layout = property.layout.trim();
-                        return layout.includes('0房') || layout.includes('開放式');
-                    }
-                    return false;
-                }
-                
-                // 處理「1房」篩選（包括套房）
-                if (this.roomFilter === '1房') {
-                    // 如果 type 是「套房」，直接匹配
-                    if (property.type === '套房') {
-                        return true;
-                    }
-                    // 如果格局包含「1房」或「套房」，也匹配
-                    if (property.layout) {
-                        const layout = property.layout.trim();
-                        return layout.includes('1房') || layout.includes('套房');
-                    }
-                    return false;
-                }
-                
-                // 一般房型篩選
-                return property.type === this.roomFilter;
-            });
+            filtered = filtered.filter(property => this.getRoomTypeFromProperty(property) === this.roomFilter);
         }
         
         // 搜尋功能
@@ -1260,40 +1261,12 @@ class EmbeddedPropertyPaginationSystem {
         // 先取得基礎篩選結果
         let baseFiltered = this.properties;
         
-        // 房型統計 - 動態統計所有存在的房型
-        const roomCounts = {
-            'all': 0,
-            '開放式': 0,
-            '1房': 0
-        };
+        // 房型統計 - 依 getRoomTypeFromProperty 動態累加（含所有建築類型只要有房間數）
+        const roomCounts = { 'all': 0 };
 
-        // 統計建築類型數量（考慮房型篩選）
+        // 統計建築類型數量（考慮房型篩選；房型一律用 getRoomTypeFromProperty，含透天別墅從 layout 解析）
         baseFiltered.forEach(property => {
-            // 檢查是否符合當前房型篩選（包括開放式和1房）
-            let matchRoomFilter = this.roomFilter === 'all';
-            
-            if (!matchRoomFilter) {
-                if (this.roomFilter === '開放式') {
-                    if (property.layout) {
-                        const layout = property.layout.trim();
-                        matchRoomFilter = layout.includes('0房') || layout.includes('開放式');
-                    }
-                } else if (this.roomFilter === '1房') {
-                    // 如果 type 是「套房」，直接匹配
-                    if (property.type === '套房') {
-                        matchRoomFilter = true;
-                    } else if (property.layout) {
-                        // 如果格局包含「1房」或「套房」，也匹配
-                        const layout = property.layout.trim();
-                        matchRoomFilter = layout.includes('1房') || layout.includes('套房');
-                    } else {
-                        matchRoomFilter = false;
-                    }
-                } else {
-                    matchRoomFilter = property.type === this.roomFilter;
-                }
-            }
-            
+            const matchRoomFilter = this.roomFilter === 'all' || this.getRoomTypeFromProperty(property) === this.roomFilter;
             if (matchRoomFilter) {
                 buildingCounts['all']++;
                 
@@ -1326,32 +1299,9 @@ class EmbeddedPropertyPaginationSystem {
             
             if (matchBuildingFilter) {
                 roomCounts['all']++;
-                
-                // 根據格局判斷開放式和1房
-                if (property.layout) {
-                    const layout = property.layout.trim();
-                    // 判斷是否為開放式（0房）
-                    if (layout.includes('0房') || layout.includes('開放式')) {
-                        roomCounts['開放式'] = (roomCounts['開放式'] || 0) + 1;
-                    }
-                    // 判斷是否為1房（套房）- 放寬條件
-                    if (layout.includes('1房') || layout.includes('套房')) {
-                        roomCounts['1房'] = (roomCounts['1房'] || 0) + 1;
-                    }
-                }
-                
-                // 如果 type 是「套房」，也應該算作「1房」
-                if (property.type === '套房') {
-                    roomCounts['1房'] = (roomCounts['1房'] || 0) + 1;
-                }
-                
-                // 統計一般房型（排除建築類型和套房，因為套房已經算作1房）
-                if (property.type) {
-                    const buildingTypes = ['透天', '別墅', '華廈', '公寓'];
-                    if (!buildingTypes.includes(property.type) && property.type !== '套房') {
-                        roomCounts[property.type] = (roomCounts[property.type] || 0) + 1;
-                    }
-                }
+                // 只要有房間數（layout 或 type 可解析），全部計入對應房型（含電梯大樓、華廈、透天、別墅、公寓等）
+                const rt = this.getRoomTypeFromProperty(property);
+                if (rt) roomCounts[rt] = (roomCounts[rt] || 0) + 1;
             }
         });
 
@@ -1379,8 +1329,9 @@ class EmbeddedPropertyPaginationSystem {
             }
         });
         
-        // 返回房型統計，供動態生成按鈕使用
-        return { roomCounts, existingRoomTypes: Array.from(existingRoomTypes) };
+        // 返回房型統計，供動態生成按鈕使用（existingRoomTypes 為有被計數的房型）
+        const existingRoomTypes = Object.keys(roomCounts).filter(k => k !== 'all');
+        return { roomCounts, existingRoomTypes };
     }
     
     // 🚀 新增：動態生成房型篩選按鈕
@@ -1391,70 +1342,21 @@ class EmbeddedPropertyPaginationSystem {
             return;
         }
         
-        // 定義真正的房型（排除建築類型）
-        const validRoomTypes = ['套房', '1房', '2房', '3房', '4房', '店住', '店面'];
-        const buildingTypes = ['透天', '別墅', '華廈', '公寓']; // 這些是建築類型，不是房型
+        const buildingTypes = ['透天', '別墅', '華廈', '公寓']; // 用於排序時排除，不當作房型按鈕
         
-        // 收集所有存在的房型（排除建築類型）
+        // 只要有房間數（layout 或 type 可解析），全部抓進房型選項（含電梯大樓、華廈、透天、別墅、公寓等）
         const existingRoomTypes = new Set();
-        const openLayoutTypes = new Set(); // 開放式格局
-        const oneRoomTypes = new Set(); // 1房格局
-        
         this.properties.forEach(property => {
-            if (property.type && property.type.trim() !== '') {
-                // 排除建築類型
-                if (!buildingTypes.includes(property.type)) {
-                    existingRoomTypes.add(property.type);
-                }
-            }
-            
-            // 根據格局判斷開放式和1房
-            if (property.layout) {
-                const layout = property.layout.trim();
-                // 判斷是否為開放式（0房）
-                if (layout.includes('0房') || layout.includes('開放式')) {
-                    openLayoutTypes.add(property.type || '店住');
-                }
-                // 判斷是否為1房（套房）- 放寬條件
-                if (layout.includes('1房') || layout.includes('套房')) {
-                    oneRoomTypes.add(property.type || '套房');
-                }
-            }
-            
-            // 如果 type 是「套房」，也應該算作「1房」
-            if (property.type === '套房') {
-                oneRoomTypes.add('套房');
-            }
+            const rt = this.getRoomTypeFromProperty(property);
+            if (rt) existingRoomTypes.add(rt);
         });
         
         // 定義房型顯示順序和顯示名稱
-        const roomTypeOrder = ['2房', '3房', '4房', '1房', '開放式', '店住', '店面'];
+        const roomTypeOrder = ['2房', '3房', '4房', '5房', '1房', '開放式', '店住', '店面'];
         const roomTypeNames = {
-            '2房': '2房',
-            '3房': '3房',
-            '4房': '4房',
-            '套房': '1房', // 套房顯示為1房
-            '1房': '1房',
-            '開放式': '開放式',
-            '店住': '店住',
-            '店面': '店面'
+            '2房': '2房', '3房': '3房', '4房': '4房', '5房': '5房',
+            '套房': '1房', '1房': '1房', '開放式': '開放式', '店住': '店住', '店面': '店面'
         };
-        
-        // 如果有開放式格局，添加「開放式」選項
-        if (openLayoutTypes.size > 0) {
-            existingRoomTypes.add('開放式');
-        }
-        
-        // 如果有1房格局或套房類型，添加「1房」選項
-        if (oneRoomTypes.size > 0) {
-            existingRoomTypes.add('1房');
-        }
-        
-        // 將「套房」類型映射為「1房」（不顯示「套房」按鈕，只顯示「1房」）
-        if (existingRoomTypes.has('套房')) {
-            existingRoomTypes.delete('套房');
-            existingRoomTypes.add('1房');
-        }
         
         // 按順序排列房型
         const sortedRoomTypes = roomTypeOrder.filter(type => existingRoomTypes.has(type));

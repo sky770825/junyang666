@@ -249,12 +249,15 @@ async function loadPropertiesFromSupabase() {
             }
             
             // 轉換為前端格式
+            // 🔒 地址隱私：當 hide_address_number 或 透天/別墅/店面 時，只傳遮罩後的地址到前端，避免完整地址出現在原始碼/Network
+            const safeAddress = formatAddressForDisplay(prop.address || '', prop.hide_address_number, prop.type);
+
             return {
                 id: prop.id,
                 number: prop.number || '',
                 title: prop.title || '',
                 type: prop.type || '',
-                address: prop.address || '',
+                address: safeAddress,
                 price: prop.price || '',
                 layout: prop.layout || '',
                 total_area: prop.total_area || '',

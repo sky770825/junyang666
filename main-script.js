@@ -1158,8 +1158,9 @@ function showMapModal(propertyId) {
                     `}
                 </div>
                 
-                <!-- 地圖操作按鈕 -->
+                <!-- 地圖操作按鈕（🔒 地址隱藏時不提供 Maps/導航連結，避免完整地址經 href 外洩） -->
                 <div class="map-buttons" style="padding: 20px 30px; background: #f8f9fa; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    ${!property.hide_address_number ? `
                     <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.address)}" 
                        target="_blank" 
                        style="
@@ -1192,6 +1193,9 @@ function showMapModal(propertyId) {
                        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                         <i class="fas fa-route"></i> 規劃路線
                     </a>
+                    ` : `
+                    <p style="text-align: center; color: #666; font-size: 0.9rem; margin: 0;">地址已隱藏，如需確切位置請聯絡我們</p>
+                    `}
                 </div>
             </div>
         `;

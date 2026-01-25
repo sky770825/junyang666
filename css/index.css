@@ -14,6 +14,37 @@
             overflow-x: hidden;
         }
         
+        /* 無障礙：跳到主內容（鍵盤 Tab 或讀屏可見） */
+        .skip-link {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        .skip-link:focus {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10000;
+            width: auto;
+            height: auto;
+            padding: 0.6rem 1.2rem;
+            margin: 0;
+            overflow: visible;
+            clip: auto;
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 0 0 8px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
         /* 基本樣式 */
         .properties-grid {
             display: grid;

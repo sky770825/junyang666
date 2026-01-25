@@ -1033,6 +1033,10 @@
         // 渲染物件詳細資訊
         function renderProperty(property) {
             const pageEl = document.getElementById('property-page');
+
+            // 🔒 地址隱私：從 Supabase 取得的是原始 address，在此替換為顯示用（遮罩）版，避免完整地址流入 DOM、iframe、連結
+            property.address = formatAddressForDisplay(property.address || '', property.hide_address_number, property.type);
+            const displayAddress = property.address;
             
             // 處理圖片
             let images = [];
@@ -1047,13 +1051,6 @@
                     images = property.images;
                 }
             }
-            
-            // 處理地址顯示
-            const displayAddress = formatAddressForDisplay(
-                property.address, 
-                property.hide_address_number, 
-                property.type
-            );
             
             // 處理屋齡顯示
             const displayAge = property.age 
@@ -1305,6 +1302,7 @@
                             </iframe>
                         </div>
                         <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                            ${!property.hide_address_number ? `
                             <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.address)}" 
                                target="_blank" 
                                style="background: #4285f4; color: white; padding: 0.75rem 1rem; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.9rem; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);"
@@ -1319,6 +1317,9 @@
                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 107, 107, 0.3)'">
                                 <i class="fas fa-route"></i> <span>規劃路線</span>
                             </a>
+                            ` : `
+                            <p style="grid-column: 1/-1; text-align: center; color: #666; font-size: 0.9rem;">地址已隱藏，如需確切位置請聯絡我們</p>
+                            `}
                         </div>
                     </div>
                     ` : ''}

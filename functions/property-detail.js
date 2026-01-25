@@ -1,14 +1,13 @@
 /**
- * Cloudflare Pages Function：為 property-detail.html 注入 Open Graph / Twitter Card meta
+ * Cloudflare Pages Function：為 /property-detail（無 .html）注入 Open Graph / Twitter Card meta
  *
- * 原因：Facebook、LINE、Discord 等爬蟲不執行 JavaScript，只讀取原始 HTML。
- * 物件頁的 og:image、標題、描述是在 JS 載入後才設定，爬蟲看到的是空值 → 沒有預覽圖。
+ * 與 property-detail.html.js 相同邏輯，但對應路徑為 /property-detail。
+ * 許多連結或分享使用 /property-detail?number=xxx，若無此 Function 則不會走 OG 注入，預覽會是預設圖與文案。
  *
- * 此 Function 在請求 property-detail.html?number=xxx 或 ?id=xxx 時：
- * 1. 向 Supabase 查詢該物件的 images, title, price, address
+ * 1. 向 Supabase 查詢該物件的 images, title, price, address, hide_address_number, type
  * 2. 取得靜態 property-detail.html
  * 3. 將 og:image、og:title、og:description、og:url、twitter:*、description 替換成實際內容
- * 4. 回傳修改後的 HTML
+ * 4. 回傳修改後的 HTML（地址依 hide_address_number / 透天|別墅|店面 遮罩，避免完整外洩）
  *
  * 環境變數（可選，有預設）：SUPABASE_URL、SUPABASE_ANON_KEY
  */
@@ -130,7 +129,7 @@ export async function onRequestGet(context) {
     const assetRes = await env.ASSETS.fetch(assetRequest);
     html = await assetRes.text();
   } catch (e) {
-    console.warn('og-meta: ASSETS.fetch failed', e);
+    console.warn('og-meta: ASSETS.fetch /property-detail.html failed', e);
     return context.next ? context.next() : new Response('Service Unavailable', { status: 503 });
   }
 

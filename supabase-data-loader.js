@@ -135,13 +135,12 @@ async function loadPropertiesFromSupabase() {
             }
         }
         
-        // 查詢已上架的本店物件（不包含非本店物件）
+        // 查詢已上架的物件（含本店與非本店，前端不區分顯示）
         // 🔥 重要：禁用快取，確保每次重新整理都獲取最新資料
         const { data, error } = await supabaseClient
             .from('properties')
             .select('*')
             .eq('is_published', true)
-            .eq('is_external', false)  // 只載入本店物件
             .order('created_at', { ascending: false });
         
         if (error) {

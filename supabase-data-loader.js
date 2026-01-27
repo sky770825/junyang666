@@ -13,6 +13,46 @@ const SUPABASE_ANON_KEY = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CO
 // 初始化 Supabase 客戶端（使用單例模式）
 let supabaseClient = null;
 
+// 📦 客戶端快取設定：將已整理好的物件資料暫存在 localStorage，降低重複請求
+const PROPERTY_CACHE_KEY = 'embeddedPropertiesCache_v1';
+const PROPERTY_CACHE_TTL_MS = 5 * 60 * 1000; // 5 分鐘，可依需求調整
+
+function loadPropertiesFromCache() {
+    try {
+        if (typeof window === 'undefined' || !window.localStorage) return null;
+        const raw = window.localStorage.getItem(PROPERTY_CACHE_KEY);
+        if (!raw) return null;
+        const cache = JSON.parse(raw);
+        if (!cache || !Array.isArray(cache.properties)) return null;
+        if (typeof cache.updatedAt !== 'number') return null;
+        const age = Date.now() - cache.updatedAt;
+        if (age > PROPERTY_CACHE_TTL_MS) return null;
+        return cache;
+    } catch (e) {
+        console.warn('⚠️ 讀取本地快取失敗，略過快取：', e);
+        return null;
+    }
+}
+
+function savePropertiesToCache(payload) {
+    try {
+        if (typeof window === 'undefined' || !window.localStorage) return;
+        const toSave = {
+            properties: payload.properties || [],
+            settings: payload.settings || {
+                itemsPerPage: 8,
+                maxPages: 10,
+                enableSearch: true,
+                enableFilter: true
+            },
+            updatedAt: Date.now()
+        };
+        window.localStorage.setItem(PROPERTY_CACHE_KEY, JSON.stringify(toSave));
+    } catch (e) {
+        console.warn('⚠️ 儲存本地快取失敗：', e);
+    }
+}
+
 // 處理地址顯示的輔助函數（根據 hide_address_number 和物件類型決定是否隱藏門牌號碼）
 function formatAddressForDisplay(address, hideAddressNumber, propertyType) {
     if (!address) return '';
@@ -104,6 +144,33 @@ async function loadPropertiesFromSupabase() {
     try {
         // 🔇 移除載入訊息，避免在刷新時顯示
         const loadStartTime = Date.now();
+
+        // 📦 優先嘗試從本地快取載入（避免每次重新整理都白等一輪）
+        try {
+            const cached = loadPropertiesFromCache();
+            if (cached && (!window.embeddedPropertiesData || !window.embeddedPropertiesData.properties || window.embeddedPropertiesData.properties.length === 0)) {
+                window.embeddedPropertiesData = {
+                    properties: cached.properties,
+                    settings: cached.settings || {
+                        itemsPerPage: 8,
+                        maxPages: 10,
+                        enableSearch: true,
+                        enableFilter: true
+                    }
+                };
+                const cacheEvent = new CustomEvent('supabaseDataLoaded', {
+                    detail: {
+                        properties: cached.properties,
+                        count: cached.properties.length,
+                        fromCache: true,
+                        timestamp: new Date().toISOString()
+                    }
+                });
+                window.dispatchEvent(cacheEvent);
+            }
+        } catch (e) {
+            console.warn('⚠️ 載入本地快取時發生錯誤，改為直接請求 Supabase：', e);
+        }
         
         // 初始化 Supabase 客戶端（使用單例模式，避免多個實例）
         if (!supabaseClient) {
@@ -301,6 +368,9 @@ async function loadPropertiesFromSupabase() {
                 enableFilter: true
             }
         };
+
+        // 📦 將最新資料寫入本地快取，後續重新整理可優先從快取顯示
+        savePropertiesToCache(window.embeddedPropertiesData);
         
         // 🔇 移除載入訊息，避免在刷新時顯示
         // 只在開發模式下顯示統計資訊

@@ -914,6 +914,7 @@ function openLightbox(imageIndex, propertyId) {
                     <img src="${property.images[imageIndex]}" 
                          alt="物件照片" 
                          loading="eager"
+                         decoding="async"
                          style="
                              max-width: 80vw;
                              max-height: 70vh;

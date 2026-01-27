@@ -372,6 +372,27 @@ class EmbeddedPropertyPaginationSystem {
         }
 
         const paginatedProperties = this.getPaginatedProperties();
+
+        // 🔥 首屏主圖預載入：提升第一張物件圖片的載入速度
+        // 僅在第 1 頁、grid 模式，且有圖片時執行一次
+        if (this.currentPage === 1 && this.viewMode === 'grid' && paginatedProperties.length > 0) {
+            const firstProperty = paginatedProperties[0];
+            const heroImage = firstProperty.images && firstProperty.images.length > 0 ? firstProperty.images[0] : null;
+            if (heroImage && typeof document !== 'undefined') {
+                if (!window.preloadedHeroImages) {
+                    window.preloadedHeroImages = new Set();
+                }
+                if (!window.preloadedHeroImages.has(heroImage)) {
+                    const link = document.createElement('link');
+                    link.rel = 'preload';
+                    link.as = 'image';
+                    link.href = heroImage;
+                    // 若日後改為 WebP，可在這裡加上 type="image/webp"
+                    document.head.appendChild(link);
+                    window.preloadedHeroImages.add(heroImage);
+                }
+            }
+        }
         
         // 🔥 優化：使用 DocumentFragment 減少重排次數
         const fragment = document.createDocumentFragment();
@@ -856,8 +877,9 @@ class EmbeddedPropertyPaginationSystem {
                     <img src="${mainImage}" 
                          alt="${property.title}" 
                          decoding="async"
-                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease, transform 0.3s ease;"
                          loading="lazy"
+                         fetchpriority="low"
+                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease, transform 0.3s ease;"
                          onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'"
                          onload="this.style.opacity='1';"
                          onloadstart="this.style.opacity='0.7';"

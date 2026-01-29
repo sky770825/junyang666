@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增新雪梨兩房車物件</title>
+    <title>新增物件 - 近龍潭科學園區城市花園別墅</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../supabase-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -104,53 +104,56 @@
             border: 1px solid #f5c6cb;
         }
         
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        #result {
-            display: none;
-            margin-top: 1rem;
-        }
-        
-        #result-content {
-            background: #f8f9fa;
+        .result {
+            margin-top: 1.5rem;
             padding: 1rem;
+            background: #f8f9fa;
             border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 400px;
-            overflow-y: auto;
+        }
+        
+        .result h3 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .result pre {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏠 新增新雪梨兩房車物件</h1>
+        <h1>🏠 新增物件 - 近龍潭科學園區城市花園別墅</h1>
         
         <div id="alert-container"></div>
         
         <div class="info-section">
             <h2>📋 物件資訊</h2>
-            <div class="info-item"><strong>案名：</strong>輕屋齡新雪梨兩房車</div>
-            <div class="info-item"><strong>社區：</strong>新雪梨</div>
-            <div class="info-item"><strong>地址：</strong>桃園市楊梅區新農街二段239巷10號2樓</div>
-            <div class="info-item"><strong>售價：</strong>938萬</div>
-            <div class="info-item"><strong>格局：</strong>2房2廳1衛</div>
-            <div class="info-item"><strong>總坪數：</strong>39.92坪（主建物16.54坪 + 附屬1.97坪 + 車位12.06坪 + 公設9.53坪）</div>
-            <div class="info-item"><strong>屋齡：</strong>3年</div>
-            <div class="info-item"><strong>房屋型式：</strong>華廈</div>
+            <div class="info-item"><strong>案名：</strong>近龍潭科學園區城市花園別墅</div>
+            <div class="info-item"><strong>社區名稱：</strong>城市花園（總戶數 32 戶）</div>
+            <div class="info-item"><strong>地址：</strong>桃園市龍潭區梅龍三街189巷</div>
+            <div class="info-item"><strong>售價：</strong>1,188 萬</div>
+            <div class="info-item"><strong>單價：</strong>22.54 萬/坪</div>
+            <div class="info-item"><strong>建坪：</strong>52.7 坪</div>
+            <div class="info-item"><strong>格局：</strong>4 房 / 3 廳 / 3 衛</div>
+            <div class="info-item"><strong>樓層：</strong>1 - 4 樓 / 共 4 樓</div>
+            <div class="info-item"><strong>屋齡：</strong>32 年</div>
+            <div class="info-item"><strong>型態：</strong>透天厝</div>
+            <div class="info-item"><strong>座向：</strong>座東北朝西南</div>
+            <div class="info-item"><strong>車位：</strong>無</div>
         </div>
         
-        <button id="add-btn" class="btn" onclick="addProperty()">🚀 新增物件到資料庫</button>
+        <button type="button" class="btn" onclick="addProperty()" id="add-btn">
+            🚀 新增物件到資料庫
+        </button>
         
-        <div id="result">
-            <h2>📊 新增結果</h2>
-            <div id="result-content"></div>
+        <div id="result" class="result" style="display: none;">
+            <h3>新增結果</h3>
+            <pre id="result-content"></pre>
         </div>
     </div>
     
@@ -165,36 +168,38 @@
             }, 5000);
         }
         
+        // 獲取類型前綴
+        function getTypePrefix(type) {
+            const prefixMap = {
+                '套房': 'SU',
+                '2房': 'TW',
+                '3房': 'TH',
+                '4房': 'FO',
+                '華廈': 'HS',
+                '公寓': 'AP',
+                '透天': 'TH',
+                '店面': 'ST',
+                '別墅': 'VI',
+                '店住': 'ST'
+            };
+            return prefixMap[type] || 'XX';
+        }
+        
         // 獲取所有物件編號
         async function getAllPropertyNumbers() {
             try {
                 const { data, error } = await supabaseClient
                     .from('properties')
-                    .select('number');
+                    .select('number')
+                    .not('number', 'is', null);
                 
                 if (error) throw error;
                 
-                return data.map(item => item.number).filter(Boolean);
+                return (data || []).map(p => p.number).filter(n => n);
             } catch (error) {
-                console.error('獲取物件編號失敗:', error);
+                console.error('獲取編號失敗:', error);
                 return [];
             }
-        }
-        
-        // 獲取房型前綴
-        function getTypePrefix(type) {
-            const typeMap = {
-                '套房': 'SU',
-                '2房': 'TW',
-                '3房': 'TH',
-                '4房': 'FO',
-                '透天': 'TH',
-                '別墅': 'VI',
-                '店面': 'SH',
-                '華廈': 'TW', // 華廈通常歸類為2房
-                '公寓': 'AP'
-            };
-            return typeMap[type] || 'XX';
         }
         
         // 獲取下一個序號（店內物件）
@@ -223,10 +228,9 @@
         
         // 生成物件編號
         async function generatePropertyNumber() {
-            const type = '2房';
-            const isExternal = false; // 本店物件
-            
+            const type = '別墅';
             const prefix = getTypePrefix(type);
+            
             if (!prefix || prefix === 'XX') {
                 throw new Error('無法識別的房型');
             }
@@ -236,7 +240,6 @@
             const formattedSeq = formatSequenceNumber(nextSeq, 5);
             const newNumber = `${prefix}${formattedSeq}`;
             
-            // 檢查是否重複
             if (existingNumbers.includes(newNumber)) {
                 throw new Error('生成的編號重複，請重試');
             }
@@ -257,79 +260,72 @@
                 // 準備物件資料
                 const propertyData = {
                     number: propertyNumber,
-                    title: '輕屋齡新雪梨兩房車',
-                    type: '2房',
+                    title: '近龍潭科學園區城市花園別墅',
+                    type: '別墅',
                     city: '桃園市',
-                    district: '楊梅區',
-                    address: '桃園市楊梅區新農街二段239巷10號2樓',
-                    address_detail: '新農街二段239巷10號2樓',
+                    district: '龍潭區',
+                    address: '桃園市龍潭區梅龍三街189巷',
+                    address_detail: '梅龍三街189巷',
                     hide_address_number: false,
-                    price: '938萬',
-                    layout: '2房2廳1衛',
-                    total_area: '39.92坪',
-                    main_area: '16.54坪',
-                    auxiliary_area: '1.97坪',
-                    common_area: '9.53坪',
-                    land_area: '8.32坪',
-                    parking_area: '12.06坪',
-                    age: '3年',
-                    floor: '2樓/7樓',
-                    building_type: '華廈',
-                    orientation: '座南朝北',
-                    management_fee: '3740元/月',
-                    parking_type: '坡道平面',
-                    parking_space: 'B2-13',
-                    current_status: '洽開發',
-                    community: '新雪梨',
+                    price: '1188萬',
+                    layout: '4房3廳3衛',
+                    total_area: '52.7坪',
+                    main_area: '52.7坪',
+                    auxiliary_area: null,
+                    common_area: null,
+                    land_area: null,
+                    parking_area: null,
+                    age: '32年',
+                    floor: '1-4樓/4樓',
+                    building_type: '透天',
+                    orientation: '座東北朝西南',
+                    management_fee: null,
+                    parking_type: null,
+                    parking_space: null,
+                    current_status: null,
+                    community: '城市花園',
                     is_published: true,
                     is_external: false,
-                    status: 'new',
-                    status_text: '新上架',
-                    description: `屋齡新採光佳
-前後雙陽台採光佳
-廁所對外窗
-走路到頭重溪公園/瑞梅國小
-小家庭自住投資首選
+                    status: null,
+                    status_text: null,
+                    description: `近龍潭科學園區城市花園別墅
 
-【房屋現況】
-- 格局：2房2廳1衛
-- 房屋型式：華廈
-- 屋齡：3年（建物完成日：111.06.10）
-- 管理費：3740元/月
-- 警衛管理：有
-- 天然瓦斯：有
-- 出售樓層：2樓
-- 最高樓層：7樓
-- 地下樓層：2樓
-- 座向：座南朝北
-- 裝潢：無
-- 臨路寬：6米
-- 車位：B2-13（12.06坪）
-- 機車位：B1-18
+【亮點推薦】
+• 地段優勢：鄰近龍潭科學園區，下樓即可享受超商購物、美食餐飲及公園休閒。
+• 價格優勢：低於周邊同格局物件之均價，總價 1,188 萬極具競爭力。
+• 空間設計：主建物空間足夠，採光與通風表現極佳；格局方正，現況為 4 房設計，室內採簡易裝潢。
+• 環境機能：位於城市花園社區，屬於單純的住宅環境，具備住家與工作通勤的便利性。
 
-【環境及交通】
-- 鄰近設施：新農街商圈、UNIQLO、全聯福利中心、職人的店、貴族世家、國稅局-楊梅分局
-- 交通：台1線、楊梅交流道、五楊交流道、楊梅區免費公車、埔心火車站
-- 學校：瑞梅國小
-- 市場：埔心市場、萬大黃昏市場
-- 公園：頭重溪公園`,
+【房屋基本資料】
+- 案名：近龍潭科學園區城市花園別墅
+- 售價：1,188 萬
+- 單價：22.54 萬/坪
+- 建坪：52.7 坪
+- 格局：4 房 / 3 廳 / 3 衛
+- 樓層：1 - 4 樓 / 共 4 樓
+- 屋齡：32 年
+- 型態：透天厝
+- 座向：座東北朝西南
+- 車位：無
+- 社區：城市花園（總戶數 32 戶）
+- 地址：桃園市龍潭區梅龍三街189巷
+
+（本資料為內部流通，詳細解說以不動產說明書為主。）`,
                     images: [],
                     transportation: {
-                        facilities: ['新農街商圈', 'UNIQLO', '全聯福利中心', '職人的店', '貴族世家', '國稅局-楊梅分局'],
-                        transport: ['台1線', '楊梅交流道', '五楊交流道', '楊梅區免費公車', '埔心火車站'],
-                        schools: ['瑞梅國小'],
-                        market: ['埔心市場', '萬大黃昏市場'],
-                        park: '頭重溪公園'
+                        facilities: ['龍潭科學園區', '超商', '美食餐飲', '公園'],
+                        transport: ['龍潭科學園區（工作通勤便利）'],
+                        schools: [],
+                        market: null,
+                        park: '公園（社區週邊）'
                     },
                     features: [
-                        '屋齡新採光佳',
-                        '前後雙陽台採光佳',
-                        '廁所對外窗',
-                        '走路到頭重溪公園/瑞梅國小',
-                        '小家庭自住投資首選',
-                        '警衛管理',
-                        '天然瓦斯',
-                        '坡道平面車位'
+                        '鄰近龍潭科學園區、生活機能便利',
+                        '總價 1,188 萬，低於周邊均價',
+                        '主建物採光通風佳、格局方正',
+                        '4 房設計、簡易裝潢',
+                        '城市花園社區、單純住宅環境',
+                        '住家與工作通勤便利'
                     ],
                     google_maps: null,
                     tiktok_video_id: null,

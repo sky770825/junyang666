@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增桂冠A+三房車物件</title>
+    <title>新增物件 - 埔心幸福成家四房車</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../supabase-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -104,47 +104,64 @@
             border: 1px solid #f5c6cb;
         }
         
-        #result {
-            display: none;
-            margin-top: 1rem;
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
         
-        #result-content {
-            background: #f8f9fa;
+        .result h3 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .result pre {
+            background: white;
             padding: 1rem;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 400px;
-            overflow-y: auto;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏠 新增桂冠A+三房車物件</h1>
+        <h1>🏠 新增物件 - 埔心幸福成家四房車</h1>
         
         <div id="alert-container"></div>
         
         <div class="info-section">
             <h2>📋 物件資訊</h2>
-            <div class="info-item"><strong>案名：</strong>楊梅國中景觀三房加車位</div>
-            <div class="info-item"><strong>社區：</strong>桂冠A+</div>
-            <div class="info-item"><strong>地址：</strong>桃園市楊梅區環南路80巷1號7樓</div>
-            <div class="info-item"><strong>售價：</strong>1188萬</div>
-            <div class="info-item"><strong>格局：</strong>3房2廳2衛</div>
-            <div class="info-item"><strong>總坪數：</strong>46.03坪（主建物24.66坪 + 附屬2.4坪 + 車位7.64坪 + 公設11.34坪）</div>
-            <div class="info-item"><strong>屋齡：</strong>14年</div>
-            <div class="info-item"><strong>房屋型式：</strong>大樓</div>
+            <div class="info-item"><strong>案名：</strong>埔心幸福成家四房車</div>
+            <div class="info-item"><strong>社區名稱：</strong>幸福宣言</div>
+            <div class="info-item"><strong>地址：</strong>桃園市楊梅區文化街336號7樓</div>
+            <div class="info-item"><strong>售價：</strong>1438萬</div>
+            <div class="info-item"><strong>格局：</strong>4房2廳2衛</div>
+            <div class="info-item"><strong>總坪數：</strong>50.23坪</div>
+            <div class="info-item"><strong>主建物：</strong>28.84坪</div>
+            <div class="info-item"><strong>附屬建物：</strong>3.44坪</div>
+            <div class="info-item"><strong>公設：</strong>10.83坪</div>
+            <div class="info-item"><strong>車位：</strong>7.13坪</div>
+            <div class="info-item"><strong>持分後地坪：</strong>10.93坪</div>
+            <div class="info-item"><strong>屋齡：</strong>18年</div>
+            <div class="info-item"><strong>建物完成日：</strong>民國95年09月04日</div>
+            <div class="info-item"><strong>樓層：</strong>7樓/13樓</div>
+            <div class="info-item"><strong>座向：</strong>座東北朝西南</div>
+            <div class="info-item"><strong>管理費：</strong>3210元/月</div>
+            <div class="info-item"><strong>車位：</strong>B2-23</div>
+            <div class="info-item"><strong>機車位：</strong>B2-28</div>
+            <div class="info-item"><strong>目前現況：</strong>自住,需提前預約</div>
+            <div class="info-item"><strong>KEY：</strong>洽網發</div>
         </div>
         
-        <button id="add-btn" class="btn" onclick="addProperty()">🚀 新增物件到資料庫</button>
+        <button type="button" class="btn" onclick="addProperty()" id="add-btn">
+            🚀 新增物件到資料庫
+        </button>
         
-        <div id="result">
-            <h2>📊 新增結果</h2>
-            <div id="result-content"></div>
+        <div id="result" class="result" style="display: none;">
+            <h3>新增結果</h3>
+            <pre id="result-content"></pre>
         </div>
     </div>
     
@@ -159,37 +176,38 @@
             }, 5000);
         }
         
+        // 獲取類型前綴
+        function getTypePrefix(type) {
+            const prefixMap = {
+                '套房': 'SU',
+                '2房': 'TW',
+                '3房': 'TH',
+                '4房': 'FO',
+                '華廈': 'HS',
+                '公寓': 'AP',
+                '透天': 'TH',
+                '店面': 'ST',
+                '別墅': 'VI',
+                '店住': 'ST'
+            };
+            return prefixMap[type] || 'XX';
+        }
+        
         // 獲取所有物件編號
         async function getAllPropertyNumbers() {
             try {
                 const { data, error } = await supabaseClient
                     .from('properties')
-                    .select('number');
+                    .select('number')
+                    .not('number', 'is', null);
                 
                 if (error) throw error;
                 
-                return data.map(item => item.number).filter(Boolean);
+                return (data || []).map(p => p.number).filter(n => n);
             } catch (error) {
-                console.error('獲取物件編號失敗:', error);
+                console.error('獲取編號失敗:', error);
                 return [];
             }
-        }
-        
-        // 獲取房型前綴
-        function getTypePrefix(type) {
-            const typeMap = {
-                '套房': 'SU',
-                '2房': 'TW',
-                '3房': 'TH',
-                '4房': 'FO',
-                '透天': 'TH',
-                '別墅': 'VI',
-                '店面': 'SH',
-                '華廈': 'TW',
-                '公寓': 'AP',
-                '大樓': 'TH' // 大樓通常歸類為3房
-            };
-            return typeMap[type] || 'XX';
         }
         
         // 獲取下一個序號（店內物件）
@@ -218,10 +236,10 @@
         
         // 生成物件編號
         async function generatePropertyNumber() {
-            const type = '3房';
-            const isExternal = false; // 本店物件
-            
+            // 4房物件使用4房類型
+            const type = '4房';
             const prefix = getTypePrefix(type);
+            
             if (!prefix || prefix === 'XX') {
                 throw new Error('無法識別的房型');
             }
@@ -231,7 +249,6 @@
             const formattedSeq = formatSequenceNumber(nextSeq, 5);
             const newNumber = `${prefix}${formattedSeq}`;
             
-            // 檢查是否重複
             if (existingNumbers.includes(newNumber)) {
                 throw new Error('生成的編號重複，請重試');
             }
@@ -252,83 +269,68 @@
                 // 準備物件資料
                 const propertyData = {
                     number: propertyNumber,
-                    title: '楊梅國中景觀三房加車位',
-                    type: '3房',
+                    title: '埔心幸福成家四房車',
+                    type: '4房', // 房型
                     city: '桃園市',
                     district: '楊梅區',
-                    address: '桃園市楊梅區環南路80巷1號7樓',
-                    address_detail: '環南路80巷1號7樓',
+                    address: '桃園市楊梅區文化街336號7樓',
+                    address_detail: '文化街336號7樓',
                     hide_address_number: false,
-                    price: '1188萬',
-                    layout: '3房2廳2衛',
-                    total_area: '46.03坪',
-                    main_area: '24.66坪',
-                    auxiliary_area: '2.4坪',
-                    common_area: '11.34坪',
-                    land_area: '8.48坪',
-                    parking_area: '7.64坪',
-                    age: '14年',
-                    floor: '7樓/12樓',
+                    price: '1438萬',
+                    layout: '4房2廳2衛',
+                    total_area: '50.23坪',
+                    main_area: '28.84坪',
+                    auxiliary_area: '3.44坪',
+                    common_area: '10.83坪',
+                    land_area: '10.93坪', // 持分後地坪
+                    parking_area: '7.13坪', // 車位坪數
+                    age: '18年',
+                    floor: '7樓/13樓',
                     building_type: '大樓',
-                    orientation: '座西朝東',
-                    management_fee: '3087元/月',
+                    orientation: '座東北朝西南',
+                    management_fee: '3210元/月',
                     parking_type: '坡道平面',
-                    parking_space: 'B1-13',
-                    current_status: '空屋,隨時可看',
-                    community: '桂冠A+',
+                    parking_space: 'B2-23',
+                    current_status: '自住,需提前預約',
+                    community: '幸福宣言',
                     is_published: true,
                     is_external: false,
-                    status: 'new',
-                    status_text: '新上架',
-                    description: `環南路生活商圈,生活機能佳
-楊梅國中小學區,走路上學
-近五楊高架,楊梅交流道,交通便利
-屋齡新,屋況好,採光通風佳
-市場,公園,學區宅,稀有釋出
+                    status: null,
+                    status_text: null,
+                    description: `埔心幸福成家四房車
 
-【房屋現況】
-- 格局：3房2廳2衛
-- 房屋型式：大樓
-- 屋齡：14年（建物完成日：100.10.07）
-- 管理費：3087元/月
-- 警衛管理：有
-- 天然瓦斯：有
-- 出售樓層：7樓
-- 最高樓層：12樓
-- 地下樓層：2樓
-- 座向：座西朝東
-- 裝潢：有
-- 臨路寬：6米
-- 車位：B1-13（7.64坪）
-- 機車位：汽車位後方
-- 目前現況：空屋,隨時可看
+屋主用心維護屋況好、精緻裝潢
+一層二戶、戶數單純
+稀有四房、室內空間寬敞、使用坪數達32坪
+雙衛浴皆開窗、通風不怕潮濕
+地段好、近學區公園、商店林立機能完善
 
-【環境及交通】
-- 鄰近設施：天成醫院
-- 交通：台1線、楊梅交流道、五楊交流道、楊梅火車站
-- 學校：楊梅國中、楊梅國小
-- 市場：楊梅市場
-- 公園：永寧公園`,
+房屋型式：大樓
+屋齡：18年（建物完成日：民國95年09月04日）
+管理費：3210元/月
+出售樓層：7樓
+最高樓層：13樓
+地下樓層：2樓
+套房：一間
+警衛管理：有
+座向：座東北朝西南
+天然瓦斯：有
+裝潢：有
+臨路寬：6米
+面寬：0米
+車位：B2-23
+機車位：B2-28
+目前現況：自住,需提前預約
+KEY：洽網發`,
                     images: [],
                     transportation: {
-                        facilities: ['天成醫院'],
-                        transport: ['台1線', '楊梅交流道', '五楊交流道', '楊梅火車站'],
-                        schools: ['楊梅國中', '楊梅國小'],
-                        market: '楊梅市場',
-                        park: '永寧公園'
+                        facilities: ['四維路商圈', '全聯福利中心', '喜客來五金百貨', '自由聯盟生鮮超市', '大樹藥局'],
+                        transport: ['台1線', '埔心火車站'],
+                        schools: ['瑞坪國中', '四維國小', '瑞埔國小'],
+                        market: '埔心市場、萬大黃昏市場',
+                        park: '四維兒童公園'
                     },
-                    features: [
-                        '環南路生活商圈,生活機能佳',
-                        '楊梅國中小學區,走路上學',
-                        '近五楊高架,楊梅交流道,交通便利',
-                        '屋齡新,屋況好,採光通風佳',
-                        '市場,公園,學區宅,稀有釋出',
-                        '警衛管理',
-                        '天然瓦斯',
-                        '有裝潢',
-                        '坡道平面車位',
-                        '空屋,隨時可看'
-                    ],
+                    features: [],
                     google_maps: null,
                     tiktok_video_id: null,
                     tiktok_username: null,

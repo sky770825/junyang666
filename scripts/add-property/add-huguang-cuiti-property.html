@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增物件 - 龍潭百年大鎮雙車別墅</title>
+    <title>新增物件 - 湖光翠堤市中心新古典美別墅</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../supabase-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -127,30 +127,24 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏠 新增物件 - 龍潭百年大鎮雙車別墅</h1>
+        <h1>🏠 新增物件 - 湖光翠堤市中心新古典美別墅</h1>
         
         <div id="alert-container"></div>
         
         <div class="info-section">
             <h2>📋 物件資訊</h2>
-            <div class="info-item"><strong>案名：</strong>龍潭百年大鎮雙車別墅</div>
-            <div class="info-item"><strong>社區名稱：</strong>百年大鎮</div>
-            <div class="info-item"><strong>地址：</strong>桃園市龍潭區百年一街48巷2弄13號</div>
-            <div class="info-item"><strong>售價：</strong>1,580萬</div>
-            <div class="info-item"><strong>格局：</strong>4房3廳3衛</div>
-            <div class="info-item"><strong>總坪數：</strong>83.28坪</div>
-            <div class="info-item"><strong>主建物：</strong>63.455坪</div>
-            <div class="info-item"><strong>附屬建物：</strong>9.51坪</div>
-            <div class="info-item"><strong>公設：</strong>10.32坪</div>
-            <div class="info-item"><strong>持分後地坪：</strong>23.57坪</div>
-            <div class="info-item"><strong>屋齡：</strong>28年</div>
-            <div class="info-item"><strong>建物完成日：</strong>民國86年6月26日</div>
-            <div class="info-item"><strong>樓層：</strong>B1-4樓/4樓</div>
-            <div class="info-item"><strong>座向：</strong>座東朝西</div>
-            <div class="info-item"><strong>管理費：</strong>2294元/月</div>
-            <div class="info-item"><strong>車位：</strong>B1地下室（附雙車位）</div>
-            <div class="info-item"><strong>目前現況：</strong>自住,需提前約</div>
-            <div class="info-item"><strong>KEY：</strong>洽開發</div>
+            <div class="info-item"><strong>案名：</strong>湖光翠堤市中心新古典美別墅</div>
+            <div class="info-item"><strong>社區名稱：</strong>湖光翠堤</div>
+            <div class="info-item"><strong>地址：</strong>桃園市龍潭區新龍路188巷</div>
+            <div class="info-item"><strong>總價：</strong>2,088萬</div>
+            <div class="info-item"><strong>單價：</strong>約 31.1 萬/坪</div>
+            <div class="info-item"><strong>地坪：</strong>24.41坪</div>
+            <div class="info-item"><strong>建坪（權狀）：</strong>67.14坪</div>
+            <div class="info-item"><strong>格局：</strong>4房2廳3衛</div>
+            <div class="info-item"><strong>樓層：</strong>1樓 ~ 5樓</div>
+            <div class="info-item"><strong>屋齡：</strong>20年</div>
+            <div class="info-item"><strong>朝向：</strong>坐北朝南</div>
+            <div class="info-item"><strong>車位：</strong>室內雙車位</div>
         </div>
         
         <button type="button" class="btn" onclick="addProperty()" id="add-btn">
@@ -266,82 +260,78 @@
                 // 準備物件資料
                 const propertyData = {
                     number: propertyNumber,
-                    title: '龍潭百年大鎮雙車別墅',
+                    title: '湖光翠堤市中心新古典美別墅',
                     type: '別墅',
                     city: '桃園市',
                     district: '龍潭區',
-                    address: '桃園市龍潭區百年一街48巷2弄13號',
-                    address_detail: '百年一街48巷2弄13號',
+                    address: '桃園市龍潭區新龍路188巷',
+                    address_detail: '新龍路188巷',
                     hide_address_number: false,
-                    price: '1580萬',
-                    layout: '4房3廳3衛',
-                    total_area: '83.28坪',
-                    main_area: '63.455坪',
-                    auxiliary_area: '9.51坪',
-                    common_area: '10.32坪',
-                    land_area: '23.57坪',
+                    price: '2088萬',
+                    layout: '4房2廳3衛',
+                    total_area: '67.14坪',
+                    main_area: null,
+                    auxiliary_area: null,
+                    common_area: null,
+                    land_area: '24.41坪',
                     parking_area: null,
-                    age: '28年',
-                    floor: 'B1-4樓/4樓',
+                    age: '20年',
+                    floor: '1-5樓/5樓',
                     building_type: '別墅',
-                    orientation: '座東朝西',
-                    management_fee: '2294元/月',
-                    parking_type: 'B1地下室',
-                    parking_space: 'B1地下室（附雙車位）',
-                    current_status: '自住,需提前約',
-                    community: '百年大鎮',
+                    orientation: '坐北朝南',
+                    management_fee: null,
+                    parking_type: '室內車位',
+                    parking_space: '室內雙車位',
+                    current_status: null,
+                    community: '湖光翠堤',
                     is_published: true,
                     is_external: false,
                     status: null,
                     status_text: null,
-                    description: `龍潭百年大鎮雙車別墅
+                    description: `湖光翠堤市中心新古典美別墅
 
-龍潭指標造鎮社區，正中豐路超熱鬧地段！
-近國道3號、66快速道路、台三線中豐路，交通便利
-挑高客廳採光好、氣派又寬敞，附雙車位
-單層大主臥設計，每間房都有自己的陽台
+【物件基本資料】
+- 總價：2,088 萬
+- 單價：約 31.1 萬/坪
+- 地坪：24.41 坪
+- 建坪（權狀）：67.14 坪
+- 格局：4 房 / 2 廳 / 3 衛
+- 樓層：1樓 ~ 5樓
+- 屋齡：約 20 年
+- 朝向：坐北朝南
+- 車位：室內雙車位
+- 社區：湖光翠堤
+- 地址：桃園市龍潭區新龍路188巷
 
-【房屋現況】
-- 格局：4房3廳3衛
-- 房屋型式：別墅
-- 屋齡：28年（建物完成日：民國86年6月26日）
-- 管理費：2294元/月
-- 出售樓層：別墅B1-4樓
-- 最高樓層：4樓
-- 地下樓層：1樓
-- 套房：無
-- 警衛管理：有
-- 座向：座東朝西
-- 天然瓦斯：有
-- 裝潢：無
-- 車位：B1地下室（附雙車位）
-- 目前現況：自住,需提前約
-- KEY：洽開發
+【物件核心優勢】
+1️⃣ 精華地段  
+位於龍潭市中心，鬧中取靜，周邊生活機能完善，社區釋出稀有，具備長期自住與保值優勢。
 
-【環境及交通】
-- 鄰近設施：全聯福利中心、龍潭夜市、全家、7-11、美聯社、八方雲集、炸雞大獅
-- 交通：縣道113、國道3號、66快速道路、台三線中豐路
-- 學校：潛龍國小、幼兒園
-- 市場：無
-- 公園：龍潭日出公園
+2️⃣ 空間寬敞  
+地坪達 24.41 坪，建坪約 67.14 坪，規劃 4 房 2 廳 3 衛，另擁有室內雙車位，停車便利、安全又不怕日曬雨淋。
 
-（本資料為內部流通，詳細解說以不動產說明書為主。）`,
+3️⃣ 屋況與格局佳  
+格局方正、採光與通風條件優良，室內維持新古典美裝潢，整體質感佳，可直接入住或再依喜好微調。
+
+4️⃣ 生活機能優勢  
+鄰近市中心機能、便利商店、公園綠地等，下樓即可享受市區生活便利，又保有寧靜住宅氛圍。
+
+【備註】
+實際坪數、權狀資料與使用分區等詳細資訊，以不動產說明書及謄本記載為準。`,
                     images: [],
                     transportation: {
-                        facilities: ['全聯福利中心', '龍潭夜市', '全家', '7-11', '美聯社', '八方雲集', '炸雞大獅'],
-                        transport: ['縣道113', '國道3號', '66快速道路', '台三線中豐路'],
-                        schools: ['潛龍國小', '幼兒園'],
+                        facilities: ['龍潭市中心生活機能', '便利商店', '公園綠地'],
+                        transport: ['新龍路', '鄰近市區主要幹道'],
+                        schools: [],
                         market: null,
-                        park: '龍潭日出公園'
+                        park: '公園綠地（社區周邊）'
                     },
                     features: [
-                        '龍潭指標造鎮社區、正中豐路熱鬧地段',
-                        '近國道3號、66快速道路、台三線',
-                        '挑高客廳採光好、氣派寬敞',
-                        '附雙車位、B1地下室',
-                        '單層大主臥、每間房有陽台',
-                        '警衛管理',
-                        '天然瓦斯'
+                        '位於龍潭市中心，鬧中取靜，釋出稀有',
+                        '地坪24.41坪、建坪67.14坪，空間寬敞',
+                        '室內雙車位，停車便利又安全',
+                        '格局方正，採光通風佳，新古典美裝潢',
+                        '鄰近便利商店與公園綠地，生活機能優'
                     ],
                     google_maps: null,
                     tiktok_video_id: null,
@@ -421,3 +411,4 @@
     </script>
 </body>
 </html>
+

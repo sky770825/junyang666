@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增物件 - 埔心幸福成家四房車</title>
+    <title>新增物件 - 頭重溪公園旁 3+1+車</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../supabase-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -123,36 +123,44 @@
             overflow-x: auto;
             font-size: 0.85rem;
         }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #856404;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏠 新增物件 - 埔心幸福成家四房車</h1>
+        <h1>🏠 新增物件 - 頭重溪公園旁 3+1+車</h1>
         
         <div id="alert-container"></div>
         
         <div class="info-section">
             <h2>📋 物件資訊</h2>
-            <div class="info-item"><strong>案名：</strong>埔心幸福成家四房車</div>
-            <div class="info-item"><strong>社區名稱：</strong>幸福宣言</div>
-            <div class="info-item"><strong>地址：</strong>桃園市楊梅區文化街336號7樓</div>
-            <div class="info-item"><strong>售價：</strong>1438萬</div>
+            <div class="info-item"><strong>案名：</strong>頭重溪公園旁 3+1+車</div>
+            <div class="info-item"><strong>社區名稱：</strong>滿福</div>
+            <div class="info-item"><strong>地址：</strong>楊梅區三民北路162巷3號4樓</div>
+            <div class="info-item"><strong>售價：</strong>998萬</div>
             <div class="info-item"><strong>格局：</strong>4房2廳2衛</div>
-            <div class="info-item"><strong>總坪數：</strong>50.23坪</div>
-            <div class="info-item"><strong>主建物：</strong>28.84坪</div>
-            <div class="info-item"><strong>附屬建物：</strong>3.44坪</div>
-            <div class="info-item"><strong>公設：</strong>10.83坪</div>
-            <div class="info-item"><strong>車位：</strong>7.13坪</div>
-            <div class="info-item"><strong>持分後地坪：</strong>10.93坪</div>
-            <div class="info-item"><strong>屋齡：</strong>18年</div>
-            <div class="info-item"><strong>建物完成日：</strong>民國95年09月04日</div>
-            <div class="info-item"><strong>樓層：</strong>7樓/13樓</div>
-            <div class="info-item"><strong>座向：</strong>座東北朝西南</div>
-            <div class="info-item"><strong>管理費：</strong>3210元/月</div>
-            <div class="info-item"><strong>車位：</strong>B2-23</div>
-            <div class="info-item"><strong>機車位：</strong>B2-28</div>
-            <div class="info-item"><strong>目前現況：</strong>自住,需提前預約</div>
-            <div class="info-item"><strong>KEY：</strong>洽網發</div>
+            <div class="info-item"><strong>總坪數：</strong>49.32坪</div>
+            <div class="info-item"><strong>主建物：</strong>29.01坪</div>
+            <div class="info-item"><strong>附屬建物：</strong>3.04坪</div>
+            <div class="info-item"><strong>公設：</strong>2.47坪</div>
+            <div class="info-item"><strong>車位：</strong>14.8坪</div>
+            <div class="info-item"><strong>持分後地坪：</strong>6.8坪</div>
+            <div class="info-item"><strong>屋齡：</strong>23年</div>
+            <div class="info-item"><strong>建物完成日：</strong>民國91年04月29日</div>
+            <div class="info-item"><strong>樓層：</strong>4/9樓</div>
+            <div class="info-item"><strong>座向：</strong>座南朝北</div>
+            <div class="info-item"><strong>管理費：</strong>1600元/月</div>
+            <div class="info-item"><strong>車位：</strong>B1-24</div>
+            <div class="info-item"><strong>目前現況：</strong>空屋,隨時可看</div>
+            <div class="info-item"><strong>KEY：</strong>洽開發</div>
+            <div class="info-item"><strong class="highlight">⚠️ 隱藏地址：</strong><span class="highlight">已勾選</span></div>
         </div>
         
         <button type="button" class="btn" onclick="addProperty()" id="add-btn">
@@ -269,66 +277,56 @@
                 // 準備物件資料
                 const propertyData = {
                     number: propertyNumber,
-                    title: '埔心幸福成家四房車',
+                    title: '頭重溪公園旁 3+1+車',
                     type: '4房', // 房型
                     city: '桃園市',
                     district: '楊梅區',
-                    address: '桃園市楊梅區文化街336號7樓',
-                    address_detail: '文化街336號7樓',
-                    hide_address_number: false,
-                    price: '1438萬',
+                    address: '桃園市楊梅區三民北路162巷3號4樓',
+                    address_detail: '三民北路162巷3號4樓',
+                    hide_address_number: true, // ✅ 隱藏地址已勾選
+                    price: '998萬',
                     layout: '4房2廳2衛',
-                    total_area: '50.23坪',
-                    main_area: '28.84坪',
-                    auxiliary_area: '3.44坪',
-                    common_area: '10.83坪',
-                    land_area: '10.93坪', // 持分後地坪
-                    parking_area: '7.13坪', // 車位坪數
-                    age: '18年',
-                    floor: '7樓/13樓',
-                    building_type: '大樓',
-                    orientation: '座東北朝西南',
-                    management_fee: '3210元/月',
+                    total_area: '49.32坪',
+                    main_area: '29.01坪',
+                    auxiliary_area: '3.04坪',
+                    common_area: '2.47坪',
+                    land_area: '6.8坪', // 持分後地坪
+                    parking_area: '14.8坪', // 車位坪數
+                    age: '23年',
+                    floor: '4/9樓',
+                    building_type: '華廈',
+                    orientation: '座南朝北',
+                    management_fee: '1600元/月',
                     parking_type: '坡道平面',
-                    parking_space: 'B2-23',
-                    current_status: '自住,需提前預約',
-                    community: '幸福宣言',
+                    parking_space: 'B1-24',
+                    current_status: '空屋,隨時可看',
+                    community: '滿福',
                     is_published: true,
                     is_external: false,
                     status: null,
                     status_text: null,
-                    description: `埔心幸福成家四房車
+                    description: `頭重溪公園旁 3+1+車
 
-屋主用心維護屋況好、精緻裝潢
-一層二戶、戶數單純
-稀有四房、室內空間寬敞、使用坪數達32坪
-雙衛浴皆開窗、通風不怕潮濕
-地段好、近學區公園、商店林立機能完善
+低總價買精華地段大三房+車位
+中悅建設,優質學區
+近楊梅交流道交通方便
+學校走路就到
+大室內空間格局方正
+採光好
+愛買商圈全聯生活機能超棒
 
-房屋型式：大樓
-屋齡：18年（建物完成日：民國95年09月04日）
-管理費：3210元/月
-出售樓層：7樓
-最高樓層：13樓
-地下樓層：2樓
-套房：一間
-警衛管理：有
-座向：座東北朝西南
-天然瓦斯：有
+臨路寬：10米
+面寬：5米
 裝潢：有
-臨路寬：6米
-面寬：0米
-車位：B2-23
-機車位：B2-28
-目前現況：自住,需提前預約
-KEY：洽網發`,
+警衛管理：有
+天然瓦斯：有`,
                     images: [],
                     transportation: {
-                        facilities: ['四維路商圈', '全聯福利中心', '喜客來五金百貨', '自由聯盟生鮮超市', '大樹藥局'],
-                        transport: ['台1線', '埔心火車站'],
-                        schools: ['瑞坪國中', '四維國小', '瑞埔國小'],
-                        market: '埔心市場、萬大黃昏市場',
-                        park: '四維兒童公園'
+                        facilities: ['愛買商圈', '新農街商圈', '全聯福利中心', '國稅局-楊梅分局'],
+                        transport: ['台1線', '楊梅交流道', '楊梅區免費公車'],
+                        schools: ['瑞梅國小'],
+                        market: '全聯福利中心、愛買商圈',
+                        park: '頭重溪公園'
                     },
                     features: [],
                     google_maps: null,
@@ -379,7 +377,7 @@ KEY：洽網發`,
                 resultDiv.style.display = 'block';
                 resultContent.textContent = JSON.stringify(data, null, 2);
                 
-                showAlert('success', `✅ 物件已成功新增！\n編號: ${propertyNumber}\nID: ${data.id}\n\n您可以前往後台管理系統查看此物件。`);
+                showAlert('success', `✅ 物件已成功新增！\n編號: ${propertyNumber}\nID: ${data.id}\n隱藏地址: ✅ 已勾選\n\n您可以前往後台管理系統查看此物件。`);
                 
                 btn.disabled = false;
                 btn.textContent = '✅ 新增成功！';

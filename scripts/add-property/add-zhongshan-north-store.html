@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增物件 - 頭重溪公園旁 3+1+車</title>
+    <title>新增店住物件 - 中山北精華段黃金店面</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../supabase-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -123,44 +123,37 @@
             overflow-x: auto;
             font-size: 0.85rem;
         }
-        
-        .highlight {
-            background: #fff3cd;
-            padding: 0.3rem 0.6rem;
-            border-radius: 4px;
-            font-weight: 600;
-            color: #856404;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏠 新增物件 - 頭重溪公園旁 3+1+車</h1>
+        <h1>🏪 新增店住物件 - 中山北精華段黃金店面</h1>
         
         <div id="alert-container"></div>
         
         <div class="info-section">
             <h2>📋 物件資訊</h2>
-            <div class="info-item"><strong>案名：</strong>頭重溪公園旁 3+1+車</div>
-            <div class="info-item"><strong>社區名稱：</strong>滿福</div>
-            <div class="info-item"><strong>地址：</strong>楊梅區三民北路162巷3號4樓</div>
-            <div class="info-item"><strong>售價：</strong>998萬</div>
-            <div class="info-item"><strong>格局：</strong>4房2廳2衛</div>
-            <div class="info-item"><strong>總坪數：</strong>49.32坪</div>
-            <div class="info-item"><strong>主建物：</strong>29.01坪</div>
-            <div class="info-item"><strong>附屬建物：</strong>3.04坪</div>
-            <div class="info-item"><strong>公設：</strong>2.47坪</div>
-            <div class="info-item"><strong>車位：</strong>14.8坪</div>
-            <div class="info-item"><strong>持分後地坪：</strong>6.8坪</div>
-            <div class="info-item"><strong>屋齡：</strong>23年</div>
-            <div class="info-item"><strong>建物完成日：</strong>民國91年04月29日</div>
-            <div class="info-item"><strong>樓層：</strong>4/9樓</div>
-            <div class="info-item"><strong>座向：</strong>座南朝北</div>
-            <div class="info-item"><strong>管理費：</strong>1600元/月</div>
-            <div class="info-item"><strong>車位：</strong>B1-24</div>
-            <div class="info-item"><strong>目前現況：</strong>空屋,隨時可看</div>
+            <div class="info-item"><strong>案名：</strong>中山北精華段黃金店面</div>
+            <div class="info-item"><strong>社區名稱：</strong>中山北路二段</div>
+            <div class="info-item"><strong>地址：</strong>楊梅區中山北路二段67號</div>
+            <div class="info-item"><strong>售價：</strong>2580萬</div>
+            <div class="info-item"><strong>格局：</strong>1房3廳2衛</div>
+            <div class="info-item"><strong>總坪數：</strong>28.75坪</div>
+            <div class="info-item"><strong>主建物：</strong>28.75坪</div>
+            <div class="info-item"><strong>附屬建物：</strong>0坪</div>
+            <div class="info-item"><strong>公設：</strong>0坪</div>
+            <div class="info-item"><strong>持分後地坪：</strong>28.13坪</div>
+            <div class="info-item"><strong>屋齡：</strong>47年</div>
+            <div class="info-item"><strong>建物完成日：</strong>民國67年04月17日</div>
+            <div class="info-item"><strong>樓層：</strong>透天1-2樓（最高2樓）</div>
+            <div class="info-item"><strong>座向：</strong>無</div>
+            <div class="info-item"><strong>臨路寬：</strong>24米</div>
+            <div class="info-item"><strong>面寬：</strong>3.5米</div>
+            <div class="info-item"><strong>車位：</strong>0</div>
+            <div class="info-item"><strong>機車位：</strong>0</div>
+            <div class="info-item"><strong>目前現況：</strong>洽開發</div>
             <div class="info-item"><strong>KEY：</strong>洽開發</div>
-            <div class="info-item"><strong class="highlight">⚠️ 隱藏地址：</strong><span class="highlight">已勾選</span></div>
+            <div class="info-item"><strong>管理費：</strong>0元/月</div>
         </div>
         
         <button type="button" class="btn" onclick="addProperty()" id="add-btn">
@@ -196,7 +189,7 @@
                 '透天': 'TH',
                 '店面': 'ST',
                 '別墅': 'VI',
-                '店住': 'ST'
+                '店住': 'ST' // 店住物件使用店面前綴
             };
             return prefixMap[type] || 'XX';
         }
@@ -220,9 +213,11 @@
         
         // 獲取下一個序號（店內物件）
         function getNextInternalSequenceNumber(existingNumbers, prefix) {
+            // 找出同類型的所有編號（格式：{prefix}{5位數字}）
             const typeNumbers = existingNumbers
                 .filter(num => {
                     if (!num || typeof num !== 'string') return false;
+                    // 排除以EX開頭的（店外物件）
                     if (num.startsWith('EX')) return false;
                     const pattern = new RegExp(`^${prefix}\\d{5}$`);
                     return pattern.test(num);
@@ -244,10 +239,11 @@
         
         // 生成物件編號
         async function generatePropertyNumber() {
-            // 4房物件使用4房類型
-            const type = '4房';
-            const prefix = getTypePrefix(type);
+            // 店面物件使用店面類型
+            const type = '店面';
+            const isExternal = false; // 本店物件
             
+            const prefix = getTypePrefix(type);
             if (!prefix || prefix === 'XX') {
                 throw new Error('無法識別的房型');
             }
@@ -257,6 +253,7 @@
             const formattedSeq = formatSequenceNumber(nextSeq, 5);
             const newNumber = `${prefix}${formattedSeq}`;
             
+            // 檢查是否重複
             if (existingNumbers.includes(newNumber)) {
                 throw new Error('生成的編號重複，請重試');
             }
@@ -277,56 +274,53 @@
                 // 準備物件資料
                 const propertyData = {
                     number: propertyNumber,
-                    title: '頭重溪公園旁 3+1+車',
-                    type: '4房', // 房型
+                    title: '中山北精華段黃金店面',
+                    type: '店面', // 房屋型式是店面
                     city: '桃園市',
                     district: '楊梅區',
-                    address: '桃園市楊梅區三民北路162巷3號4樓',
-                    address_detail: '三民北路162巷3號4樓',
-                    hide_address_number: true, // ✅ 隱藏地址已勾選
-                    price: '998萬',
-                    layout: '4房2廳2衛',
-                    total_area: '49.32坪',
-                    main_area: '29.01坪',
-                    auxiliary_area: '3.04坪',
-                    common_area: '2.47坪',
-                    land_area: '6.8坪', // 持分後地坪
-                    parking_area: '14.8坪', // 車位坪數
-                    age: '23年',
-                    floor: '4/9樓',
-                    building_type: '華廈',
-                    orientation: '座南朝北',
-                    management_fee: '1600元/月',
-                    parking_type: '坡道平面',
-                    parking_space: 'B1-24',
-                    current_status: '空屋,隨時可看',
-                    community: '滿福',
+                    address: '桃園市楊梅區中山北路二段67號',
+                    address_detail: '中山北路二段67號',
+                    hide_address_number: false,
+                    price: '2580萬',
+                    layout: '1房3廳2衛',
+                    total_area: '28.75坪',
+                    main_area: '28.75坪',
+                    auxiliary_area: '0坪',
+                    common_area: '0坪',
+                    land_area: '28.13坪', // 持分後地坪
+                    parking_area: '0坪',
+                    age: '47年',
+                    floor: '透天1-2樓（最高2樓）',
+                    building_type: '店面',
+                    orientation: null, // 座向：無
+                    management_fee: '0元/月',
+                    parking_type: null,
+                    parking_space: null,
+                    current_status: '洽開發',
+                    community: '中山北路二段',
                     is_published: true,
                     is_external: false,
                     status: null,
                     status_text: null,
-                    description: `頭重溪公園旁 3+1+車
+                    description: `中山北精華段黃金店面
 
-低總價買精華地段大三房+車位
-中悅建設,優質學區
-近楊梅交流道交通方便
-學校走路就到
-大室內空間格局方正
-採光好
-愛買商圈全聯生活機能超棒
+緊鄰交流道，坐擁交通節點人流、物流高串聯
+核心黃金資產，土地稀缺性高，長期保值潛力
+彈性規劃空間配置靈活，滿足多元業態需求
+稀有釋出店面自用、收租、資產配置皆具優勢
+臨路面寬醒目，品牌曝光效果佳
 
-臨路寬：10米
-面寬：5米
-裝潢：有
-警衛管理：有
-天然瓦斯：有`,
+基地面積：93 M²
+臨路寬：24米
+面寬：3.5米
+建物完成日：民國67年04月17日`,
                     images: [],
                     transportation: {
-                        facilities: ['愛買商圈', '新農街商圈', '全聯福利中心', '國稅局-楊梅分局'],
-                        transport: ['台1線', '楊梅交流道', '楊梅區免費公車'],
-                        schools: ['瑞梅國小'],
-                        market: '全聯福利中心、愛買商圈',
-                        park: '頭重溪公園'
+                        facilities: ['麥當勞', '愛買'],
+                        transport: ['台1線', '楊梅交流道', '五楊交流道', '楊梅區免費公車', '楊梅火車站'],
+                        schools: ['楊光國中小學'],
+                        market: '楊梅市場、萬大黃昏市場',
+                        park: '瑞溪公園'
                     },
                     features: [],
                     google_maps: null,
@@ -377,7 +371,7 @@
                 resultDiv.style.display = 'block';
                 resultContent.textContent = JSON.stringify(data, null, 2);
                 
-                showAlert('success', `✅ 物件已成功新增！\n編號: ${propertyNumber}\nID: ${data.id}\n隱藏地址: ✅ 已勾選\n\n您可以前往後台管理系統查看此物件。`);
+                showAlert('success', `✅ 物件已成功新增！\n編號: ${propertyNumber}\nID: ${data.id}\n\n您可以前往後台管理系統查看此物件。`);
                 
                 btn.disabled = false;
                 btn.textContent = '✅ 新增成功！';

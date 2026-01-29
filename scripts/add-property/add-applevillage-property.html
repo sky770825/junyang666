@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增永美路透天物件</title>
+    <title>新增蘋果村別墅物件</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../supabase-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -104,54 +104,47 @@
             border: 1px solid #f5c6cb;
         }
         
-        .result {
-            margin-top: 1.5rem;
-            padding: 1rem;
+        #result {
+            display: none;
+            margin-top: 1rem;
+        }
+        
+        #result-content {
             background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .result h3 {
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-        
-        .result pre {
-            background: white;
             padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-size: 0.85rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏠 新增永美路透天物件</h1>
+        <h1>🏠 新增蘋果村別墅物件</h1>
         
         <div id="alert-container"></div>
         
         <div class="info-section">
             <h2>📋 物件資訊</h2>
-            <div class="info-item"><strong>案名：</strong>獨家6米大面寬透天</div>
-            <div class="info-item"><strong>社區名稱：</strong>永美路</div>
-            <div class="info-item"><strong>地址：</strong>楊梅區永美路445巷46弄6號</div>
-            <div class="info-item"><strong>售價：</strong>798萬</div>
-            <div class="info-item"><strong>格局：</strong>4房2廳2衛</div>
-            <div class="info-item"><strong>總坪數：</strong>27.22坪</div>
-            <div class="info-item"><strong>主建物：</strong>27.22坪</div>
-            <div class="info-item"><strong>土地坪數：</strong>21.78坪</div>
-            <div class="info-item"><strong>屋齡：</strong>47年</div>
-            <div class="info-item"><strong>樓層：</strong>透天1-2樓</div>
+            <div class="info-item"><strong>案名：</strong>獨家金蘋果近龍科別墅</div>
+            <div class="info-item"><strong>社區：</strong>蘋果村</div>
+            <div class="info-item"><strong>地址：</strong>桃園市楊梅區蘋果路108巷1弄62-1號</div>
+            <div class="info-item"><strong>售價：</strong>1198萬</div>
+            <div class="info-item"><strong>格局：</strong>4房2廳3衛</div>
+            <div class="info-item"><strong>總坪數：</strong>47.57坪（主建物41.08坪 + 附屬6.47坪）</div>
+            <div class="info-item"><strong>屋齡：</strong>18年</div>
+            <div class="info-item"><strong>房屋型式：</strong>別墅</div>
         </div>
         
-        <button type="button" class="btn" onclick="addProperty()" id="add-btn">
-            🚀 新增物件到資料庫
-        </button>
+        <button id="add-btn" class="btn" onclick="addProperty()">🚀 新增物件到資料庫</button>
         
-        <div id="result" class="result" style="display: none;">
-            <h3>新增結果</h3>
-            <pre id="result-content"></pre>
+        <div id="result">
+            <h2>📊 新增結果</h2>
+            <div id="result-content"></div>
         </div>
     </div>
     
@@ -166,46 +159,44 @@
             }, 5000);
         }
         
-        // 獲取類型前綴
-        function getTypePrefix(type) {
-            const prefixMap = {
-                '套房': 'SU',
-                '2房': 'TW',
-                '3房': 'TH',
-                '4房': 'FO',
-                '華廈': 'HS',
-                '公寓': 'AP',
-                '透天': 'TH',
-                '店面': 'ST',
-                '別墅': 'VI'
-            };
-            return prefixMap[type] || 'XX';
-        }
-        
         // 獲取所有物件編號
         async function getAllPropertyNumbers() {
             try {
                 const { data, error } = await supabaseClient
                     .from('properties')
-                    .select('number')
-                    .not('number', 'is', null);
+                    .select('number');
                 
                 if (error) throw error;
                 
-                return (data || []).map(p => p.number).filter(n => n);
+                return data.map(item => item.number).filter(Boolean);
             } catch (error) {
-                console.error('獲取編號失敗:', error);
+                console.error('獲取物件編號失敗:', error);
                 return [];
             }
         }
         
+        // 獲取房型前綴
+        function getTypePrefix(type) {
+            const typeMap = {
+                '套房': 'SU',
+                '2房': 'TW',
+                '3房': 'TH',
+                '4房': 'FO',
+                '透天': 'TH',
+                '別墅': 'VI',
+                '店面': 'SH',
+                '華廈': 'TW',
+                '公寓': 'AP',
+                '大樓': 'TH'
+            };
+            return typeMap[type] || 'XX';
+        }
+        
         // 獲取下一個序號（店內物件）
         function getNextInternalSequenceNumber(existingNumbers, prefix) {
-            // 找出同類型的所有編號（格式：{prefix}{5位數字}）
             const typeNumbers = existingNumbers
                 .filter(num => {
                     if (!num || typeof num !== 'string') return false;
-                    // 排除以EX開頭的（店外物件）
                     if (num.startsWith('EX')) return false;
                     const pattern = new RegExp(`^${prefix}\\d{5}$`);
                     return pattern.test(num);
@@ -227,7 +218,7 @@
         
         // 生成物件編號
         async function generatePropertyNumber() {
-            const type = '透天';
+            const type = '別墅';
             const isExternal = false; // 本店物件
             
             const prefix = getTypePrefix(type);
@@ -261,48 +252,83 @@
                 // 準備物件資料
                 const propertyData = {
                     number: propertyNumber,
-                    title: '獨家6米大面寬透天',
-                    type: '透天',
+                    title: '獨家金蘋果近龍科別墅',
+                    type: '別墅',
                     city: '桃園市',
                     district: '楊梅區',
-                    address: '桃園市楊梅區永美路445巷46弄6號',
-                    address_detail: '永美路445巷46弄6號',
+                    address: '桃園市楊梅區蘋果路108巷1弄62-1號',
+                    address_detail: '蘋果路108巷1弄62-1號',
                     hide_address_number: false,
-                    price: '798萬',
-                    layout: '4房2廳2衛',
-                    total_area: '27.22坪',
-                    main_area: '27.22坪',
-                    auxiliary_area: '0坪',
+                    price: '1198萬',
+                    layout: '4房2廳3衛',
+                    total_area: '47.57坪',
+                    main_area: '41.08坪',
+                    auxiliary_area: '6.47坪',
                     common_area: '0坪',
-                    land_area: '21.78坪',
+                    land_area: '30.62坪',
                     parking_area: '0坪',
-                    age: '47年',
-                    floor: '1-2樓',
-                    building_type: '透天',
-                    orientation: null,
-                    management_fee: '0元/月',
-                    parking_type: null,
-                    parking_space: null,
-                    current_status: '洽開發',
-                    community: '永美路',
+                    age: '18年',
+                    floor: '1-3樓/3樓',
+                    building_type: '別墅',
+                    orientation: '座東南朝西北',
+                    management_fee: '989元/月',
+                    parking_type: '門前停車',
+                    parking_space: '門前停車',
+                    current_status: '需提前預約',
+                    community: '蘋果村',
                     is_published: true,
                     is_external: false,
-                    status: null,
-                    status_text: null,
-                    description: `靜巷住宅遠離車流吵雜，回家就是放鬆
-鄰近主要道路，交通方便通勤、外出機動性高
-生活機能成熟便利，市場、超市、餐飲店齊全
-診所、學校、公車站步行可達，生活無斷層
-機能與居住投資兼具，適合長期居住規劃`,
+                    status: 'new',
+                    status_text: '新上架',
+                    description: `社區型住宅、警衛24H管理
+格局方正、四房大空間、好規劃
+無過多裝潢、簡單溫馨
+門前停車、愛車不用日曬雨淋
+鄰近梅獅商圈、萬大黃昏市場
+
+【房屋現況】
+- 格局：4房2廳3衛
+- 房屋型式：別墅
+- 屋齡：18年（建物完成日：96.07.02）
+- 管理費：989元/月
+- 警衛管理：有（24H管理）
+- 天然瓦斯：有
+- 出售樓層：1-3樓
+- 最高樓層：3樓
+- 地下樓層：無
+- 座向：座東南朝西北
+- 裝潢：無
+- 臨路寬：8米
+- 面寬：4.5米
+- 車位：門前停車
+- 機車位：門前停車
+- 目前現況：需提前預約
+
+【環境及交通】
+- 鄰近設施：梅獅路商圈、UNIQLO、星巴克、全聯福利中心、職人的店、萊爾富
+- 交通：台1線、楊梅交流道、埔心火車站
+- 學校：瑞坪國中、楊光國中小學、瑞塘國小
+- 市場：萬大黃昏市場
+- 公園：社區自有小公園`,
                     images: [],
                     transportation: {
-                        facilities: ['四維兒童公園', '四維商圈'],
-                        transport: ['台1線', '楊梅交流道', '幼獅交流道', '埔心火車站'],
-                        schools: ['瑞坪國中', '瑞塘國小'],
+                        facilities: ['梅獅路商圈', 'UNIQLO', '星巴克', '全聯福利中心', '職人的店', '萊爾富'],
+                        transport: ['台1線', '楊梅交流道', '埔心火車站'],
+                        schools: ['瑞坪國中', '楊光國中小學', '瑞塘國小'],
                         market: '萬大黃昏市場',
-                        park: '四維公園'
+                        park: '社區自有小公園'
                     },
-                    features: [],
+                    features: [
+                        '社區型住宅、警衛24H管理',
+                        '格局方正、四房大空間、好規劃',
+                        '無過多裝潢、簡單溫馨',
+                        '門前停車、愛車不用日曬雨淋',
+                        '鄰近梅獅商圈、萬大黃昏市場',
+                        '警衛24H管理',
+                        '天然瓦斯',
+                        '門前停車',
+                        '需提前預約'
+                    ],
                     google_maps: null,
                     tiktok_video_id: null,
                     tiktok_username: null,

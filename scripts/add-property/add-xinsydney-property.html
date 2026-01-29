@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增店住物件 - 中山北精華段黃金店面</title>
+    <title>新增新雪梨兩房車物件</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../supabase-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -104,65 +104,53 @@
             border: 1px solid #f5c6cb;
         }
         
-        .result {
-            margin-top: 1.5rem;
-            padding: 1rem;
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        #result {
+            display: none;
+            margin-top: 1rem;
+        }
+        
+        #result-content {
             background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .result h3 {
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-        
-        .result pre {
-            background: white;
             padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-size: 0.85rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏪 新增店住物件 - 中山北精華段黃金店面</h1>
+        <h1>🏠 新增新雪梨兩房車物件</h1>
         
         <div id="alert-container"></div>
         
         <div class="info-section">
             <h2>📋 物件資訊</h2>
-            <div class="info-item"><strong>案名：</strong>中山北精華段黃金店面</div>
-            <div class="info-item"><strong>社區名稱：</strong>中山北路二段</div>
-            <div class="info-item"><strong>地址：</strong>楊梅區中山北路二段67號</div>
-            <div class="info-item"><strong>售價：</strong>2580萬</div>
-            <div class="info-item"><strong>格局：</strong>1房3廳2衛</div>
-            <div class="info-item"><strong>總坪數：</strong>28.75坪</div>
-            <div class="info-item"><strong>主建物：</strong>28.75坪</div>
-            <div class="info-item"><strong>附屬建物：</strong>0坪</div>
-            <div class="info-item"><strong>公設：</strong>0坪</div>
-            <div class="info-item"><strong>持分後地坪：</strong>28.13坪</div>
-            <div class="info-item"><strong>屋齡：</strong>47年</div>
-            <div class="info-item"><strong>建物完成日：</strong>民國67年04月17日</div>
-            <div class="info-item"><strong>樓層：</strong>透天1-2樓（最高2樓）</div>
-            <div class="info-item"><strong>座向：</strong>無</div>
-            <div class="info-item"><strong>臨路寬：</strong>24米</div>
-            <div class="info-item"><strong>面寬：</strong>3.5米</div>
-            <div class="info-item"><strong>車位：</strong>0</div>
-            <div class="info-item"><strong>機車位：</strong>0</div>
-            <div class="info-item"><strong>目前現況：</strong>洽開發</div>
-            <div class="info-item"><strong>KEY：</strong>洽開發</div>
-            <div class="info-item"><strong>管理費：</strong>0元/月</div>
+            <div class="info-item"><strong>案名：</strong>輕屋齡新雪梨兩房車</div>
+            <div class="info-item"><strong>社區：</strong>新雪梨</div>
+            <div class="info-item"><strong>地址：</strong>桃園市楊梅區新農街二段239巷10號2樓</div>
+            <div class="info-item"><strong>售價：</strong>938萬</div>
+            <div class="info-item"><strong>格局：</strong>2房2廳1衛</div>
+            <div class="info-item"><strong>總坪數：</strong>39.92坪（主建物16.54坪 + 附屬1.97坪 + 車位12.06坪 + 公設9.53坪）</div>
+            <div class="info-item"><strong>屋齡：</strong>3年</div>
+            <div class="info-item"><strong>房屋型式：</strong>華廈</div>
         </div>
         
-        <button type="button" class="btn" onclick="addProperty()" id="add-btn">
-            🚀 新增物件到資料庫
-        </button>
+        <button id="add-btn" class="btn" onclick="addProperty()">🚀 新增物件到資料庫</button>
         
-        <div id="result" class="result" style="display: none;">
-            <h3>新增結果</h3>
-            <pre id="result-content"></pre>
+        <div id="result">
+            <h2>📊 新增結果</h2>
+            <div id="result-content"></div>
         </div>
     </div>
     
@@ -177,47 +165,43 @@
             }, 5000);
         }
         
-        // 獲取類型前綴
-        function getTypePrefix(type) {
-            const prefixMap = {
-                '套房': 'SU',
-                '2房': 'TW',
-                '3房': 'TH',
-                '4房': 'FO',
-                '華廈': 'HS',
-                '公寓': 'AP',
-                '透天': 'TH',
-                '店面': 'ST',
-                '別墅': 'VI',
-                '店住': 'ST' // 店住物件使用店面前綴
-            };
-            return prefixMap[type] || 'XX';
-        }
-        
         // 獲取所有物件編號
         async function getAllPropertyNumbers() {
             try {
                 const { data, error } = await supabaseClient
                     .from('properties')
-                    .select('number')
-                    .not('number', 'is', null);
+                    .select('number');
                 
                 if (error) throw error;
                 
-                return (data || []).map(p => p.number).filter(n => n);
+                return data.map(item => item.number).filter(Boolean);
             } catch (error) {
-                console.error('獲取編號失敗:', error);
+                console.error('獲取物件編號失敗:', error);
                 return [];
             }
         }
         
+        // 獲取房型前綴
+        function getTypePrefix(type) {
+            const typeMap = {
+                '套房': 'SU',
+                '2房': 'TW',
+                '3房': 'TH',
+                '4房': 'FO',
+                '透天': 'TH',
+                '別墅': 'VI',
+                '店面': 'SH',
+                '華廈': 'TW', // 華廈通常歸類為2房
+                '公寓': 'AP'
+            };
+            return typeMap[type] || 'XX';
+        }
+        
         // 獲取下一個序號（店內物件）
         function getNextInternalSequenceNumber(existingNumbers, prefix) {
-            // 找出同類型的所有編號（格式：{prefix}{5位數字}）
             const typeNumbers = existingNumbers
                 .filter(num => {
                     if (!num || typeof num !== 'string') return false;
-                    // 排除以EX開頭的（店外物件）
                     if (num.startsWith('EX')) return false;
                     const pattern = new RegExp(`^${prefix}\\d{5}$`);
                     return pattern.test(num);
@@ -239,8 +223,7 @@
         
         // 生成物件編號
         async function generatePropertyNumber() {
-            // 店面物件使用店面類型
-            const type = '店面';
+            const type = '2房';
             const isExternal = false; // 本店物件
             
             const prefix = getTypePrefix(type);
@@ -274,55 +257,80 @@
                 // 準備物件資料
                 const propertyData = {
                     number: propertyNumber,
-                    title: '中山北精華段黃金店面',
-                    type: '店面', // 房屋型式是店面
+                    title: '輕屋齡新雪梨兩房車',
+                    type: '2房',
                     city: '桃園市',
                     district: '楊梅區',
-                    address: '桃園市楊梅區中山北路二段67號',
-                    address_detail: '中山北路二段67號',
+                    address: '桃園市楊梅區新農街二段239巷10號2樓',
+                    address_detail: '新農街二段239巷10號2樓',
                     hide_address_number: false,
-                    price: '2580萬',
-                    layout: '1房3廳2衛',
-                    total_area: '28.75坪',
-                    main_area: '28.75坪',
-                    auxiliary_area: '0坪',
-                    common_area: '0坪',
-                    land_area: '28.13坪', // 持分後地坪
-                    parking_area: '0坪',
-                    age: '47年',
-                    floor: '透天1-2樓（最高2樓）',
-                    building_type: '店面',
-                    orientation: null, // 座向：無
-                    management_fee: '0元/月',
-                    parking_type: null,
-                    parking_space: null,
+                    price: '938萬',
+                    layout: '2房2廳1衛',
+                    total_area: '39.92坪',
+                    main_area: '16.54坪',
+                    auxiliary_area: '1.97坪',
+                    common_area: '9.53坪',
+                    land_area: '8.32坪',
+                    parking_area: '12.06坪',
+                    age: '3年',
+                    floor: '2樓/7樓',
+                    building_type: '華廈',
+                    orientation: '座南朝北',
+                    management_fee: '3740元/月',
+                    parking_type: '坡道平面',
+                    parking_space: 'B2-13',
                     current_status: '洽開發',
-                    community: '中山北路二段',
+                    community: '新雪梨',
                     is_published: true,
                     is_external: false,
-                    status: null,
-                    status_text: null,
-                    description: `中山北精華段黃金店面
+                    status: 'new',
+                    status_text: '新上架',
+                    description: `屋齡新採光佳
+前後雙陽台採光佳
+廁所對外窗
+走路到頭重溪公園/瑞梅國小
+小家庭自住投資首選
 
-緊鄰交流道，坐擁交通節點人流、物流高串聯
-核心黃金資產，土地稀缺性高，長期保值潛力
-彈性規劃空間配置靈活，滿足多元業態需求
-稀有釋出店面自用、收租、資產配置皆具優勢
-臨路面寬醒目，品牌曝光效果佳
+【房屋現況】
+- 格局：2房2廳1衛
+- 房屋型式：華廈
+- 屋齡：3年（建物完成日：111.06.10）
+- 管理費：3740元/月
+- 警衛管理：有
+- 天然瓦斯：有
+- 出售樓層：2樓
+- 最高樓層：7樓
+- 地下樓層：2樓
+- 座向：座南朝北
+- 裝潢：無
+- 臨路寬：6米
+- 車位：B2-13（12.06坪）
+- 機車位：B1-18
 
-基地面積：93 M²
-臨路寬：24米
-面寬：3.5米
-建物完成日：民國67年04月17日`,
+【環境及交通】
+- 鄰近設施：新農街商圈、UNIQLO、全聯福利中心、職人的店、貴族世家、國稅局-楊梅分局
+- 交通：台1線、楊梅交流道、五楊交流道、楊梅區免費公車、埔心火車站
+- 學校：瑞梅國小
+- 市場：埔心市場、萬大黃昏市場
+- 公園：頭重溪公園`,
                     images: [],
                     transportation: {
-                        facilities: ['麥當勞', '愛買'],
-                        transport: ['台1線', '楊梅交流道', '五楊交流道', '楊梅區免費公車', '楊梅火車站'],
-                        schools: ['楊光國中小學'],
-                        market: '楊梅市場、萬大黃昏市場',
-                        park: '瑞溪公園'
+                        facilities: ['新農街商圈', 'UNIQLO', '全聯福利中心', '職人的店', '貴族世家', '國稅局-楊梅分局'],
+                        transport: ['台1線', '楊梅交流道', '五楊交流道', '楊梅區免費公車', '埔心火車站'],
+                        schools: ['瑞梅國小'],
+                        market: ['埔心市場', '萬大黃昏市場'],
+                        park: '頭重溪公園'
                     },
-                    features: [],
+                    features: [
+                        '屋齡新採光佳',
+                        '前後雙陽台採光佳',
+                        '廁所對外窗',
+                        '走路到頭重溪公園/瑞梅國小',
+                        '小家庭自住投資首選',
+                        '警衛管理',
+                        '天然瓦斯',
+                        '坡道平面車位'
+                    ],
                     google_maps: null,
                     tiktok_video_id: null,
                     tiktok_username: null,

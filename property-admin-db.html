@@ -2491,11 +2491,8 @@
                 if (addTab) {
                     switchTab('add', addTab);
                     
-                    // 如果有 ID 參數，載入物件資料進行編輯
-                    if (id) {
-                        setTimeout(() => {
-                            editProperty(id);
-                        }, 500);
+                        if (id) {
+                        setTimeout(() => editProperty(id), 150);
                     }
                 }
             }
@@ -6462,12 +6459,12 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const propertyId = urlParams.get('id');
                 if (propertyId) {
-                    // 等待 Supabase 初始化完成後再載入
+                    // 短延遲等 DOM 與 Supabase 就緒後再載入
                     setTimeout(() => {
                         if (supabaseClient) {
                             editProperty(propertyId);
                         }
-                    }, 500);
+                    }, 150);
                 }
             } else {
                 // 如果沒有保存的設定，載入表單預設值
@@ -6477,18 +6474,13 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const propertyId = urlParams.get('id');
                 if (propertyId) {
-                    // 監聽 Supabase 初始化完成
                     const checkInterval = setInterval(() => {
                         if (supabaseClient) {
                             clearInterval(checkInterval);
                             editProperty(propertyId);
                         }
-                    }, 500);
-                    
-                    // 10 秒後停止檢查
-                    setTimeout(() => {
-                        clearInterval(checkInterval);
-                    }, 10000);
+                    }, 200);
+                    setTimeout(() => clearInterval(checkInterval), 10000);
                 }
             }
             

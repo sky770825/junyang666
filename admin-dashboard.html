@@ -1763,7 +1763,7 @@
                     </div>
                     
                     <div class="search-box">
-                        <input type="text" id="search-input" placeholder="搜尋物件（標題、編號、地址）..." onkeyup="filterProperties()">
+                        <input type="text" id="search-input" placeholder="搜尋物件（標題、編號、地址）..." onkeyup="filterPropertiesDebounced()">
                         <select id="type-filter" onchange="filterProperties()">
                             <option value="">所有房型</option>
                             <option value="套房">套房</option>
@@ -2088,7 +2088,7 @@
             } 
             // 如果沒有編號，使用 ID
             else if (property.id) {
-                const url = `${baseUrl}property-detail.html?id=${property.id}`;
+                const url = `${baseUrl}property-detail.html?id=${encodeURIComponent(property.id)}`;
                 console.log('🔗 生成獨立頁 URL:', url, '基礎路徑:', basePath);
                 return url;
             }
@@ -2525,12 +2525,11 @@
             // 啟動背景自動刷新
             startBackgroundRefresh();
             
-            // 監聽頁面可見性變化（當用戶切換標籤頁時）
+            // 監聽頁面可見性變化（延遲刷新，避免一回來就卡頓）
             document.addEventListener('visibilitychange', function() {
-                if (!document.hidden) {
-                    // 頁面變為可見時，立即刷新一次
-                    refreshCurrentTab();
-                }
+                if (document.hidden) return;
+                clearTimeout(window._visibilityRefreshTimer);
+                window._visibilityRefreshTimer = setTimeout(refreshCurrentTab, 400);
             });
             
             // 事件委派：處理動態生成的按鈕點擊
@@ -2554,6 +2553,18 @@
                     case 'delete':
                         deleteProperty(propertyId);
                         break;
+                }
+            });
+            
+            // 監聽 iframe（新增/編輯表單）儲存成功後的通知，切換到物件列表並刷新
+            window.addEventListener('message', function(e) {
+                if (e.data && e.data.type === 'propertySaved' && e.data.action === 'switchToList') {
+                    const listSubTab = document.getElementById('property-list-tab');
+                    if (listSubTab) {
+                        switchPropertySubTab('list', listSubTab);
+                        loadProperties();
+                        updateStats();
+                    }
                 }
             });
         }
@@ -2662,19 +2673,18 @@
             }
         }
         
-        // 載入儀表板
+        // 載入儀表板（儀表板資料與統計並行請求，減少等待時間）
         async function loadDashboard() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('properties')
-                    .select('*')
-                    .order('updated_at', { ascending: false })
-                    .limit(10);
-                
+                const [recentRes, statsRes] = await Promise.all([
+                    supabaseClient.from('properties').select('*').order('updated_at', { ascending: false }).limit(10),
+                    supabaseClient.from('properties').select('is_published, status, is_external')
+                ]);
+                const { data, error } = recentRes;
                 if (error) throw error;
                 
-                // 更新統計
-                updateStats();
+                // 用並行取回的統計資料更新數字，不再多等一次請求
+                if (statsRes.data) updateStatsFromData(statsRes.data);
                 
                 // 更新檢視模式按鈕狀態
                 const tableBtn = document.getElementById('dashboard-view-table-btn');
@@ -2854,62 +2864,60 @@
             }
         }
         
-        // 更新統計
+        // 用現成資料更新統計數字（避免重複請求）
+        function updateStatsFromData(data) {
+            if (!data || !Array.isArray(data)) return;
+            const total = data.length;
+            const published = data.filter(p => p.is_published).length;
+            const unpublished = data.filter(p => !p.is_published).length;
+            const sold = data.filter(p => p.status === 'sold').length;
+            const elTotal = document.getElementById('stat-total');
+            const elPublished = document.getElementById('stat-published');
+            const elUnpublished = document.getElementById('stat-unpublished');
+            const elSold = document.getElementById('stat-sold');
+            if (elTotal) elTotal.textContent = total;
+            if (elPublished) elPublished.textContent = published;
+            if (elUnpublished) elUnpublished.textContent = unpublished;
+            if (elSold) elSold.textContent = sold;
+        }
+        
+        // 更新統計（從 API 取回後更新）
         async function updateStats() {
             try {
                 const { data, error } = await supabaseClient
                     .from('properties')
                     .select('is_published, status, is_external');
-                
                 if (error) throw error;
-                
-                const total = data.length;
-                const published = data.filter(p => p.is_published).length;
-                const unpublished = data.filter(p => !p.is_published).length;
-                const sold = data.filter(p => p.status === 'sold').length;
-                const internal = data.filter(p => !p.is_external || p.is_external === false).length;
-                const external = data.filter(p => p.is_external === true || p.is_external === 'true').length;
-                
-                document.getElementById('stat-total').textContent = total;
-                document.getElementById('stat-published').textContent = published;
-                document.getElementById('stat-unpublished').textContent = unpublished;
-                document.getElementById('stat-sold').textContent = sold;
-                
-                // 記錄統計資訊（用於除錯）
-                console.log('📊 物件統計:', {
-                    total,
-                    published,
-                    unpublished,
-                    sold,
-                    internal,
-                    external
-                });
+                updateStatsFromData(data);
             } catch (error) {
                 console.error('更新統計失敗:', error);
             }
         }
         
+        // 列表所需欄位（不拉 description、features、transportation 等大欄位，減少延遲）
+        const PROPERTIES_LIST_COLUMNS = 'id, title, number, type, price, address, is_published, is_external, status, images, updated_at, created_at';
+        
         // 載入物件列表
         async function loadProperties() {
+            const listEl = document.getElementById('properties-list');
+            if (listEl) listEl.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>';
             try {
                 const { data, error } = await supabaseClient
                     .from('properties')
-                    .select('*')
+                    .select(PROPERTIES_LIST_COLUMNS)
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
                 
                 allProperties = data || [];
-                // 更新下拉選單的值
                 const select = document.getElementById('status-filter-select');
-                if (select) {
-                    select.value = currentFilter || 'all';
-                }
-                renderProperties();
+                if (select) select.value = currentFilter || 'all';
+                // 用 rAF 讓瀏覽器先畫出「載入中」再渲染列表，體感更順
+                requestAnimationFrame(() => renderProperties());
             } catch (error) {
                 console.error('載入物件失敗:', error);
-                document.getElementById('properties-list').innerHTML = 
-                    `<div class="alert alert-error">載入失敗：${error.message}</div>`;
+                const el = document.getElementById('properties-list');
+                if (el) el.innerHTML = `<div class="alert alert-error">載入失敗：${error.message}</div>`;
             }
         }
         
@@ -3002,7 +3010,7 @@
                             return `
                                 <div class="property-card">
                                     ${safeImgUrl 
-                                        ? `<img src="${safeImgUrl}" alt="${safeTitle}" class="property-card-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                                        ? `<img src="${safeImgUrl}" alt="${safeTitle}" class="property-card-image" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
                                         : ''
                                     }
                                     <div class="property-card-placeholder" ${imgUrl ? 'style="display:none;"' : ''}>
@@ -3102,7 +3110,7 @@
                                     <div class="property-card-mobile">
                                         <div class="property-card-mobile-header">
                                             ${safeImgUrl 
-                                                ? `<img src="${safeImgUrl}" alt="${safeTitle}" class="property-card-mobile-image" onerror="this.style.display='none';">`
+                                                ? `<img src="${safeImgUrl}" alt="${safeTitle}" class="property-card-mobile-image" loading="lazy" onerror="this.style.display='none';">`
                                                 : '<div class="property-card-mobile-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 2rem;">🏠</div>'
                                             }
                                             <div class="property-card-mobile-info">
@@ -3184,7 +3192,7 @@
                                     <tr>
                                         <td>
                                             <div class="property-preview">
-                                                ${safeImgUrl ? `<img src="${safeImgUrl}" alt="${safeTitle}">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
+                                                ${safeImgUrl ? `<img src="${safeImgUrl}" alt="${safeTitle}" loading="lazy">` : '<div style="width:80px;height:60px;background:#f0f0f0;border-radius:6px;"></div>'}
                                                 <div class="property-preview-info">
                                                     <h4>
                                                         <a href="${getPropertyDetailUrl(prop)}" 
@@ -3326,6 +3334,13 @@
             loadDashboard();
         }
         
+        // 搜尋防抖（減少輸入時頻繁重繪）
+        let filterPropertiesDebounceTimer = null;
+        function filterPropertiesDebounced() {
+            clearTimeout(filterPropertiesDebounceTimer);
+            filterPropertiesDebounceTimer = setTimeout(filterProperties, 250);
+        }
+        
         // 搜尋和篩選
         function filterProperties() {
             renderProperties();
@@ -3386,38 +3401,30 @@
             }, 3000);
         }
         
-        // 編輯物件
+        // 編輯物件（縮短延遲以減少體感延遲）
         function editProperty(id) {
-            // 切換到物件管理標籤的新增子標籤，並載入編輯表單
             const propertiesTab = document.querySelector('.nav-item[onclick*="properties"]');
-            if (propertiesTab) {
-                switchTab('properties', propertiesTab);
-                
-                // 切換到新增子標籤
-                setTimeout(() => {
-                    const addSubTab = document.getElementById('property-add-tab');
-                    if (addSubTab) {
-                        switchPropertySubTab('add', addSubTab);
-                        
-                        // 載入編輯表單（通過 iframe）
+            if (!propertiesTab) return;
+            switchTab('properties', propertiesTab);
+            const safeId = encodeURIComponent(id);
+            // 用 requestAnimationFrame 等 DOM 更新後再切子標籤與 iframe，避免累積過長 setTimeout
+            requestAnimationFrame(() => {
+                const addSubTab = document.getElementById('property-add-tab');
+                if (!addSubTab) return;
+                switchPropertySubTab('add', addSubTab);
+                requestAnimationFrame(() => {
+                    const iframe = document.getElementById('property-add-iframe');
+                    if (iframe) {
+                        iframe.src = `property-admin-db.html?tab=add&id=${safeId}`;
+                    } else {
+                        loadPropertyAddForm();
                         setTimeout(() => {
-                            const iframe = document.getElementById('property-add-iframe');
-                            if (iframe) {
-                                iframe.src = `property-admin-db.html?tab=add&id=${id}`;
-                            } else {
-                                // 如果 iframe 還沒載入，重新載入表單
-                                loadPropertyAddForm();
-                                setTimeout(() => {
-                                    const newIframe = document.getElementById('property-add-iframe');
-                                    if (newIframe) {
-                                        newIframe.src = `property-admin-db.html?tab=add&id=${id}`;
-                                    }
-                                }, 500);
-                            }
-                        }, 300);
+                            const newIframe = document.getElementById('property-add-iframe');
+                            if (newIframe) newIframe.src = `property-admin-db.html?tab=add&id=${safeId}`;
+                        }, 150);
                     }
-                }, 100);
-            }
+                });
+            });
         }
         
         // 顯示確認彈跳視窗

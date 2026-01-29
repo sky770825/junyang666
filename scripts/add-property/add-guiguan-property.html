@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增蘋果村別墅物件</title>
+    <title>新增桂冠A+三房車物件</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../supabase-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -124,20 +124,20 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏠 新增蘋果村別墅物件</h1>
+        <h1>🏠 新增桂冠A+三房車物件</h1>
         
         <div id="alert-container"></div>
         
         <div class="info-section">
             <h2>📋 物件資訊</h2>
-            <div class="info-item"><strong>案名：</strong>獨家金蘋果近龍科別墅</div>
-            <div class="info-item"><strong>社區：</strong>蘋果村</div>
-            <div class="info-item"><strong>地址：</strong>桃園市楊梅區蘋果路108巷1弄62-1號</div>
-            <div class="info-item"><strong>售價：</strong>1198萬</div>
-            <div class="info-item"><strong>格局：</strong>4房2廳3衛</div>
-            <div class="info-item"><strong>總坪數：</strong>47.57坪（主建物41.08坪 + 附屬6.47坪）</div>
-            <div class="info-item"><strong>屋齡：</strong>18年</div>
-            <div class="info-item"><strong>房屋型式：</strong>別墅</div>
+            <div class="info-item"><strong>案名：</strong>楊梅國中景觀三房加車位</div>
+            <div class="info-item"><strong>社區：</strong>桂冠A+</div>
+            <div class="info-item"><strong>地址：</strong>桃園市楊梅區環南路80巷1號7樓</div>
+            <div class="info-item"><strong>售價：</strong>1188萬</div>
+            <div class="info-item"><strong>格局：</strong>3房2廳2衛</div>
+            <div class="info-item"><strong>總坪數：</strong>46.03坪（主建物24.66坪 + 附屬2.4坪 + 車位7.64坪 + 公設11.34坪）</div>
+            <div class="info-item"><strong>屋齡：</strong>14年</div>
+            <div class="info-item"><strong>房屋型式：</strong>大樓</div>
         </div>
         
         <button id="add-btn" class="btn" onclick="addProperty()">🚀 新增物件到資料庫</button>
@@ -187,7 +187,7 @@
                 '店面': 'SH',
                 '華廈': 'TW',
                 '公寓': 'AP',
-                '大樓': 'TH'
+                '大樓': 'TH' // 大樓通常歸類為3房
             };
             return typeMap[type] || 'XX';
         }
@@ -218,7 +218,7 @@
         
         // 生成物件編號
         async function generatePropertyNumber() {
-            const type = '別墅';
+            const type = '3房';
             const isExternal = false; // 本店物件
             
             const prefix = getTypePrefix(type);
@@ -252,82 +252,82 @@
                 // 準備物件資料
                 const propertyData = {
                     number: propertyNumber,
-                    title: '獨家金蘋果近龍科別墅',
-                    type: '別墅',
+                    title: '楊梅國中景觀三房加車位',
+                    type: '3房',
                     city: '桃園市',
                     district: '楊梅區',
-                    address: '桃園市楊梅區蘋果路108巷1弄62-1號',
-                    address_detail: '蘋果路108巷1弄62-1號',
+                    address: '桃園市楊梅區環南路80巷1號7樓',
+                    address_detail: '環南路80巷1號7樓',
                     hide_address_number: false,
-                    price: '1198萬',
-                    layout: '4房2廳3衛',
-                    total_area: '47.57坪',
-                    main_area: '41.08坪',
-                    auxiliary_area: '6.47坪',
-                    common_area: '0坪',
-                    land_area: '30.62坪',
-                    parking_area: '0坪',
-                    age: '18年',
-                    floor: '1-3樓/3樓',
-                    building_type: '別墅',
-                    orientation: '座東南朝西北',
-                    management_fee: '989元/月',
-                    parking_type: '門前停車',
-                    parking_space: '門前停車',
-                    current_status: '需提前預約',
-                    community: '蘋果村',
+                    price: '1188萬',
+                    layout: '3房2廳2衛',
+                    total_area: '46.03坪',
+                    main_area: '24.66坪',
+                    auxiliary_area: '2.4坪',
+                    common_area: '11.34坪',
+                    land_area: '8.48坪',
+                    parking_area: '7.64坪',
+                    age: '14年',
+                    floor: '7樓/12樓',
+                    building_type: '大樓',
+                    orientation: '座西朝東',
+                    management_fee: '3087元/月',
+                    parking_type: '坡道平面',
+                    parking_space: 'B1-13',
+                    current_status: '空屋,隨時可看',
+                    community: '桂冠A+',
                     is_published: true,
                     is_external: false,
                     status: 'new',
                     status_text: '新上架',
-                    description: `社區型住宅、警衛24H管理
-格局方正、四房大空間、好規劃
-無過多裝潢、簡單溫馨
-門前停車、愛車不用日曬雨淋
-鄰近梅獅商圈、萬大黃昏市場
+                    description: `環南路生活商圈,生活機能佳
+楊梅國中小學區,走路上學
+近五楊高架,楊梅交流道,交通便利
+屋齡新,屋況好,採光通風佳
+市場,公園,學區宅,稀有釋出
 
 【房屋現況】
-- 格局：4房2廳3衛
-- 房屋型式：別墅
-- 屋齡：18年（建物完成日：96.07.02）
-- 管理費：989元/月
-- 警衛管理：有（24H管理）
+- 格局：3房2廳2衛
+- 房屋型式：大樓
+- 屋齡：14年（建物完成日：100.10.07）
+- 管理費：3087元/月
+- 警衛管理：有
 - 天然瓦斯：有
-- 出售樓層：1-3樓
-- 最高樓層：3樓
-- 地下樓層：無
-- 座向：座東南朝西北
-- 裝潢：無
-- 臨路寬：8米
-- 面寬：4.5米
-- 車位：門前停車
-- 機車位：門前停車
-- 目前現況：需提前預約
+- 出售樓層：7樓
+- 最高樓層：12樓
+- 地下樓層：2樓
+- 座向：座西朝東
+- 裝潢：有
+- 臨路寬：6米
+- 車位：B1-13（7.64坪）
+- 機車位：汽車位後方
+- 目前現況：空屋,隨時可看
 
 【環境及交通】
-- 鄰近設施：梅獅路商圈、UNIQLO、星巴克、全聯福利中心、職人的店、萊爾富
-- 交通：台1線、楊梅交流道、埔心火車站
-- 學校：瑞坪國中、楊光國中小學、瑞塘國小
-- 市場：萬大黃昏市場
-- 公園：社區自有小公園`,
+- 鄰近設施：天成醫院
+- 交通：台1線、楊梅交流道、五楊交流道、楊梅火車站
+- 學校：楊梅國中、楊梅國小
+- 市場：楊梅市場
+- 公園：永寧公園`,
                     images: [],
                     transportation: {
-                        facilities: ['梅獅路商圈', 'UNIQLO', '星巴克', '全聯福利中心', '職人的店', '萊爾富'],
-                        transport: ['台1線', '楊梅交流道', '埔心火車站'],
-                        schools: ['瑞坪國中', '楊光國中小學', '瑞塘國小'],
-                        market: '萬大黃昏市場',
-                        park: '社區自有小公園'
+                        facilities: ['天成醫院'],
+                        transport: ['台1線', '楊梅交流道', '五楊交流道', '楊梅火車站'],
+                        schools: ['楊梅國中', '楊梅國小'],
+                        market: '楊梅市場',
+                        park: '永寧公園'
                     },
                     features: [
-                        '社區型住宅、警衛24H管理',
-                        '格局方正、四房大空間、好規劃',
-                        '無過多裝潢、簡單溫馨',
-                        '門前停車、愛車不用日曬雨淋',
-                        '鄰近梅獅商圈、萬大黃昏市場',
-                        '警衛24H管理',
+                        '環南路生活商圈,生活機能佳',
+                        '楊梅國中小學區,走路上學',
+                        '近五楊高架,楊梅交流道,交通便利',
+                        '屋齡新,屋況好,採光通風佳',
+                        '市場,公園,學區宅,稀有釋出',
+                        '警衛管理',
                         '天然瓦斯',
-                        '門前停車',
-                        '需提前預約'
+                        '有裝潢',
+                        '坡道平面車位',
+                        '空屋,隨時可看'
                     ],
                     google_maps: null,
                     tiktok_video_id: null,

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增物件 - 近龍潭科學園區城市花園別墅</title>
+    <title>新增永美路透天物件</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../supabase-config.js"></script>
     <style>
         * {
             margin: 0;
@@ -127,24 +127,22 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏠 新增物件 - 近龍潭科學園區城市花園別墅</h1>
+        <h1>🏠 新增永美路透天物件</h1>
         
         <div id="alert-container"></div>
         
         <div class="info-section">
             <h2>📋 物件資訊</h2>
-            <div class="info-item"><strong>案名：</strong>近龍潭科學園區城市花園別墅</div>
-            <div class="info-item"><strong>社區名稱：</strong>城市花園（總戶數 32 戶）</div>
-            <div class="info-item"><strong>地址：</strong>桃園市龍潭區梅龍三街189巷</div>
-            <div class="info-item"><strong>售價：</strong>1,188 萬</div>
-            <div class="info-item"><strong>單價：</strong>22.54 萬/坪</div>
-            <div class="info-item"><strong>建坪：</strong>52.7 坪</div>
-            <div class="info-item"><strong>格局：</strong>4 房 / 3 廳 / 3 衛</div>
-            <div class="info-item"><strong>樓層：</strong>1 - 4 樓 / 共 4 樓</div>
-            <div class="info-item"><strong>屋齡：</strong>32 年</div>
-            <div class="info-item"><strong>型態：</strong>透天厝</div>
-            <div class="info-item"><strong>座向：</strong>座東北朝西南</div>
-            <div class="info-item"><strong>車位：</strong>無</div>
+            <div class="info-item"><strong>案名：</strong>獨家6米大面寬透天</div>
+            <div class="info-item"><strong>社區名稱：</strong>永美路</div>
+            <div class="info-item"><strong>地址：</strong>楊梅區永美路445巷46弄6號</div>
+            <div class="info-item"><strong>售價：</strong>798萬</div>
+            <div class="info-item"><strong>格局：</strong>4房2廳2衛</div>
+            <div class="info-item"><strong>總坪數：</strong>27.22坪</div>
+            <div class="info-item"><strong>主建物：</strong>27.22坪</div>
+            <div class="info-item"><strong>土地坪數：</strong>21.78坪</div>
+            <div class="info-item"><strong>屋齡：</strong>47年</div>
+            <div class="info-item"><strong>樓層：</strong>透天1-2樓</div>
         </div>
         
         <button type="button" class="btn" onclick="addProperty()" id="add-btn">
@@ -179,8 +177,7 @@
                 '公寓': 'AP',
                 '透天': 'TH',
                 '店面': 'ST',
-                '別墅': 'VI',
-                '店住': 'ST'
+                '別墅': 'VI'
             };
             return prefixMap[type] || 'XX';
         }
@@ -204,9 +201,11 @@
         
         // 獲取下一個序號（店內物件）
         function getNextInternalSequenceNumber(existingNumbers, prefix) {
+            // 找出同類型的所有編號（格式：{prefix}{5位數字}）
             const typeNumbers = existingNumbers
                 .filter(num => {
                     if (!num || typeof num !== 'string') return false;
+                    // 排除以EX開頭的（店外物件）
                     if (num.startsWith('EX')) return false;
                     const pattern = new RegExp(`^${prefix}\\d{5}$`);
                     return pattern.test(num);
@@ -228,9 +227,10 @@
         
         // 生成物件編號
         async function generatePropertyNumber() {
-            const type = '別墅';
-            const prefix = getTypePrefix(type);
+            const type = '透天';
+            const isExternal = false; // 本店物件
             
+            const prefix = getTypePrefix(type);
             if (!prefix || prefix === 'XX') {
                 throw new Error('無法識別的房型');
             }
@@ -240,6 +240,7 @@
             const formattedSeq = formatSequenceNumber(nextSeq, 5);
             const newNumber = `${prefix}${formattedSeq}`;
             
+            // 檢查是否重複
             if (existingNumbers.includes(newNumber)) {
                 throw new Error('生成的編號重複，請重試');
             }
@@ -260,73 +261,48 @@
                 // 準備物件資料
                 const propertyData = {
                     number: propertyNumber,
-                    title: '近龍潭科學園區城市花園別墅',
-                    type: '別墅',
+                    title: '獨家6米大面寬透天',
+                    type: '透天',
                     city: '桃園市',
-                    district: '龍潭區',
-                    address: '桃園市龍潭區梅龍三街189巷',
-                    address_detail: '梅龍三街189巷',
+                    district: '楊梅區',
+                    address: '桃園市楊梅區永美路445巷46弄6號',
+                    address_detail: '永美路445巷46弄6號',
                     hide_address_number: false,
-                    price: '1188萬',
-                    layout: '4房3廳3衛',
-                    total_area: '52.7坪',
-                    main_area: '52.7坪',
-                    auxiliary_area: null,
-                    common_area: null,
-                    land_area: null,
-                    parking_area: null,
-                    age: '32年',
-                    floor: '1-4樓/4樓',
+                    price: '798萬',
+                    layout: '4房2廳2衛',
+                    total_area: '27.22坪',
+                    main_area: '27.22坪',
+                    auxiliary_area: '0坪',
+                    common_area: '0坪',
+                    land_area: '21.78坪',
+                    parking_area: '0坪',
+                    age: '47年',
+                    floor: '1-2樓',
                     building_type: '透天',
-                    orientation: '座東北朝西南',
-                    management_fee: null,
+                    orientation: null,
+                    management_fee: '0元/月',
                     parking_type: null,
                     parking_space: null,
-                    current_status: null,
-                    community: '城市花園',
+                    current_status: '洽開發',
+                    community: '永美路',
                     is_published: true,
                     is_external: false,
                     status: null,
                     status_text: null,
-                    description: `近龍潭科學園區城市花園別墅
-
-【亮點推薦】
-• 地段優勢：鄰近龍潭科學園區，下樓即可享受超商購物、美食餐飲及公園休閒。
-• 價格優勢：低於周邊同格局物件之均價，總價 1,188 萬極具競爭力。
-• 空間設計：主建物空間足夠，採光與通風表現極佳；格局方正，現況為 4 房設計，室內採簡易裝潢。
-• 環境機能：位於城市花園社區，屬於單純的住宅環境，具備住家與工作通勤的便利性。
-
-【房屋基本資料】
-- 案名：近龍潭科學園區城市花園別墅
-- 售價：1,188 萬
-- 單價：22.54 萬/坪
-- 建坪：52.7 坪
-- 格局：4 房 / 3 廳 / 3 衛
-- 樓層：1 - 4 樓 / 共 4 樓
-- 屋齡：32 年
-- 型態：透天厝
-- 座向：座東北朝西南
-- 車位：無
-- 社區：城市花園（總戶數 32 戶）
-- 地址：桃園市龍潭區梅龍三街189巷
-
-（本資料為內部流通，詳細解說以不動產說明書為主。）`,
+                    description: `靜巷住宅遠離車流吵雜，回家就是放鬆
+鄰近主要道路，交通方便通勤、外出機動性高
+生活機能成熟便利，市場、超市、餐飲店齊全
+診所、學校、公車站步行可達，生活無斷層
+機能與居住投資兼具，適合長期居住規劃`,
                     images: [],
                     transportation: {
-                        facilities: ['龍潭科學園區', '超商', '美食餐飲', '公園'],
-                        transport: ['龍潭科學園區（工作通勤便利）'],
-                        schools: [],
-                        market: null,
-                        park: '公園（社區週邊）'
+                        facilities: ['四維兒童公園', '四維商圈'],
+                        transport: ['台1線', '楊梅交流道', '幼獅交流道', '埔心火車站'],
+                        schools: ['瑞坪國中', '瑞塘國小'],
+                        market: '萬大黃昏市場',
+                        park: '四維公園'
                     },
-                    features: [
-                        '鄰近龍潭科學園區、生活機能便利',
-                        '總價 1,188 萬，低於周邊均價',
-                        '主建物採光通風佳、格局方正',
-                        '4 房設計、簡易裝潢',
-                        '城市花園社區、單純住宅環境',
-                        '住家與工作通勤便利'
-                    ],
+                    features: [],
                     google_maps: null,
                     tiktok_video_id: null,
                     tiktok_username: null,

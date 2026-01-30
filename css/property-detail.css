@@ -1,0 +1,453 @@
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft JhengHei', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #dc3545;
+        }
+        
+        .property-page {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .property-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+        }
+        
+        .property-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .property-address {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+        
+        .property-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .property-content {
+            padding: 2rem;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 售價特殊樣式 */
+        .info-item.price-item .info-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+        
+        /* 其他資料區塊樣式 */
+        .other-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .other-info-item {
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .other-info-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.2rem;
+        }
+        
+        .other-info-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .image-main-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .image-main {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f0f0f0;
+            position: relative;
+        }
+        
+        .image-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+        
+        .image-nav-btn:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        
+        .image-nav-btn.prev {
+            left: 10px;
+        }
+        
+        .image-nav-btn.next {
+            right: 10px;
+        }
+        
+        .image-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+        
+        .image-close-btn:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        
+        .image-thumbnails {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: #667eea #f1f1f1;
+        }
+        
+        .image-thumbnails::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .image-thumbnails::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .image-thumbnails::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+        
+        .image-thumbnail {
+            flex-shrink: 0;
+            width: 80px;
+            height: 60px;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            background: #f0f0f0;
+        }
+        
+        .image-thumbnail.active {
+            border-color: #667eea;
+        }
+        
+        .image-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-thumbnail:hover {
+            transform: scale(1.05);
+            border-color: #764ba2;
+        }
+        
+        @media (max-width: 768px) {
+            .image-thumbnail {
+                width: 60px;
+                height: 45px;
+            }
+            
+            .image-nav-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .image-close-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+        }
+        
+        .description {
+            line-height: 1.8;
+            color: #555;
+            white-space: pre-line;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+                max-width: 100%;
+            }
+            
+            .property-header {
+                padding: 1.5rem 1rem;
+            }
+            
+            .property-title {
+                font-size: 1.4rem;
+            }
+            
+            .property-content {
+                padding: 1.5rem 1rem;
+            }
+            
+            /* 移除所有區塊的 max-width 限制，讓手機版全螢幕 */
+            .section {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            /* 聯絡方式區塊全寬 */
+            .section[style*="max-width: 1200px"],
+            .contact-grid {
+                max-width: 100% !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            /* 確保聯絡方式卡片不會換行 */
+            .contact-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            /* 基本資訊手機版 - 三欄佈局 */
+            .info-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 0.5rem !important;
+            }
+            
+            .info-item {
+                padding: 0.6rem 0.4rem !important;
+            }
+            
+            .info-label {
+                font-size: 0.7rem !important;
+                margin-bottom: 0.15rem !important;
+            }
+            
+            .info-value {
+                font-size: 0.9rem !important;
+            }
+            
+            /* 手機版售價特殊樣式 */
+            .info-item.price-item .info-value {
+                font-size: 1.1rem !important;
+                font-weight: 700 !important;
+            }
+            
+            /* 其他資料區塊手機版 */
+            .other-info-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.6rem !important;
+            }
+            
+            .other-info-item {
+                padding: 0.6rem 0.5rem !important;
+            }
+            
+            .other-info-label {
+                font-size: 0.75rem !important;
+                margin-bottom: 0.15rem !important;
+            }
+            
+            .other-info-value {
+                font-size: 0.85rem !important;
+            }
+            
+            /* 聯絡方式區塊手機版 */
+            .section > div[style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            /* Google Maps 按鈕手機版保持兩欄 */
+            .section > div[style*="grid-template-columns: 1fr 1fr"][style*="margin-top: 1rem"] {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.5rem !important;
+            }
+            
+            .section > div[style*="grid-template-columns: 1fr 1fr"][style*="margin-top: 1rem"] a {
+                font-size: 0.8rem !important;
+                padding: 0.6rem 0.5rem !important;
+            }
+            
+            .section > div[style*="grid-template-columns: 1fr 1fr"][style*="margin-top: 1rem"] a span {
+                display: none;
+            }
+            
+            @media (min-width: 480px) {
+                .section > div[style*="grid-template-columns: 1fr 1fr"][style*="margin-top: 1rem"] a span {
+                    display: inline;
+                }
+            }
+            
+            /* 相關連結按鈕手機版 */
+            .section a[style*="min-width: 180px"] {
+                min-width: calc(50% - 0.4rem) !important;
+                font-size: 0.85rem !important;
+                padding: 0.5rem 0.8rem !important;
+            }
+            
+            /* 區塊標題手機版 */
+            .section-title {
+                font-size: 1.1rem !important;
+                margin-bottom: 0.8rem !important;
+            }
+            
+            /* 區塊間距手機版 */
+            .section {
+                margin-bottom: 1.5rem !important;
+            }

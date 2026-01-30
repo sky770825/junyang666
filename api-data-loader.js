@@ -26,90 +26,86 @@ function getApiBaseUrl() {
 // API 基礎網址
 const API_BASE_URL = getApiBaseUrl();
 
-// 從 API 載入物件資料
+// 客戶端快取鍵（與 js/lib/client-cache.js、js/lib/query-client.js 搭配）
+const CACHE_KEY_PROPERTIES_API = 'properties:api:list';
+
+// React Query 風格：快取時間與重新驗證
+var QUERY_STALE_TIME_MS = 5 * 60 * 1000;   // 5 分鐘內視為新鮮
+var QUERY_GC_TIME_MS = 10 * 60 * 1000;    // 10 分鐘後回收
+
+// 將 API 物件列表寫入 embeddedPropertiesData（共用邏輯：快取命中與 API 回傳）
+function applyPropertiesToEmbedded(apiProperties) {
+    if (!Array.isArray(apiProperties)) return;
+    if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties) {
+        const existingIds = new Set(embeddedPropertiesData.properties.map(p => p.id || p.number));
+        const newProperties = apiProperties.filter(p => !existingIds.has(p.id || p.number));
+        if (newProperties.length > 0) {
+            embeddedPropertiesData.properties = [...embeddedPropertiesData.properties, ...newProperties];
+        }
+    } else {
+        window.embeddedPropertiesData = {
+            properties: apiProperties,
+            settings: { itemsPerPage: 8, maxPages: 10, enableSearch: true, enableFilter: true }
+        };
+    }
+}
+
+// 純 fetcher：只負責從 API 取得陣列（供 DataQuery 使用）
+function fetchPropertiesFromApi() {
+    return fetch(`${API_BASE_URL}/properties`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        mode: 'cors'
+    }).then(function(res) {
+        if (!res.ok) return res.text().then(function(t) { throw new Error('HTTP ' + res.status + ': ' + t); });
+        return res.json();
+    }).then(function(json) {
+        if (!Array.isArray(json)) throw new Error('API 返回的資料格式不正確');
+        return json;
+    });
+}
+
+// 從 API 載入物件資料（優先使用 DataQuery：staleTime、refetchOnWindowFocus、refetchOnReconnect）
 async function loadPropertiesFromAPI() {
     try {
-        // 🔇 移除訊息，避免在刷新時顯示
-        
-        const response = await fetch(`${API_BASE_URL}/properties`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            mode: 'cors' // 明確指定 CORS 模式
-        });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`❌ API 錯誤 (${response.status}):`, errorText);
-            throw new Error(`HTTP 錯誤! status: ${response.status}, message: ${errorText}`);
-        }
-        
-        const apiProperties = await response.json();
-        
-        if (!Array.isArray(apiProperties)) {
-            throw new Error('API 返回的資料格式不正確');
-        }
-        
-        // 🔇 移除訊息，避免在刷新時顯示（只在開發模式顯示）
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.log(`✅ 成功從 API 載入 ${apiProperties.length} 個物件`);
-            console.log('📋 API 物件列表:', apiProperties.map(p => `${p.title} (${p.type})`));
-        }
-        
-        // 如果 embeddedPropertiesData 已存在，合併資料（避免重複）
-        if (typeof embeddedPropertiesData !== 'undefined' && embeddedPropertiesData.properties) {
-            // 檢查是否已有相同的 ID，避免重複
-            const existingIds = new Set(embeddedPropertiesData.properties.map(p => p.id || p.number));
-            
-            // 只添加不重複的物件
-            const newProperties = apiProperties.filter(p => !existingIds.has(p.id || p.number));
-            
-            if (newProperties.length > 0) {
-                embeddedPropertiesData.properties = [
-                    ...embeddedPropertiesData.properties,
-                    ...newProperties
-                ];
-                // 🔇 移除訊息，避免在刷新時顯示
-            } else {
-                // 🔇 移除訊息，避免在刷新時顯示
+        if (typeof window.DataQuery !== 'undefined') {
+            var data = await window.DataQuery.fetchQuery(CACHE_KEY_PROPERTIES_API, fetchPropertiesFromApi, {
+                staleTime: QUERY_STALE_TIME_MS,
+                gcTime: QUERY_GC_TIME_MS,
+                refetchOnWindowFocus: true,
+                refetchOnReconnect: true
+            });
+            applyPropertiesToEmbedded(data);
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.log('✅ 從 DataQuery 取得 API 物件列表（含快取/重新驗證）');
             }
-        } else {
-            // 如果 embeddedPropertiesData 不存在，建立它
-            window.embeddedPropertiesData = {
-                properties: apiProperties,
-                settings: {
-                    itemsPerPage: 8,
-                    maxPages: 10,
-                    enableSearch: true,
-                    enableFilter: true
-                }
-            };
-            // 🔇 移除訊息，避免在刷新時顯示
+            return data;
         }
-        
-        // 🔇 移除訊息，避免在刷新時顯示
-        
+        if (typeof window.ClientCache !== 'undefined') {
+            var cached = window.ClientCache.get(CACHE_KEY_PROPERTIES_API);
+            if (cached && Array.isArray(cached) && cached.length >= 0) {
+                applyPropertiesToEmbedded(cached);
+                return cached;
+            }
+        }
+
+        var apiProperties = await fetchPropertiesFromApi();
+        applyPropertiesToEmbedded(apiProperties);
+        if (typeof window.ClientCache !== 'undefined') {
+            window.ClientCache.set(CACHE_KEY_PROPERTIES_API, apiProperties);
+        }
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('✅ 成功從 API 載入 ' + apiProperties.length + ' 個物件');
+        }
         return apiProperties;
-        
     } catch (error) {
         console.warn('⚠️ 無法從 API 載入資料:', error.message);
-        console.warn('將等待 Supabase 資料載入');
-        
-        // 如果 API 載入失敗，確保 embeddedPropertiesData 存在（空陣列）
         if (typeof embeddedPropertiesData === 'undefined') {
             window.embeddedPropertiesData = {
                 properties: [],
-                settings: {
-                    itemsPerPage: 8,
-                    maxPages: 10,
-                    enableSearch: true,
-                    enableFilter: true
-                }
+                settings: { itemsPerPage: 8, maxPages: 10, enableSearch: true, enableFilter: true }
             };
         }
-        
         return [];
     }
 }
@@ -155,48 +151,44 @@ function refreshPaginationSystem() {
 
 // 🚀 性能優化：如果 Supabase 已成功載入，跳過 API 載入
 // 在 DOM 載入完成後載入 API 資料（僅作為備用）
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', async () => {
-        // 🚀 檢查是否已有 Supabase 資料，如果有則跳過 API 載入
-        if (typeof embeddedPropertiesData !== 'undefined' && 
-            embeddedPropertiesData.properties && 
-            embeddedPropertiesData.properties.length > 0) {
-            // Supabase 已成功載入，跳過 API 載入
-            return;
+(function initApiDataLoader() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function onDomReady() {
+            if (typeof embeddedPropertiesData !== 'undefined' &&
+                embeddedPropertiesData.properties &&
+                embeddedPropertiesData.properties.length > 0) {
+                return;
+            }
+            loadPropertiesFromAPI().then(function() {
+                setTimeout(refreshPaginationSystem, 50);
+                window.dispatchEvent(new CustomEvent('apiDataLoaded', {
+                    detail: { properties: embeddedPropertiesData.properties }
+                }));
+            });
+        });
+    } else {
+        if (typeof embeddedPropertiesData === 'undefined' ||
+            !embeddedPropertiesData.properties ||
+            embeddedPropertiesData.properties.length === 0) {
+            loadPropertiesFromAPI().then(function() {
+                setTimeout(refreshPaginationSystem, 50);
+                window.dispatchEvent(new CustomEvent('apiDataLoaded', {
+                    detail: { properties: embeddedPropertiesData.properties }
+                }));
+            });
         }
-        
-        await loadPropertiesFromAPI();
-        
-        // 觸發重新渲染（減少延遲）
-        setTimeout(() => {
-            refreshPaginationSystem();
-        }, 50); // 減少到 50ms
-        
-        // 觸發自定義事件，通知其他模組資料已載入
-        window.dispatchEvent(new CustomEvent('apiDataLoaded', { 
-            detail: { properties: embeddedPropertiesData.properties } 
-        }));
-    });
-} else {
-    // DOM 已經載入完成
-    // 🚀 檢查是否已有 Supabase 資料
-    if (typeof embeddedPropertiesData !== 'undefined' && 
-        embeddedPropertiesData.properties && 
-        embeddedPropertiesData.properties.length > 0) {
-        // Supabase 已成功載入，跳過 API 載入
-        return;
     }
-    
-    loadPropertiesFromAPI().then(() => {
-        setTimeout(() => {
-            refreshPaginationSystem();
-        }, 50); // 減少到 50ms
-        
-        window.dispatchEvent(new CustomEvent('apiDataLoaded', { 
-            detail: { properties: embeddedPropertiesData.properties } 
-        }));
-    });
-}
+})();
 
 // 暴露刷新函數供手動調用
 window.refreshPaginationSystem = refreshPaginationSystem;
+
+// DataQuery 背景重新驗證後更新分頁
+if (typeof window.addEventListener !== 'undefined') {
+    window.addEventListener('dataQueryUpdated', function(e) {
+        if (e.detail && e.detail.queryKey === CACHE_KEY_PROPERTIES_API && Array.isArray(e.detail.data)) {
+            applyPropertiesToEmbedded(e.detail.data);
+            setTimeout(refreshPaginationSystem, 50);
+        }
+    });
+}

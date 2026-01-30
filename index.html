@@ -660,13 +660,18 @@
     
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    
+    <!-- Supabase 配置（必須先於 data-loader / frontend） -->
+    <script src="supabase-config.js"></script>
+    <!-- 客戶端快取（常用資料暫存瀏覽器，減少重複請求） -->
+    <script src="js/lib/client-cache.js"></script>
+    <!-- React Query 風格：快取時間與重新驗證（staleTime、refetchOnWindowFocus、refetchOnReconnect） -->
+    <script src="js/lib/query-client.js"></script>
+    <!-- 圖片優化：壓縮畫質、WebP（Supabase 自動）、首屏預載入 -->
+    <script src="js/lib/image-optimizer.js"></script>
+    <!-- 非同步執行工具：耗時處理改為下一幀/下一 tick，避免阻塞 UI -->
+    <script src="js/lib/async-utils.js"></script>
     <!-- 載入 Supabase 資料（已上架物件） -->
     <script src="supabase-data-loader.js"></script>
-    
-    <!-- Supabase 配置（包含預設連結資料） -->
-    <script src="supabase-config.js"></script>
-    
     <!-- 相關連結前端顯示模組（從後端 API 載入） -->
     <script src="modules/related-links/frontend.js"></script>
     
@@ -675,6 +680,13 @@
     
     <!-- 載入浮框功能 -->
     <script src="property-modals.js"></script>
+    
+    <!-- 共用元件（Phase 3 模組化） -->
+    <script src="js/lib/utils.js"></script>
+    <script src="js/lib/lightbox.js"></script>
+    <script src="js/lib/map-modal.js"></script>
+    <script src="js/lib/tiktok-modal.js"></script>
+    <script src="js/lib/loan-calculator.js"></script>
     
     <!-- 載入分頁系統 -->
     <script src="pagination-system.js"></script>

@@ -19,6 +19,41 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIs
 // 初始化 Supabase 客戶端
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ============================================
+// 伺服器端快取（記憶體 TTL，減少資料庫查詢）
+// ============================================
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 分鐘
+const cache = new Map(); // key -> { data, expiresAt }
+
+function getCached(key) {
+    const entry = cache.get(key);
+    if (!entry) return null;
+    if (Date.now() > entry.expiresAt) {
+        cache.delete(key);
+        return null;
+    }
+    return entry.data;
+}
+
+function setCache(key, data, ttlMs = CACHE_TTL_MS) {
+    cache.set(key, {
+        data,
+        expiresAt: Date.now() + ttlMs
+    });
+}
+
+function invalidateCache(keyOrPrefix) {
+    if (!keyOrPrefix) {
+        cache.clear();
+        return;
+    }
+    for (const key of cache.keys()) {
+        if (key === keyOrPrefix || key.startsWith(keyOrPrefix)) {
+            cache.delete(key);
+        }
+    }
+}
+
 // 中間件
 // CORS 設定（允許所有來源，包括 127.0.0.1 和 localhost）
 app.use(cors({
@@ -150,15 +185,20 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
     });
 });
 
-// 獲取所有物件
+// 獲取所有物件（含快取）
 app.get('/api/properties', (req, res) => {
-    // 檢查資料庫連接
     if (!db) {
         console.error('❌ API: 資料庫未連接');
         return res.status(503).json({ 
             error: '資料庫未連接',
             message: 'SQLite 資料庫尚未初始化，請檢查 server.js 日誌'
         });
+    }
+    
+    const cached = getCached('properties:list');
+    if (cached !== null) {
+        console.log('📦 API: 從快取返回物件列表');
+        return res.json(cached);
     }
     
     console.log('🔄 API: 正在查詢所有物件...');
@@ -208,6 +248,7 @@ app.get('/api/properties', (req, res) => {
             });
             
             console.log(`✅ API: 成功返回 ${properties.length} 個物件`);
+            setCache('properties:list', properties);
             res.json(properties);
         });
     } catch (error) {
@@ -217,18 +258,18 @@ app.get('/api/properties', (req, res) => {
             message: error.message
         });
     }
-    } catch (error) {
-        console.error('❌ API 處理錯誤:', error);
-        return res.status(500).json({
-            error: '伺服器錯誤',
-            message: error.message
-        });
-    }
 });
 
-// 獲取單一物件
+// 獲取單一物件（含快取）
 app.get('/api/properties/:id', (req, res) => {
     const id = req.params.id;
+    const cacheKey = 'properties:id:' + id;
+    
+    const cached = getCached(cacheKey);
+    if (cached !== null) {
+        console.log('📦 API: 從快取返回單一物件');
+        return res.json(cached);
+    }
     
     db.get('SELECT * FROM properties WHERE id = ?', [id], (err, row) => {
         if (err) {
@@ -264,11 +305,12 @@ app.get('/api/properties/:id', (req, res) => {
             }
         }
         
+        setCache(cacheKey, property);
         res.json(property);
     });
 });
 
-// 新增物件
+// 新增物件（新增後清除列表快取）
 app.post('/api/properties', (req, res) => {
     const property = req.body;
     
@@ -331,7 +373,7 @@ app.post('/api/properties', (req, res) => {
             console.error('新增錯誤:', err);
             return res.status(500).json({ error: '新增失敗' });
         }
-        
+        invalidateCache('properties');
         res.json({
             success: true,
             id: property.id,
@@ -340,7 +382,7 @@ app.post('/api/properties', (req, res) => {
     });
 });
 
-// 更新物件
+// 更新物件（更新後清除該筆與列表快取）
 app.put('/api/properties/:id', (req, res) => {
     const id = req.params.id;
     const property = req.body;
@@ -404,7 +446,7 @@ app.put('/api/properties/:id', (req, res) => {
         if (this.changes === 0) {
             return res.status(404).json({ error: '物件不存在' });
         }
-        
+        invalidateCache('properties');
         res.json({
             success: true,
             message: '物件已更新'
@@ -412,7 +454,7 @@ app.put('/api/properties/:id', (req, res) => {
     });
 });
 
-// 刪除物件
+// 刪除物件（刪除後清除該筆與列表快取）
 app.delete('/api/properties/:id', (req, res) => {
     const id = req.params.id;
     
@@ -448,7 +490,7 @@ app.delete('/api/properties/:id', (req, res) => {
                 console.error('刪除錯誤:', err);
                 return res.status(500).json({ error: '刪除失敗' });
             }
-            
+            invalidateCache('properties');
             res.json({
                 success: true,
                 message: '物件已刪除'
@@ -458,12 +500,18 @@ app.delete('/api/properties/:id', (req, res) => {
 });
 
 // ============================================
-// 相關連結 API 端點
+// 相關連結 API 端點（含快取）
 // ============================================
 
-// 獲取所有啟用的相關連結（前端使用）
+// 獲取所有啟用的相關連結（前端使用，5 分鐘快取）
 app.get('/api/related-links', async (req, res) => {
     try {
+        const cached = getCached('related-links');
+        if (cached !== null) {
+            console.log('📦 後端 API: 從快取返回相關連結');
+            return res.json(cached);
+        }
+        
         console.log('🔄 後端 API: 正在從 Supabase 載入相關連結...');
         
         // 從 Supabase 載入啟用的連結
@@ -511,11 +559,13 @@ app.get('/api/related-links', async (req, res) => {
         }));
         
         console.log(`✅ 後端 API: 成功載入 ${result.length} 個連結`);
-        res.json({
+        const response = {
             success: true,
             data: result,
             count: result.length
-        });
+        };
+        setCache('related-links', response);
+        res.json(response);
     } catch (error) {
         console.error('❌ 後端 API 錯誤:', error);
         res.status(500).json({

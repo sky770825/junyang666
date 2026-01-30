@@ -1,8 +1,10 @@
 // ============================================
-// Supabase 統一配置檔案
+// Supabase 統一配置檔案（僅供本專案使用）
 // ============================================
-// 所有 Supabase 相關的配置都應該從這裡讀取
-// 避免在多個文件中重複定義
+// 專案：子菲濬瑒物件網站 / junyang666
+// 此 Supabase 專案請勿與其他應用程式共用，以確保資料庫隔離。
+// 詳見：Supabase-資料庫隔離與命名說明.md
+// ============================================
 
 const SUPABASE_CONFIG = {
     // Supabase 專案 URL
@@ -11,10 +13,16 @@ const SUPABASE_CONFIG = {
     // Supabase Anon/Public Key
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE',
     
-    // 預設配置選項
+    // 預設配置選項（Supabase 僅暴露 public / graphql_public，未開放 junyang666 時請用 public）
     defaultOptions: {
         db: { schema: 'public' },
-        auth: { persistSession: false }
+        auth: { persistSession: false },
+        global: {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }
     }
 };
 
@@ -115,9 +123,18 @@ function createSupabaseClient(customOptions = {}) {
         return null;
     }
     
+    const defaults = SUPABASE_CONFIG.defaultOptions || {};
     const options = {
-        ...SUPABASE_CONFIG.defaultOptions,
-        ...customOptions
+        ...defaults,
+        ...customOptions,
+        global: {
+            ...(defaults.global || {}),
+            ...(customOptions.global || {}),
+            headers: {
+                ...(defaults.global && defaults.global.headers ? defaults.global.headers : {}),
+                ...(customOptions.global && customOptions.global.headers ? customOptions.global.headers : {})
+            }
+        }
     };
     
     try {

@@ -37,9 +37,57 @@
         return client;
     }
     
-    // 載入相關連結（直接從 Supabase）
+    // 客戶端快取鍵（與 js/lib/client-cache.js、js/lib/query-client.js 搭配）
+    const CACHE_KEY_RELATED_LINKS = 'related-links:list';
+    var RELATED_LINKS_STALE_MS = 5 * 60 * 1000;
+    var RELATED_LINKS_GC_MS = 10 * 60 * 1000;
+
+    // 純 fetcher：從 Supabase 取得連結列表（供 DataQuery 使用）
+    async function fetchRelatedLinksFromSupabase() {
+        var client = initSupabaseClient();
+        if (!client) throw new Error('無法初始化 Supabase 客戶端');
+        var res = await client.from('related_links').select('*').eq('is_active', true).order('display_order', { ascending: true });
+        if (res.error) throw res.error;
+        var links = res.data || [];
+        var items = [];
+        if (links.length > 0) {
+            var r = await client.from('related_link_items').select('*').eq('is_active', true).order('display_order', { ascending: true });
+            if (!r.error && r.data) items = r.data;
+        }
+        var itemsByParent = {};
+        items.forEach(function(item) {
+            if (!itemsByParent[item.parent_link_id]) itemsByParent[item.parent_link_id] = [];
+            itemsByParent[item.parent_link_id].push(item);
+        });
+        return links.map(function(link) {
+            return Object.assign({}, link, { items: itemsByParent[link.id] || [] });
+        });
+    }
+
+    // 載入相關連結（優先使用 DataQuery / 客戶端快取，再從 Supabase 載入；支援 refetchOnWindowFocus）
     async function loadRelatedLinks() {
         try {
+            if (typeof window.DataQuery !== 'undefined') {
+                var data = await window.DataQuery.fetchQuery(CACHE_KEY_RELATED_LINKS, fetchRelatedLinksFromSupabase, {
+                    staleTime: RELATED_LINKS_STALE_MS,
+                    gcTime: RELATED_LINKS_GC_MS,
+                    refetchOnWindowFocus: true,
+                    refetchOnReconnect: true
+                });
+                if (data && data.length >= 0) {
+                    if (data.length === 0 && typeof DEFAULT_RELATED_LINKS !== 'undefined') {
+                        return DEFAULT_RELATED_LINKS.filter(function(l) { return l.is_active !== false; });
+                    }
+                    return data;
+                }
+            }
+            if (typeof window.ClientCache !== 'undefined') {
+                var cached = window.ClientCache.get(CACHE_KEY_RELATED_LINKS);
+                if (cached && Array.isArray(cached) && cached.length >= 0) {
+                    return cached;
+                }
+            }
+
             const client = initSupabaseClient();
             if (!client) {
                 throw new Error('無法初始化 Supabase 客戶端');
@@ -87,6 +135,13 @@
                 ...link,
                 items: itemsByParent[link.id] || []
             }));
+
+            if (typeof window.DataQuery !== 'undefined') {
+                window.DataQuery.setQueryData(CACHE_KEY_RELATED_LINKS, result, { staleTime: RELATED_LINKS_STALE_MS, gcTime: RELATED_LINKS_GC_MS });
+            }
+            if (typeof window.ClientCache !== 'undefined') {
+                window.ClientCache.set(CACHE_KEY_RELATED_LINKS, result);
+            }
             
             if (result.length > 0) {
                 console.log(`✅ 成功從 Supabase 載入 ${result.length} 個連結（後台儲存的資料）`);
@@ -113,8 +168,11 @@
         }
     }
     
+    var _lastRelatedLinksContainerId = null;
+
     // 渲染相關連結到容器
     async function renderRelatedLinks(containerId) {
+        if (containerId) _lastRelatedLinksContainerId = containerId;
         // 等待 DOM 完全載入
         if (document.readyState === 'loading') {
             await new Promise(resolve => {
@@ -314,6 +372,14 @@
         togglePropertyInfoMenu
     };
     
+    if (typeof window.addEventListener !== 'undefined') {
+        window.addEventListener('dataQueryUpdated', function(e) {
+            if (e.detail && e.detail.queryKey === CACHE_KEY_RELATED_LINKS && _lastRelatedLinksContainerId) {
+                renderRelatedLinks(_lastRelatedLinksContainerId);
+            }
+        });
+    }
+
     // 觸發準備就緒事件
     if (typeof window.dispatchEvent !== 'undefined') {
         window.dispatchEvent(new CustomEvent('relatedLinksFrontendReady'));

@@ -43,9 +43,9 @@ class EmbeddedPropertyPaginationSystem {
         this.cacheKey = '';
         this.cardCache = new Map(); // 緩存已創建的卡片 DOM
         
-        // 🔥 新增：防抖動計時器
+        // 🔥 搜尋防抖：使用者停止輸入 300ms 後才觸發搜尋與渲染
         this.searchDebounceTimer = null;
-        this.debounceDelay = 300; // 300ms 延遲
+        this.debounceDelay = 300;
         
         // 🚀 新增：篩選狀態管理
         this.isFiltering = false;
@@ -373,46 +373,46 @@ class EmbeddedPropertyPaginationSystem {
 
         const paginatedProperties = this.getPaginatedProperties();
 
-        // 🔥 首屏主圖預載入：提升第一張物件圖片的載入速度
-        // 僅在第 1 頁、grid 模式，且有圖片時執行一次
-        if (this.currentPage === 1 && this.viewMode === 'grid' && paginatedProperties.length > 0) {
-            const firstProperty = paginatedProperties[0];
-            const heroImage = firstProperty.images && firstProperty.images.length > 0 ? firstProperty.images[0] : null;
-            if (heroImage && typeof document !== 'undefined') {
-                if (!window.preloadedHeroImages) {
-                    window.preloadedHeroImages = new Set();
-                }
-                if (!window.preloadedHeroImages.has(heroImage)) {
-                    const link = document.createElement('link');
-                    link.rel = 'preload';
-                    link.as = 'image';
-                    link.href = heroImage;
-                    // 若日後改為 WebP，可在這裡加上 type="image/webp"
-                    document.head.appendChild(link);
-                    window.preloadedHeroImages.add(heroImage);
-                }
+        // 🔥 首屏圖片預載入：優化後 URL + 多張預載（壓縮畫質、WebP 由 Supabase 自動）
+        if (this.currentPage === 1 && paginatedProperties.length > 0 && typeof window.ImageOptimizer !== 'undefined') {
+            const preloadUrls = [];
+            const limit = Math.min(paginatedProperties.length, 8);
+            for (let i = 0; i < limit; i++) {
+                const prop = paginatedProperties[i];
+                const img = prop.images && prop.images.length > 0 ? (typeof prop.images[0] === 'string' ? prop.images[0] : prop.images[0].url) : null;
+                if (img) preloadUrls.push(window.ImageOptimizer.getOptimizedImageUrl(img, { width: 600, quality: 80 }));
             }
+            if (preloadUrls.length > 0) window.ImageOptimizer.preloadFirstScreenImages(preloadUrls, 8);
         }
-        
-        // 🔥 優化：使用 DocumentFragment 減少重排次數
-        const fragment = document.createDocumentFragment();
 
-        if (paginatedProperties.length === 0) {
-            container.innerHTML = `
+        var self = this;
+        var runHeavyRender = function() {
+            if (self._renderDebounceTimer) {
+                clearTimeout(self._renderDebounceTimer);
+                self._renderDebounceTimer = null;
+            }
+            // 🔥 耗時 DOM 建構改為下一幀執行，避免阻塞 UI
+            var doRender = function() {
+                // 🔥 優化：使用 DocumentFragment 減少重排次數
+                const fragment = document.createDocumentFragment();
+
+                if (paginatedProperties.length === 0) {
+                    container.innerHTML = `
                 <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #666;">
                     <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
                     <h3>找不到符合條件的物件</h3>
                     <p>請嘗試調整搜尋條件或篩選條件</p>
                 </div>
             `;
-            return;
-        }
+                    self._isRendering = false;
+                    return;
+                }
 
-        // 🎨 根據預覽模式渲染
-        if (this.viewMode === 'grid') {
-            // 網格模式：創建緊湊的網格項目
-            paginatedProperties.forEach(property => {
-                const gridItem = this.createPropertyGridItem(property);
+                // 🎨 根據預覽模式渲染
+                if (self.viewMode === 'grid') {
+            // 網格模式：創建緊湊的網格項目（傳入 index 供首屏優化）
+            paginatedProperties.forEach((property, index) => {
+                const gridItem = self.createPropertyGridItem(property, index);
                 fragment.appendChild(gridItem);
             });
             
@@ -445,59 +445,48 @@ class EmbeddedPropertyPaginationSystem {
                 container.style.gap = '1.5rem';
                 container.style.padding = '1rem';
             }
-        } else {
-            // 卡片模式：使用原有的卡片渲染
+                } else {
+                // 卡片模式：使用原有的卡片渲染
             const cards = [];
             paginatedProperties.forEach(property => {
                 let card;
-                
-                // 🚀 優先檢查預渲染快取
-                const preRenderKey = `pre_${this.buildingFilter}_${this.roomFilter}_${property.id}`;
-                if (this.cardCache.has(preRenderKey)) {
-                    card = this.cardCache.get(preRenderKey).cloneNode(true);
-                } else if (this.cardCache.has(property.id)) {
-                    card = this.cardCache.get(property.id).cloneNode(true);
+                const preRenderKey = `pre_${self.buildingFilter}_${self.roomFilter}_${property.id}`;
+                if (self.cardCache.has(preRenderKey)) {
+                    card = self.cardCache.get(preRenderKey).cloneNode(true);
+                } else if (self.cardCache.has(property.id)) {
+                    card = self.cardCache.get(property.id).cloneNode(true);
                 } else {
-                    card = this.createPropertyCard(property);
-                    this.cardCache.set(property.id, card.cloneNode(true));
+                    card = self.createPropertyCard(property);
+                    self.cardCache.set(property.id, card.cloneNode(true));
                 }
                 cards.push(card);
             });
-            
             cards.forEach(card => fragment.appendChild(card));
-            
-            // 恢復原有卡片佈局樣式
             container.className = 'properties-grid';
         }
 
-        // 🚀 真正的瞬間切換
-        container.innerHTML = '';
-        container.appendChild(fragment);
-        
-        // 重新綁定事件（確保新渲染的卡片和網格項目有正確的事件處理）
-        paginatedProperties.forEach(property => {
-            const element = container.querySelector(`[data-property-id="${property.id}"]`);
-            if (element) {
-                // 🔥 同時處理卡片和網格項目
-                this.rebindCardEvents(element, property);
+                container.innerHTML = '';
+                container.appendChild(fragment);
+                paginatedProperties.forEach(property => {
+                    const element = container.querySelector(`[data-property-id="${property.id}"]`);
+                    if (element) self.rebindCardEvents(element, property);
+                });
+                self.renderPagination(self.getTotalPages());
+                self.updateStats();
+                requestAnimationFrame(function() { self.adjustTitleFontSize(); });
+                self._isRendering = false;
+            };
+            if (window.AsyncUtils && typeof window.AsyncUtils.runOnNextFrame === 'function') {
+                window.AsyncUtils.runOnNextFrame(doRender);
+            } else {
+                doRender();
             }
-        });
-        
-        // 立即執行其他操作
-        this.renderPagination(this.getTotalPages());
-        this.updateStats();
-        
-        // 🚀 延遲調整標題字體大小，避免阻塞主線程
-        requestAnimationFrame(() => {
-            this.adjustTitleFontSize();
-        });
-        
-        // 清除渲染標記
-        if (this._renderDebounceTimer) {
-            clearTimeout(this._renderDebounceTimer);
+        };
+        if (window.AsyncUtils && typeof window.AsyncUtils.runOnNextFrame === 'function') {
+            window.AsyncUtils.runOnNextFrame(runHeavyRender);
+        } else {
+            runHeavyRender();
         }
-        this._isRendering = false;
-        this._renderDebounceTimer = null;
     }
 
     // 🚀 新增：設置事件委託
@@ -692,17 +681,19 @@ class EmbeddedPropertyPaginationSystem {
             ` : ''}
             <h3 class="property-title">${property.title}</h3>
             
-            <!-- 照片滾動區 -->
+            <!-- 照片滾動區（壓縮畫質、WebP 由 Supabase 自動） -->
             <div class="photo-scroll-container" style="margin: 0.6rem 0; overflow-x: auto; padding: 0.5rem 0;">
                 <div class="photo-scroll" style="display: flex; gap: 0.5rem; width: max-content;">
-                    ${property.images.map((img, index) => `
+                    ${property.images.map((img, index) => {
+                        const src = typeof img === 'string' ? img : (img && img.url);
+                        const optSrc = src && typeof window.ImageOptimizer !== 'undefined' ? window.ImageOptimizer.getOptimizedImageUrl(src, { thumb: true }) : src;
+                        return `
                         <div class="photo-item" data-photo-index="${index}" 
                              style="flex-shrink: 0; width: 80px; height: 60px; border-radius: 4px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; background: #f0f0f0;"
                              onclick="if(typeof openLightbox === 'function') { openLightbox(${index}, '${property.id}'); } else { console.error('openLightbox 函數未載入'); }">
-                            <!-- 第一張圖片優先載入，其他使用懶加載 -->
-                            <img src="${img}" 
+                            <img src="${optSrc || src}" 
                                  alt="物件照片" 
-                                 data-src="${img}"
+                                 data-src="${src || optSrc}"
                                  loading="${index === 0 ? 'eager' : 'lazy'}"
                                  decoding="async"
                                  style="width: 100%; height: 100%; object-fit: cover; pointer-events: none; transition: opacity 0.3s ease;" 
@@ -710,7 +701,7 @@ class EmbeddedPropertyPaginationSystem {
                                  onload="this.style.opacity='1';"
                                  onloadstart="this.style.opacity='0.5';">
                         </div>
-                    `).join('')}
+                    `; }).join('')}
                 </div>
             </div>
 
@@ -849,8 +840,8 @@ class EmbeddedPropertyPaginationSystem {
         return card;
     }
 
-    // 🎨 新增：創建網格預覽項目（緊湊版）
-    createPropertyGridItem(property) {
+    // 🎨 新增：創建網格預覽項目（緊湊版；支援首屏優化與壓縮畫質）
+    createPropertyGridItem(property, index) {
         const gridItem = document.createElement('div');
         gridItem.className = 'property-grid-item';
         gridItem.setAttribute('data-property-id', property.id);
@@ -860,7 +851,11 @@ class EmbeddedPropertyPaginationSystem {
             gridItem.setAttribute('data-property-number', property.number);
         }
         
-        const mainImage = property.images && property.images.length > 0 ? property.images[0] : 'https://via.placeholder.com/300x200?text=No+Image';
+        const rawImage = property.images && property.images.length > 0 ? (typeof property.images[0] === 'string' ? property.images[0] : property.images[0].url) : null;
+        const mainImage = rawImage && typeof window.ImageOptimizer !== 'undefined'
+            ? window.ImageOptimizer.getOptimizedImageUrl(rawImage, { width: 600, quality: 80 })
+            : (rawImage || 'https://via.placeholder.com/300x200?text=No+Image');
+        const isFirstScreen = typeof index === 'number' && index < 6;
         const detailUrl = `property-detail.html?${property.number ? 'number=' + encodeURIComponent(property.number) : 'id=' + property.id}`;
         
         gridItem.innerHTML = `
@@ -872,13 +867,13 @@ class EmbeddedPropertyPaginationSystem {
                     </div>
                 ` : ''}
                 
-                <!-- 主圖 -->
+                <!-- 主圖（首屏前 6 張優先載入） -->
                 <div class="grid-item-image-container" style="position: relative; width: 100%; padding-top: 60%; overflow: hidden; background: #f0f0f0;">
                     <img src="${mainImage}" 
                          alt="${property.title}" 
                          decoding="async"
-                         loading="lazy"
-                         fetchpriority="low"
+                         loading="${isFirstScreen ? 'eager' : 'lazy'}"
+                         fetchpriority="${isFirstScreen ? 'high' : 'low'}"
                          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease, transform 0.3s ease;"
                          onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'"
                          onload="this.style.opacity='1';"
@@ -1428,6 +1423,13 @@ class EmbeddedPropertyPaginationSystem {
         
         // 重新設置事件監聽器
         this.setupRoomFilterListeners();
+        
+        // 依目前 roomFilter 同步哪一顆按鈕為 active（避免資料重載後按鈕與篩選狀態不一致）
+        var roomButtons = document.querySelectorAll('.room-filter-button');
+        var roomActive = document.querySelector('.room-filter-button[data-room="' + (this.roomFilter || 'all') + '"]');
+        if (roomButtons.length && roomActive) {
+            this.updateRoomButtonStates(roomButtons, roomActive);
+        }
     }
     
     // 🚀 新增：設置房型篩選事件監聽器
@@ -1460,8 +1462,9 @@ class EmbeddedPropertyPaginationSystem {
                     this.roomFilter = roomType;
                     this.currentPage = 1;
                     
-                    // 立即更新按鈕狀態
-                    this.updateRoomButtonStates(roomButtons, clickedButton);
+                    // 立即更新按鈕狀態（必須用目前 DOM 上的按鈕清單，單選只亮一個）
+                    var currentRoomButtons = document.querySelectorAll('.room-filter-button');
+                    this.updateRoomButtonStates(currentRoomButtons, clickedButton);
                     
                     // 立即執行篩選
                     this.renderProperties();
@@ -1479,17 +1482,11 @@ class EmbeddedPropertyPaginationSystem {
     }
 
     setSearch(term) {
-        // 🔥 新增：防抖動搜尋
-        console.log(`🔍 搜尋輸入: ${term}`);
-        
-        // 清除之前的計時器
+        // 防抖：每次輸入清除前一次計時，僅在停止輸入 300ms 後才執行搜尋
         if (this.searchDebounceTimer) {
             clearTimeout(this.searchDebounceTimer);
         }
-        
-        // 設定新的計時器
         this.searchDebounceTimer = setTimeout(() => {
-            console.log(`✅ 執行搜尋: ${term}`);
             this.searchTerm = term;
             this.currentPage = 1;
             this.renderProperties();
@@ -1576,6 +1573,43 @@ class EmbeddedPropertyPaginationSystem {
         this.renderProperties();
         this.updateFilterCounts(); // 建築類型、房型數量須對應所選行政區
     }
+
+    /**
+     * 將所有篩選恢復為「全部」狀態（用於從 bfcache 返回首頁時，避免篩選與數量錯亂）
+     */
+    resetFiltersToAll() {
+        this.buildingFilter = 'all';
+        this.roomFilter = 'all';
+        this.districtFilter = '';
+        this.searchTerm = '';
+        this.currentPage = 1;
+        this.filteredCache = null;
+        this.cacheKey = '';
+        if (this.cardCache) this.cardCache.clear();
+
+        // 更新建築類型按鈕狀態
+        const buildingButtons = document.querySelectorAll('.building-filter-button');
+        const buildingAll = document.querySelector('.building-filter-button[data-building="all"]');
+        if (buildingButtons.length && buildingAll) {
+            this.updateBuildingButtonStates(buildingButtons, buildingAll);
+        }
+
+        // 更新房型按鈕狀態
+        const roomButtons = document.querySelectorAll('.room-filter-button');
+        const roomAll = document.querySelector('.room-filter-button[data-room="all"]');
+        if (roomButtons.length && roomAll) {
+            this.updateRoomButtonStates(roomButtons, roomAll);
+        }
+
+        const districtSelect = document.getElementById('district-filter');
+        if (districtSelect) districtSelect.value = '';
+
+        const searchInput = document.getElementById('property-search');
+        if (searchInput) searchInput.value = '';
+
+        this.updateFilterCounts();
+        this.renderProperties();
+    }
     
     setupEventListeners() {
         // 確保所有必要的元素都存在
@@ -1642,8 +1676,9 @@ class EmbeddedPropertyPaginationSystem {
                 this.buildingFilter = building;
                 this.currentPage = 1;
                 
-                // 立即更新按鈕狀態
-                this.updateBuildingButtonStates(buildingButtons, clickedButton);
+                // 立即更新按鈕狀態（用目前 DOM 上的按鈕清單，單選只亮一個）
+                var currentBuildingButtons = document.querySelectorAll('.building-filter-button');
+                this.updateBuildingButtonStates(currentBuildingButtons, clickedButton);
                 
                 // 立即執行篩選
                 this.renderProperties();
@@ -1688,8 +1723,9 @@ class EmbeddedPropertyPaginationSystem {
                 this.roomFilter = room;
                 this.currentPage = 1;
                 
-                // 立即更新按鈕狀態
-                this.updateRoomButtonStates(roomButtons, clickedButton);
+                // 立即更新按鈕狀態（用目前 DOM 上的按鈕清單，單選只亮一個）
+                var currentRoomButtons = document.querySelectorAll('.room-filter-button');
+                this.updateRoomButtonStates(currentRoomButtons, clickedButton);
                 
                 // 立即執行篩選
                 this.renderProperties();

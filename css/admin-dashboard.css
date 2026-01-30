@@ -1,0 +1,1598 @@
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft JhengHei', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .nav {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .nav-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+        
+        .nav-item.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-card .change {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-card.primary { border-left: 4px solid #667eea; }
+        .stat-card.success { border-left: 4px solid #28a745; }
+        .stat-card.warning { border-left: 4px solid #ffc107; }
+        .stat-card.danger { border-left: 4px solid #dc3545; }
+        
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-card h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+        }
+        
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        /* 🎨 可愛的複製連結彈窗樣式 */
+        .cute-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeInOverlay 0.3s ease-out;
+        }
+        
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .cute-modal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUpBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+        }
+        
+        @keyframes slideUpBounce {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.8);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .cute-modal::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .cute-modal-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+        }
+        
+        .cute-modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease-in-out infinite;
+            display: inline-block;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+        
+        .cute-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .cute-modal-message {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+        
+        .cute-modal-url {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            word-break: break-all;
+            font-size: 0.9rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .cute-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .cute-modal-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .cute-modal-btn-primary {
+            background: white;
+            color: #667eea;
+        }
+        
+        .cute-modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .cute-modal-btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .cute-modal-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .cute-modal-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .cute-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cute-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        /* QR Code 彈窗樣式 */
+        .qrcode-modal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUpBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+        }
+        
+        .qrcode-modal-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+        }
+        
+        .qrcode-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+        
+        .qrcode-container {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            min-height: 300px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .qrcode-container img,
+        .qrcode-container canvas {
+            width: 300px;
+            height: 300px;
+            border-radius: 8px;
+            display: block;
+            object-fit: contain;
+        }
+        
+        .qrcode-loading {
+            padding: 3rem;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+        
+        .qrcode-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .qrcode-modal-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+        
+        .qrcode-modal-btn-primary {
+            background: white;
+            color: #667eea;
+        }
+        
+        .qrcode-modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .qrcode-modal-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .qrcode-modal-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* 手機版 QR Code 彈窗優化 */
+        @media (max-width: 768px) {
+            .qrcode-modal {
+                padding: 1.5rem;
+                max-width: 90%;
+                width: 90%;
+                border-radius: 16px;
+            }
+            
+            .qrcode-modal-title {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+                white-space: nowrap;
+            }
+            
+            .qrcode-container {
+                padding: 1rem;
+                min-height: 200px;
+                max-width: 100%;
+                overflow: hidden;
+            }
+            
+            .qrcode-container img,
+            .qrcode-container canvas {
+                width: 200px !important;
+                height: 200px !important;
+                max-width: 100%;
+                max-height: 100%;
+            }
+            
+            .qrcode-loading {
+                padding: 2rem 1rem;
+                font-size: 1rem;
+            }
+            
+            .qrcode-modal-buttons {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .qrcode-modal-btn {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+                width: 100%;
+                white-space: nowrap;
+            }
+        }
+        
+        /* 錯誤狀態的彈窗 */
+        .cute-modal.error {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .cute-modal.warning {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+        
+        .cute-modal.warning .cute-modal-url {
+            background: rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* 優化的彈跳視窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        .modal-dialog {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .modal-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .modal-icon.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .modal-icon.danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+            flex: 1;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 0.625rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 100px;
+        }
+        
+        .modal-btn-cancel {
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .modal-btn-cancel:hover {
+            background: #e9ecef;
+        }
+        
+        .modal-btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .modal-btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+        
+        .modal-btn-danger:active {
+            transform: translateY(0);
+        }
+        
+        /* 手機版響應式設計 */
+        @media (max-width: 768px) {
+            /* 基本佈局調整 - 全螢幕寬度 */
+            .container {
+                padding: 0.5rem;
+                max-width: 100%;
+                width: 100%;
+                margin: 0;
+            }
+            
+            /* 新增物件標籤頁 - 移除容器 padding */
+            #properties-tab {
+                padding: 0 !important;
+            }
+            
+            #property-add-subtab {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Header 優化 */
+            .header {
+                padding: 1rem;
+                position: relative;
+            }
+            
+            .header h1 {
+                font-size: 1.2rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .header p {
+                font-size: 0.8rem;
+            }
+            
+            /* 漢堡選單按鈕 */
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                padding: 0.5rem;
+                border-radius: 4px;
+                cursor: pointer;
+                z-index: 1001;
+            }
+            
+            .mobile-menu-btn:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+            
+            /* 導航欄改為側邊抽屜 */
+            .nav {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                background: white;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+                z-index: 1000;
+                transition: left 0.3s ease;
+                flex-direction: column;
+                padding: 3rem 0 0 0;
+                overflow-y: auto;
+            }
+            
+            .nav.active {
+                left: 0;
+            }
+            
+            /* 側邊欄遮罩 */
+            .nav-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            
+            .nav-overlay.active {
+                display: block;
+            }
+            
+            .nav-item {
+                padding: 1rem 1.5rem;
+                border-bottom: 1px solid #e9ecef;
+                border-left: 4px solid transparent;
+                border-bottom-width: 1px;
+            }
+            
+            .nav-item.active {
+                border-left-color: #667eea;
+                background: #f8f9fa;
+            }
+            
+            /* 關閉按鈕 */
+            .nav-close-btn {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: #666;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+            
+            /* 統計卡片優化 */
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-card h3 {
+                font-size: 0.85rem;
+            }
+            
+            .stat-card .value {
+                font-size: 1.5rem;
+            }
+            
+            /* 搜尋和篩選區域優化 */
+            .search-box {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .search-box input,
+            .search-box select {
+                width: 100%;
+            }
+            
+            /* 篩選下拉選單優化 */
+            .filter-select-container {
+                width: 100%;
+            }
+            
+            .filter-select {
+                width: 100%;
+                padding: 0.6rem 2.5rem 0.6rem 0.8rem;
+                font-size: 0.9rem;
+                min-width: auto;
+            }
+            
+            /* 篩選按鈕優化（保留以兼容其他地方） */
+            .filter-buttons {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .filter-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+                flex: 1;
+                min-width: calc(50% - 0.25rem);
+            }
+            
+            /* 檢視模式切換優化 - 保持水平排列 */
+            .view-mode-toggle,
+            .dashboard-view-mode-toggle {
+                flex-direction: row !important;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+            
+            .view-mode-toggle span,
+            .dashboard-view-mode-toggle span {
+                white-space: nowrap;
+            }
+            
+            .view-mode-toggle .filter-btn,
+            .dashboard-view-mode-toggle .filter-btn {
+                flex: 0 0 auto;
+                min-width: auto;
+            }
+            
+            /* 表格改為卡片式顯示 */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .table {
+                min-width: 800px;
+            }
+            
+            /* 物件卡片模式（手機版預設） */
+            .properties-grid-view {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .property-card-mobile {
+                background: white;
+                border-radius: 8px;
+                padding: 1rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin-bottom: 1rem;
+            }
+            
+            .property-card-mobile-header {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 1rem;
+                align-items: flex-start;
+            }
+            
+            .property-card-mobile-image {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 6px;
+                flex-shrink: 0;
+            }
+            
+            .property-card-mobile-info {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .property-card-mobile-title {
+                font-size: 1rem;
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+                color: #333;
+                word-break: break-word;
+            }
+            
+            .property-card-mobile-number {
+                font-size: 0.85rem;
+                color: #666;
+            }
+            
+            /* 緊湊化詳細資訊 - 放在標題右邊 */
+            .property-card-mobile-details-compact {
+                display: flex;
+                flex-direction: column;
+                gap: 0.3rem;
+                flex-shrink: 0;
+                min-width: 120px;
+                margin-left: auto;
+            }
+            
+            .property-card-mobile-detail-compact-item {
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+                font-size: 0.8rem;
+                line-height: 1.3;
+            }
+            
+            .property-card-mobile-detail-compact-label {
+                color: #999;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+            
+            .property-card-mobile-detail-compact-value {
+                color: #333;
+                font-weight: 500;
+                font-size: 0.8rem;
+                white-space: nowrap;
+            }
+            
+            /* 保留舊的詳細資訊樣式（以防其他地方使用） */
+            .property-card-mobile-details {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid #e9ecef;
+            }
+            
+            .property-card-mobile-detail-item {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .property-card-mobile-detail-label {
+                font-size: 0.75rem;
+                color: #999;
+                margin-bottom: 0.25rem;
+            }
+            
+            .property-card-mobile-detail-value {
+                font-size: 0.9rem;
+                color: #333;
+                font-weight: 500;
+            }
+            
+            .property-card-mobile-actions {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+            
+            /* 三欄佈局（一般手機） */
+            .property-card-mobile-actions .btn {
+                flex: 1;
+                min-width: calc(33.333% - 0.33rem);
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            /* 超窄螢幕（< 360px）改為兩欄佈局 */
+            @media (max-width: 360px) {
+                .property-card-mobile-actions .btn {
+                    min-width: calc(50% - 0.25rem);
+                }
+            }
+            
+            /* 相關連結網格卡片樣式（手機版） */
+            .links-grid-mobile {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .link-card-mobile {
+                background: white;
+                border: 1px solid #e9ecef;
+                border-radius: 12px;
+                padding: 1rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                transition: all 0.3s ease;
+            }
+            
+            .link-card-mobile:hover {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+                transform: translateY(-2px);
+            }
+            
+            .link-card-mobile-header {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .link-card-mobile-order {
+                background: #667eea;
+                color: white;
+                font-weight: 600;
+                font-size: 0.85rem;
+                padding: 0.25rem 0.5rem;
+                border-radius: 6px;
+                min-width: 40px;
+                text-align: center;
+                flex-shrink: 0;
+            }
+            
+            .link-card-mobile-title {
+                flex: 1;
+                font-size: 1rem;
+                font-weight: 600;
+                color: #333;
+                display: flex;
+                align-items: center;
+            }
+            
+            .link-card-mobile-content {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .link-card-mobile-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+            
+            .link-card-mobile-label {
+                color: #666;
+                font-weight: 500;
+                min-width: 50px;
+                flex-shrink: 0;
+            }
+            
+            .link-card-mobile-url {
+                color: #667eea;
+                text-decoration: none;
+                word-break: break-all;
+                flex: 1;
+            }
+            
+            .link-card-mobile-url:hover {
+                text-decoration: underline;
+            }
+            
+            .link-card-mobile-actions {
+                display: flex;
+                gap: 0.5rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid #e9ecef;
+            }
+            
+            .link-card-mobile-actions .btn {
+                flex: 1;
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            /* 內容卡片優化 */
+            .content-card {
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            /* 新增物件區塊 - 移除多餘的 padding */
+            #property-add-subtab .content-card {
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+                box-shadow: none !important;
+            }
+            
+            #property-add-subtab .content-card h2 {
+                display: none !important; /* 隱藏標題，因為 iframe 內已有標題 */
+            }
+            
+            #property-add-form-container {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .content-card h2 {
+                font-size: 1.1rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            /* Modal 優化 */
+            .modal-dialog {
+                width: 95%;
+                margin: 1rem;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .modal-header {
+                padding: 1.25rem;
+            }
+            
+            .modal-body {
+                padding: 1.25rem;
+            }
+            
+            .modal-footer {
+                flex-direction: column-reverse;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+            
+            /* 子標籤切換優化 */
+            .sub-tab-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            /* 表單欄位優化 - 增加間距和大小 */
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+            
+            .form-group label {
+                font-size: 0.95rem;
+                margin-bottom: 0.6rem;
+                font-weight: 600;
+            }
+            
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 0.85rem;
+                font-size: 1rem;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                min-height: 44px; /* 觸控友好的最小高度 */
+            }
+            
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+                border-color: #667eea;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+            
+            .form-group textarea {
+                min-height: 120px;
+                line-height: 1.5;
+            }
+            
+            /* iframe 中的表單優化 - 移除所有邊距和邊框 */
+            #property-add-iframe,
+            #property-edit-iframe {
+                width: 100% !important;
+                min-height: auto !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: block !important;
+            }
+            
+            /* 表單區塊優化 */
+            .form-section {
+                padding: 1rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .form-section h3 {
+                font-size: 1.1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .form-grid {
+                display: grid !important;
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+        }
+        
+        /* 桌面版隱藏漢堡選單 */
+        @media (min-width: 769px) {
+            .mobile-menu-btn,
+            .nav-close-btn,
+            .nav-overlay {
+                display: none !important;
+            }
+            
+            .nav {
+                position: static;
+                width: auto;
+                height: auto;
+                flex-direction: row;
+                padding: 0 2rem;
+            }
+        }
+        
+        /* 子標籤切換樣式 */
+        .sub-tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #666;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sub-tab-btn:hover {
+            color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .sub-tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .property-subtab {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .property-subtab.active {
+            display: block;
+        }
+        
+        /* 物件列表可滾動：保留標題/搜尋/篩選在上方，列表區塊獨立滾動 */
+        #property-list-subtab #properties-list {
+            max-height: calc(100vh - 320px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #667eea #f1f5f9;
+            scroll-behavior: smooth;
+        }
+        #property-list-subtab #properties-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        #property-list-subtab #properties-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        #property-list-subtab #properties-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+        #property-list-subtab #properties-list::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        
+        /* 手機版快速操作三欄布局 */
+        @media (max-width: 768px) {
+            .quick-actions {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .quick-actions .btn {
+                padding: 0.6rem 0.5rem;
+                font-size: 0.85rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+        
+        .property-preview {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .property-preview img {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .property-preview-info {
+            flex: 1;
+        }
+        
+        .property-preview-info h4 {
+            margin-bottom: 0.25rem;
+            color: #333;
+        }
+        
+        .property-preview-info p {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-select-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-select {
+            padding: 0.5rem 2.5rem 0.5rem 0.8rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 12px;
+            min-width: 150px;
+        }
+        
+        .filter-select:hover {
+            border-color: #667eea;
+            background-color: #f8f9fa;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .filter-btn {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        /* 卡片網格佈局 */
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .property-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .property-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .property-card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: #f0f0f0;
+        }
+        
+        .property-card-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 2rem;
+        }
+        
+        .property-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .property-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        
+        .property-card-meta {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+        
+        .property-card-status {
+            margin-bottom: 1rem;
+        }
+        
+        .property-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .property-card-actions .btn {
+            flex: 1;
+            padding: 0.6rem;
+            font-size: 0.9rem;
+        }

@@ -269,7 +269,9 @@ async function loadPropertiesFromSupabase() {
         if (publishedCount !== data.length) {
             console.warn(`⚠️ 資料不一致：查詢條件是 is_published=true，但返回的資料中有 ${data.length - publishedCount} 個 is_published=false 的物件`);
         }
-        
+
+        // 🔥 耗時格式轉換改為非同步執行，避免阻塞 UI
+        function doFormat() {
         // 轉換資料格式以符合前端需求
         const formattedProperties = data.map(prop => {
             // 處理 images（可能是陣列或 JSONB）
@@ -402,7 +404,7 @@ async function loadPropertiesFromSupabase() {
         
         // 觸發資料載入完成事件
         const event = new CustomEvent('supabaseDataLoaded', {
-            detail: { 
+            detail: {
                 properties: formattedProperties,
                 count: formattedProperties.length,
                 timestamp: new Date().toISOString()
@@ -432,6 +434,12 @@ async function loadPropertiesFromSupabase() {
                 }
             });
             window.dispatchEvent(initEvent);
+        }
+        }
+        if (typeof window.AsyncUtils !== 'undefined' && typeof window.AsyncUtils.runAsync === 'function') {
+            window.AsyncUtils.runAsync(doFormat);
+        } else {
+            doFormat();
         }
         
     } catch (error) {

@@ -949,8 +949,8 @@ async function updateStats() {
     }
 }
 
-// 列表所需欄位（不拉 description、features、transportation 等大欄位，減少延遲）
-const PROPERTIES_LIST_COLUMNS = 'id, title, number, type, price, address, is_published, is_external, status, images, updated_at, created_at';
+// 列表所需欄位（含 transportation 供學區/交通顯示；不拉 description、features 以減少延遲）
+const PROPERTIES_LIST_COLUMNS = 'id, title, number, type, price, address, is_published, is_external, status, images, transportation, updated_at, created_at';
 
 // 載入物件列表
 async function loadProperties() {

@@ -105,7 +105,7 @@ async function addProperty() {
             district: '楊梅區',
             address: '桃園市楊梅區梅獅路二段186號2樓',
             address_detail: '梅獅路二段186號2樓',
-            hide_address_number: false,
+            hide_address_number: true,
             price: '1598萬',
             layout: '3房2廳2衛',
             total_area: '66.14坪',

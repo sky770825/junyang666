@@ -7,36 +7,32 @@ const SUPABASE_ANON_KEY_VALUE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOi
 // 處理地址顯示的輔助函數（與前端一致）
 function formatAddressForDisplay(address, hideAddressNumber, propertyType) {
     if (!address) return '';
-    
+
     const typesToShowOnlyRoad = ['透天', '別墅', '店面'];
     const shouldShowOnlyRoad = propertyType && typesToShowOnlyRoad.includes(propertyType);
-    
+
     if (!hideAddressNumber && !shouldShowOnlyRoad) {
         return address;
     }
-    
-    let displayAddress = address;
-    const cityDistrictMatch = displayAddress.match(/^([^路街道]+[市縣區鄉鎮])/i);
-    const cityDistrict = cityDistrictMatch ? cityDistrictMatch[1] : '';
-    
-    displayAddress = displayAddress.replace(/^[^路街道]+[市縣區鄉鎮]/i, '');
-    const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
-    const roadMatch = displayAddress.match(roadPattern);
-    
-    if (roadMatch) {
-        displayAddress = (cityDistrict + roadMatch[1]).trim();
-    } else {
+
+    if (shouldShowOnlyRoad) {
+        let displayAddress = address;
+        const cityDistrictMatch = displayAddress.match(/^([^路街道]+[市縣區鄉鎮])/i);
+        const cityDistrict = cityDistrictMatch ? cityDistrictMatch[1] : '';
+        displayAddress = displayAddress.replace(/^[^路街道]+[市縣區鄉鎮]/i, '');
+        const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
+        const roadMatch = displayAddress.match(roadPattern);
+        if (roadMatch) {
+            return (cityDistrict + roadMatch[1]).trim();
+        }
         const simpleRoadMatch = displayAddress.match(/([^路街道]*[路街道])/);
         if (simpleRoadMatch) {
-            displayAddress = (cityDistrict + simpleRoadMatch[1]).trim();
-        } else {
-            displayAddress = displayAddress.replace(/[\d]+[巷弄號].*$/i, '');
-            displayAddress = displayAddress.replace(/[巷弄號][\d\w\-\s]*.*$/i, '');
-            displayAddress = (cityDistrict + displayAddress).trim();
+            return (cityDistrict + simpleRoadMatch[1]).trim();
         }
+        return address;
     }
-    
-    return displayAddress.replace(/[\s\-]+$/, '').trim();
+
+    return address.replace(/(\d+)(巷|弄|號)/g, '**$2');
 }
 
 // 正規化物件編號（處理舊格式，例如 TT-012 → TT00012）

@@ -56,84 +56,39 @@ function savePropertiesToCache(payload) {
 // 處理地址顯示的輔助函數（根據 hide_address_number 和物件類型決定是否隱藏門牌號碼）
 function formatAddressForDisplay(address, hideAddressNumber, propertyType) {
     if (!address) return '';
-    
+
     // 透天、別墅、店面類型：前端只顯示到路名（例如「永美路」）
     const typesToShowOnlyRoad = ['透天', '別墅', '店面'];
     const shouldShowOnlyRoad = propertyType && typesToShowOnlyRoad.includes(propertyType);
-    
+
     // 如果不需要隱藏門牌號碼，且不是透天/別墅/店面，直接返回完整地址
     if (!hideAddressNumber && !shouldShowOnlyRoad) {
         return address;
     }
-    
-    // 需要隱藏門牌號碼的情況（勾選隱藏 或 透天/別墅/店面類型）
-    // 提取地址：保留縣市區域、路名，以及樓層資訊（如果有的話）
-    // 例如：「桃園市楊梅區永美路445巷144弄20號」→「桃園市楊梅區永美路」
-    // 例如：「新北市板橋區文化路一段123號3F」→「新北市板橋區文化路一段3F」
-    // 例如：「永美路15號3樓」→「永美路3樓」
-    
-    let displayAddress = address;
-    
-    // 方法1：提取縣市區域前綴（例如「桃園市」、「楊梅區」）
-    const cityDistrictMatch = displayAddress.match(/^([^路街道]+[市縣區鄉鎮])/i);
-    const cityDistrict = cityDistrictMatch ? cityDistrictMatch[1] : '';
-    
-    // 方法2：移除縣市區域前綴，準備提取路名
-    let roadPart = displayAddress.replace(/^[^路街道]+[市縣區鄉鎮]/i, '');
-    
-    // 方法3：匹配路名模式（包含「一段」、「二段」等）
-    // 匹配：路名 + 可選的「一段」、「二段」等 + 「路/街/道/大道」
-    // 例如：「永美路」或「文化路一段」
-    const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
-    const roadMatch = roadPart.match(roadPattern);
-    
-    let roadName = '';
-    if (roadMatch) {
-        roadName = roadMatch[1];
-    } else {
-        // 方法4：如果方法3失敗，使用更簡單的匹配
-        // 匹配第一個「XX路」、「XX街」、「XX道」等
+
+    // 透天/別墅/店面：只顯示到路名
+    if (shouldShowOnlyRoad) {
+        let displayAddress = address;
+        const cityDistrictMatch = displayAddress.match(/^([^路街道]+[市縣區鄉鎮])/i);
+        const cityDistrict = cityDistrictMatch ? cityDistrictMatch[1] : '';
+        let roadPart = displayAddress.replace(/^[^路街道]+[市縣區鄉鎮]/i, '');
+        const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
+        const roadMatch = roadPart.match(roadPattern);
+        if (roadMatch) {
+            return (cityDistrict + roadMatch[1]).trim();
+        }
         const simpleRoadMatch = roadPart.match(/([^路街道]*[路街道])/);
         if (simpleRoadMatch) {
-            roadName = simpleRoadMatch[1];
+            return (cityDistrict + simpleRoadMatch[1]).trim();
         }
+        return address;
     }
-    
-    // 方法5：提取樓層資訊（在門牌號碼之後）
-    // 匹配模式：在路名之後，找到「號」後面的樓層資訊
-    // 例如：「永美路15號3F」→「3F」
-    // 例如：「永美路15號3樓」→「3樓」
-    // 例如：「永美路15號3樓F」→「3樓F」
-    let floorInfo = '';
-    if (roadName) {
-        // 找到路名在原始地址中的位置
-        const roadIndex = displayAddress.indexOf(roadName);
-        if (roadIndex !== -1) {
-            // 從路名之後開始查找樓層資訊
-            const afterRoad = displayAddress.substring(roadIndex + roadName.length);
-            // 匹配：號 + 數字 + 可選的「樓」或「F」或「樓F」
-            const floorMatch = afterRoad.match(/號[\d\w\-\s]*?([\d]+[樓層F]+)/i);
-            if (floorMatch) {
-                floorInfo = floorMatch[1];
-            }
-        }
-    }
-    
-    // 組合：縣市區域 + 路名 + 樓層資訊（如果有）
-    if (roadName) {
-        displayAddress = (cityDistrict + roadName + (floorInfo ? floorInfo : '')).trim();
-    } else {
-        // 如果找不到路名，使用備用方法
-        roadPart = roadPart.replace(/號[\d\w\-\s]*?([\d]+[樓層F]+)/i, floorInfo || '');
-        roadPart = roadPart.replace(/[\d]+[巷弄號].*$/i, '');
-        roadPart = roadPart.replace(/[巷弄號][\d\w\-\s]*.*$/i, '');
-        displayAddress = (cityDistrict + roadPart).trim();
-    }
-    
-    // 清理多餘空格和結尾符號
-    displayAddress = displayAddress.replace(/[\s\-]+$/, '').trim();
-    
-    return displayAddress;
+
+    // 一般物件隱藏門牌：只把門牌數字換成 **，保留其餘部分
+    // 例如：「桃園市楊梅區梅獅路二段186號2樓」→「桃園市楊梅區梅獅路二段**號2樓」
+    // 例如：「楊梅區文化街336號7樓」→「楊梅區文化街**號7樓」
+    // 例如：「永美路445巷144弄20號」→「永美路**巷**弄**號」
+    return address.replace(/(\d+)(巷|弄|號)/g, '**$2');
 }
 
 // 將輔助函數暴露到全域，供其他模組使用

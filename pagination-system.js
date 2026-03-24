@@ -730,14 +730,12 @@ class EmbeddedPropertyPaginationSystem {
                             let displayAddress = property.address || '';
                             const typesToShowOnlyRoad = ['透天', '別墅', '店面'];
                             const shouldShowOnlyRoad = property.type && typesToShowOnlyRoad.includes(property.type);
-                            
-                            if ((property.hide_address_number || shouldShowOnlyRoad) && displayAddress) {
-                                displayAddress = displayAddress.replace(/號[\d\w\-\s]*[樓層F]*.*$/i, '');
-                                displayAddress = displayAddress.replace(/[\d]+[樓層F]+.*$/i, '');
-                                if (shouldShowOnlyRoad) {
-                                    displayAddress = displayAddress.replace(/[巷弄][\d\w\-\s]*.*$/i, '');
-                                }
+
+                            if (shouldShowOnlyRoad && displayAddress) {
+                                displayAddress = displayAddress.replace(/\d+[巷弄號].*$/i, '');
                                 displayAddress = displayAddress.replace(/[\s\-]+$/, '').trim();
+                            } else if (property.hide_address_number && displayAddress) {
+                                displayAddress = displayAddress.replace(/(\d+)(巷|弄|號)/g, '**$2');
                             }
                             return displayAddress;
                         })())}
@@ -936,55 +934,23 @@ class EmbeddedPropertyPaginationSystem {
                             // 如果應該只顯示路名（隱藏門牌號碼），使用格式化函數
                             if (property.hide_address_number || shouldShowOnlyRoad) {
                                 if (typeof window.formatAddressForDisplay === 'function') {
-                                    // 傳入 true 表示隱藏門牌號碼，函數會自動保留樓層資訊
-                                    return window.formatAddressForDisplay(property.address, true, property.type);
+                                    return window.formatAddressForDisplay(property.address, property.hide_address_number, property.type);
                                 }
                             }
-                            
+
                             // 如果沒有勾選隱藏門牌號碼，且不是透天/別墅/店面，顯示完整地址
                             if (!property.hide_address_number && !shouldShowOnlyRoad) {
                                 return property.address;
                             }
-                            
-                            // 如果沒有格式化函數，使用簡化邏輯（備用方案）
+
+                            // 備用邏輯
                             let addr = property.address || '';
                             if (addr) {
-                                // 提取縣市區域
-                                const cityDistrictMatch = addr.match(/^([^路街道]+[市縣區鄉鎮])/i);
-                                const cityDistrict = cityDistrictMatch ? cityDistrictMatch[1] : '';
-                                
-                                // 移除縣市區域，準備提取路名
-                                let roadPart = addr.replace(/^[^路街道]+[市縣區鄉鎮]/i, '');
-                                
-                                // 匹配路名（包含「一段」、「二段」等）
-                                const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
-                                const roadMatch = roadPart.match(roadPattern);
-                                
-                                let roadName = '';
-                                if (roadMatch) {
-                                    roadName = roadMatch[1];
-                                } else {
-                                    // 簡單匹配第一個「XX路」、「XX街」等
-                                    const simpleRoadMatch = roadPart.match(/([^路街道]*[路街道])/);
-                                    if (simpleRoadMatch) {
-                                        roadName = simpleRoadMatch[1];
-                                    }
+                                if (shouldShowOnlyRoad) {
+                                    addr = addr.replace(/\d+[巷弄號].*$/i, '').replace(/[\s\-]+$/, '').trim();
+                                } else if (property.hide_address_number) {
+                                    addr = addr.replace(/(\d+)(巷|弄|號)/g, '**$2');
                                 }
-                                
-                                // 提取樓層資訊（備用邏輯）
-                                let floorInfo = '';
-                                if (roadName) {
-                                    const roadIndex = addr.indexOf(roadName);
-                                    if (roadIndex !== -1) {
-                                        const afterRoad = addr.substring(roadIndex + roadName.length);
-                                        const floorMatch = afterRoad.match(/號[\d\w\-\s]*?([\d]+[樓層F]+)/i);
-                                        if (floorMatch) {
-                                            floorInfo = floorMatch[1];
-                                        }
-                                    }
-                                }
-                                
-                                return (cityDistrict + roadName + (floorInfo ? floorInfo : '')).trim();
                             }
                             return addr || '地址未設定';
                         })()}</span>

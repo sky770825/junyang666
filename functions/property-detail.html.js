@@ -48,19 +48,18 @@ function formatAddressForDisplay(address, hideAddressNumber, propertyType) {
   const typesToShowOnlyRoad = ['透天', '別墅', '店面'];
   const shouldShowOnlyRoad = propertyType && typesToShowOnlyRoad.includes(propertyType);
   if (!hideAddressNumber && !shouldShowOnlyRoad) return address;
-  let display = address;
-  const cityDistrictMatch = display.match(/^([^路街道]+[市縣區鄉鎮])/i);
-  const cityDistrict = cityDistrictMatch ? cityDistrictMatch[1] : '';
-  display = display.replace(/^[^路街道]+[市縣區鄉鎮]/i, '');
-  const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
-  const roadMatch = display.match(roadPattern);
-  if (roadMatch) {
-    display = (cityDistrict + roadMatch[1]).trim();
-  } else {
+  if (shouldShowOnlyRoad) {
+    let display = address;
+    const cityDistrictMatch = display.match(/^([^路街道]+[市縣區鄉鎮])/i);
+    const cityDistrict = cityDistrictMatch ? cityDistrictMatch[1] : '';
+    display = display.replace(/^[^路街道]+[市縣區鄉鎮]/i, '');
+    const roadPattern = /([^路街道]+(?:[一二三四五六七八九十]+段)?[路街道大道])/;
+    const roadMatch = display.match(roadPattern);
+    if (roadMatch) return (cityDistrict + roadMatch[1]).trim();
     const simple = display.match(/([^路街道]*[路街道])/);
-    display = simple ? (cityDistrict + simple[1]).trim() : (cityDistrict + display).trim();
+    return simple ? (cityDistrict + simple[1]).trim() : address;
   }
-  return display.replace(/[\s\-]+$/, '').trim();
+  return address.replace(/(\d+)(巷|弄|號)/g, '**$2');
 }
 
 export async function onRequestGet(context) {

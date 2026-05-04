@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>後台管理系統 | 住商不動產</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <!-- QR Code 生成函式庫（已抽離至 js/admin/qrcode-loader.js） -->
+    <script src="js/admin/qrcode-loader.js"></script>
+    <!-- 統一 Supabase 配置 -->
+    <script src="supabase-config.js"></script>
+    <!-- 相關連結後台管理模組 -->
+    <script src="modules/related-links/backend.js"></script>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+</head>
+<body>
+    <div class="header">
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+        <h1>🏠 後台管理系統</h1>
+        <p>物件管理、上下架控制、連結管理</p>
+    </div>
+    
+    <!-- 側邊欄遮罩 -->
+    <div class="nav-overlay" onclick="toggleMobileMenu()"></div>
+    
+    <div class="nav" id="main-nav">
+        <button class="nav-close-btn" onclick="toggleMobileMenu()">×</button>
+        <div class="nav-item active" onclick="switchTab('dashboard', this); toggleMobileMenu();">📊 儀表板</div>
+        <div class="nav-item" onclick="switchTab('properties', this); toggleMobileMenu();">🏘️ 物件管理</div>
+        <div class="nav-item" onclick="switchTab('duplicates', this); toggleMobileMenu();">🔍 重複物件檢測</div>
+        <div class="nav-item" onclick="switchTab('links', this); toggleMobileMenu();">🔗 連結管理</div>
+    </div>
+    
+    <div class="container">
+        <!-- 儀表板 -->
+        <div id="dashboard-tab" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <h3>總物件數</h3>
+                    <div class="value" id="stat-total">0</div>
+                </div>
+                <div class="stat-card success">
+                    <h3>已上架</h3>
+                    <div class="value" id="stat-published">0</div>
+                </div>
+                <div class="stat-card warning">
+                    <h3>已下架</h3>
+                    <div class="value" id="stat-unpublished">0</div>
+                </div>
+                <div class="stat-card danger">
+                    <h3>已售出</h3>
+                    <div class="value" id="stat-sold">0</div>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <h2>快速操作</h2>
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="switchTab('properties', document.querySelectorAll('#main-nav > .nav-item')[1])">
+                        ➕ 新增物件
+                    </button>
+                    <button class="btn btn-success" onclick="switchTab('properties', document.querySelectorAll('#main-nav > .nav-item')[1])">
+                        ⬆️ 管理上下架
+                    </button>
+                    <a href="index.html" target="_blank" class="btn btn-secondary">
+                        👁️ 查看前台
+                    </a>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2 style="margin: 0;">最近更新的物件</h2>
+                    <div class="dashboard-view-mode-toggle" style="display: flex; gap: 0.5rem; align-items: center;">
+                        <span style="color: #666; font-size: 0.9rem; margin-right: 0.5rem;">檢視模式：</span>
+                        <button class="filter-btn active" id="dashboard-view-table-btn" onclick="setDashboardViewMode('table', this)" style="padding: 0.4rem 0.8rem;">
+                            📋 表格
+                        </button>
+                        <button class="filter-btn" id="dashboard-view-grid-btn" onclick="setDashboardViewMode('grid', this)" style="padding: 0.4rem 0.8rem;">
+                            🎴 網格
+                        </button>
+                    </div>
+                </div>
+                <div id="recent-properties">
+                    <p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 物件管理 -->
+        <div id="properties-tab" class="tab-content">
+            <!-- 子標籤切換 -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e9ecef;">
+                <button class="sub-tab-btn active" onclick="switchPropertySubTab('list', this)" id="property-list-tab">
+                    📋 物件列表
+                </button>
+                <button class="sub-tab-btn" onclick="switchPropertySubTab('add', this)" id="property-add-tab">
+                    ➕ 新增物件
+                </button>
+            </div>
+            
+            <!-- 物件列表子標籤 -->
+            <div id="property-list-subtab" class="property-subtab active">
+                <div class="content-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2>物件列表</h2>
+                        <div>
+                            <button class="btn btn-secondary" onclick="checkDuplicates()" style="margin-right: 0.5rem;">
+                                🔍 檢查重複
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="搜尋物件（標題、編號、地址）..." onkeyup="filterPropertiesDebounced()">
+                        <select id="type-filter" onchange="filterProperties()">
+                            <option value="">所有房型</option>
+                            <option value="套房">套房</option>
+                            <option value="2房">2房</option>
+                            <option value="3房">3房</option>
+                            <option value="4房">4房</option>
+                            <option value="華廈">華廈</option>
+                            <option value="公寓">公寓</option>
+                            <option value="透天">透天</option>
+                            <option value="店面">店面</option>
+                            <option value="別墅">別墅</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                        <div class="filter-select-container" style="margin: 0;">
+                            <select id="status-filter-select" class="filter-select" onchange="setFilterFromSelect(this.value)">
+                                <option value="all">全部</option>
+                                <option value="published">已上架</option>
+                                <option value="unpublished">已下架</option>
+                                <option value="sold">已售出</option>
+                                <option value="internal">🏠 本店物件</option>
+                                <option value="external">🏢 非本店物件</option>
+                            </select>
+                        </div>
+                        <div class="view-mode-toggle" style="display: flex; gap: 0.5rem; align-items: center;">
+                            <span style="color: #666; font-size: 0.9rem; margin-right: 0.5rem;">檢視模式：</span>
+                            <button class="filter-btn active" id="view-table-btn" onclick="setViewMode('table', this)" style="padding: 0.4rem 0.8rem;">
+                                📋 表格
+                            </button>
+                            <button class="filter-btn" id="view-grid-btn" onclick="setViewMode('grid', this)" style="padding: 0.4rem 0.8rem;">
+                                🎴 網格
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="properties-list">
+                        <p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 新增物件子標籤 -->
+            <div id="property-add-subtab" class="property-subtab">
+                <div class="content-card">
+                    <h2>新增物件</h2>
+                    <div id="property-add-alert-container" style="margin-bottom: 1rem;"></div>
+                    <div id="property-add-form-container">
+                        <p style="text-align: center; color: #666; padding: 2rem;">
+                            ⏳ 正在載入新增表單...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 重複物件檢測 -->
+        <div id="duplicates-tab" class="tab-content">
+            <div class="content-card">
+                <h2>🔍 重複物件檢測與清理</h2>
+                <p style="color: #666; margin-bottom: 1.5rem;">
+                    自動檢測並清理重複的物件（根據物件編號）。系統會保留最新建立的物件，刪除較舊的重複項目。
+                </p>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <button class="btn btn-primary" onclick="checkDuplicates()">
+                        🔍 開始檢測重複物件
+                    </button>
+                    <button class="btn btn-danger" onclick="cleanDuplicates()" id="clean-btn" style="display: none; margin-left: 0.5rem;">
+                        🗑️ 清理重複物件
+                    </button>
+                </div>
+                
+                <div id="duplicates-result">
+                    <p style="text-align: center; color: #666; padding: 2rem;">點擊「開始檢測」來檢查重複物件</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 連結管理 -->
+        <div id="links-tab" class="tab-content">
+            <div class="content-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>📎 相關連結管理</h2>
+                    <button class="btn btn-primary" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.showAddLinkModal) { RelatedLinksBackend.showAddLinkModal(); } else { showAddLinkModal(); }">
+                        ➕ 新增連結
+                    </button>
+                </div>
+                
+                <p style="color: #666; margin-bottom: 1.5rem;">
+                    管理網站首頁和物件詳細頁面顯示的相關連結。可以新增、編輯、刪除連結，並調整顯示順序。
+                </p>
+                
+                <div id="links-alert-container" style="margin-bottom: 1rem;"></div>
+                
+                <!-- 連結列表 -->
+                <div id="links-list">
+                    <p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新增/編輯連結彈窗 -->
+        <div id="link-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-dialog" style="max-width: 600px; width: 90%;">
+                <div class="modal-header">
+                    <h3 id="link-modal-title">新增連結</h3>
+                    <button class="modal-close" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.closeLinkModal) { RelatedLinksBackend.closeLinkModal(); } else { closeLinkModal(); }">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>連結標題 *</label>
+                        <input type="text" id="link-title" placeholder="例如：更多物件資料" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>連結網址 *</label>
+                        <input type="url" id="link-url" placeholder="https://example.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>圖示（Emoji）</label>
+                        <input type="text" id="link-icon" placeholder="例如：🏠、🎵、🧮" maxlength="2">
+                        <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                            💡 提示：輸入一個 emoji 圖示，例如 🏠、🎵、🧮
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>按鈕顏色（CSS 漸層）</label>
+                        <input type="text" id="link-color" placeholder="例如：linear-gradient(45deg, #2ecc71, #27ae60)" value="linear-gradient(45deg, #667eea, #764ba2)">
+                        <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                            💡 提示：使用 CSS linear-gradient 語法，例如：linear-gradient(45deg, #2ecc71, #27ae60)
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>顯示順序</label>
+                        <input type="number" id="link-order" value="0" min="0">
+                        <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                            💡 提示：數字越小越靠前顯示
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="link-active" checked> 啟用此連結
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>連結類型</label>
+                        <select id="link-type">
+                            <option value="button">按鈕（直接連結）</option>
+                            <option value="dropdown">下拉選單（包含多個子項目）</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 下拉選單項目（僅當類型為 dropdown 時顯示） -->
+                    <div id="link-items-container" style="display: none; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <label style="margin: 0; font-weight: 600;">下拉選單項目</label>
+                            <button type="button" class="btn btn-secondary btn-small" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.addLinkItem) { RelatedLinksBackend.addLinkItem(); } else { addLinkItem(); }">
+                                ➕ 新增項目
+                            </button>
+                        </div>
+                        <div id="link-items-list">
+                            <!-- 動態生成的項目列表 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.closeLinkModal) { RelatedLinksBackend.closeLinkModal(); } else { closeLinkModal(); }">取消</button>
+                    <button class="btn btn-primary" onclick="if(typeof RelatedLinksBackend !== 'undefined' && RelatedLinksBackend.saveLink) { RelatedLinksBackend.saveLink(); } else { saveLink(); }">💾 儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/admin/dashboard.js"></script>
+</body>
+</html>

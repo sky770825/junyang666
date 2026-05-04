@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poll-Tex 普特絲防霾紗窗 - 南桃園展示中心</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --secondary: #059669;
+  --accent: #f59e0b;
+  --gradient: linear-gradient(135deg, #2563eb, #059669);
+  --glass-bg: rgba(255,255,255,0.9);
+  --shadow: 0 10px 25px rgba(0,0,0,0.1);
+  --border-radius: 1rem;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  min-height: 100vh;
+}
+
+.hero-section {
+  background: var(--gradient);
+  color: white;
+  padding: 2rem 1rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  gap: 1rem;
+}
+
+.logo-image {
+  height: 4rem;
+  width: auto;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+}
+
+.logo-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+}
+
+.address {
+  background: rgba(255,255,255,0.2);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin: 1rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.card {
+  background: var(--glass-bg);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin: 1rem;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.contact-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.contact-item:hover {
+  transform: scale(1.02);
+}
+
+.contact-btn {
+  display: inline-block;
+  background: var(--gradient);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 0.5rem;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.contact-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+.map-container {
+  margin: 2rem 0;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.map-container iframe {
+  width: 100%;
+  height: 400px;
+  border: none;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.feature-item {
+  text-align: center;
+  padding: 1rem;
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.back-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  background: white;
+  color: var(--primary);
+  border: none;
+  padding: 0.75rem;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  z-index: 100;
+  transition: var(--transition);
+}
+
+.back-btn:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 2rem;
+  }
+  
+  .logo-image {
+    height: 3rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .card {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+  
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .map-container iframe {
+    height: 300px;
+  }
+  
+  .features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 1rem;
+  }
+  
+  .logo-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .logo-text {
+    font-size: 1.8rem;
+  }
+  
+  .logo-image {
+    height: 2.5rem;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<!-- 返回按鈕 -->
+<button onclick="history.back()" class="back-btn" aria-label="返回上一頁">
+  ←
+</button>
+
+<!-- 主要內容區 -->
+<div class="hero-section">
+  <div class="hero-content">
+    <div class="logo-container">
+      <img src="https://www.gogo-engineering.com/store_image/polltex/L173380795390.png" 
+           alt="Poll-Tex 普特絲 LOGO" 
+           class="logo-image">
+      <div class="logo-text">Poll-Tex 普特絲</div>
+    </div>
+    <div class="subtitle">防霾紗窗 南桃園展示中心</div>
+    <div class="address">
+      <strong>📍 地址：</strong>326桃園市楊梅區梅獅路二段42號
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- 產品系列緊湊版 -->
+  <div class="card">
+    <h2 class="text-xl font-bold text-center mb-4 text-gray-800">🛡️ 產品系列</h2>
+    <div class="grid grid-cols-2 gap-3">
+      <!-- 平面式防霾紗窗 -->
+      <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg">
+        <img src="https://www.poll-tex.com.tw/wp-content/uploads/polltex.jpg" 
+             alt="Poll-tex 平面式防霾紗窗" 
+             class="w-full h-32 object-cover rounded-lg mb-2">
+        <h3 class="font-bold mb-2 text-blue-800 text-sm">🪟 平面式</h3>
+        <div class="space-y-1 mb-2">
+          <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">✓ 歐盟認證</div>
+          <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">✓ 專利技術</div>
+          <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">✓ 建案標配</div>
+        </div>
+        <a href="tel:0928776755" class="contact-btn w-full text-center block text-xs">📞 諮詢</a>
+      </div>
+
+      <!-- 捲軸式防霾紗窗 -->
+      <div class="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-lg">
+        <img src="https://www.poll-tex.com.tw/wp-content/uploads/polltexroll.jpg" 
+             alt="Poll-tex 捲軸式防霾紗窗" 
+             class="w-full h-32 object-cover rounded-lg mb-2">
+        <h3 class="font-bold mb-2 text-green-800 text-sm">🔄 捲軸式</h3>
+        <div class="space-y-1 mb-2">
+          <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">✓ 四周密合</div>
+          <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">✓ 耐12級風</div>
+          <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">✓ 隨處定位</div>
+        </div>
+        <a href="tel:0928776755" class="contact-btn w-full text-center block text-xs">📞 諮詢</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 線上試算工具 -->
+  <div class="card">
+    <h2 class="text-xl font-bold text-center mb-4 text-gray-800">🧮 線上報價試算</h2>
+    
+    <div class="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg text-center">
+      <img src="https://www.poll-tex.com.tw/wp-content/uploads/window2.png" 
+           alt="線上試算" 
+           class="w-12 h-12 mx-auto mb-3">
+      
+      <a href="https://housepice.pages.dev/%E4%B8%89%E5%90%88%E4%B8%80%E6%88%BF%E5%83%B9%E6%99%AE%E7%89%B9%E7%B5%B2" 
+         target="_blank" 
+         class="bg-gradient-to-r from-blue-500 to-green-500 text-white py-3 px-6 rounded-lg text-lg font-bold hover:from-blue-600 hover:to-green-600 transition inline-block mb-3">
+        🪟 立即試算報價
+      </a>
+      
+      <p class="text-sm text-gray-600">專業報價試算工具，一頁完成</p>
+    </div>
+  </div>
+
+  <!-- 費用聲明 -->
+  <div class="card">
+    <h2 class="text-xl font-bold text-center mb-4 text-gray-800">📋 費用聲明</h2>
+    <div class="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg">
+      <img src="https://www.poll-tex.com.tw/wp-content/uploads/C-_Users_User_Desktop_WEB_%E7%B8%BD%E5%AE%98%E7%B6%B2%E7%B4%A0%E6%9D%90_%E7%B7%9A%E4%B8%8A%E4%BC%B0%E5%83%B9_%E8%B2%BB%E7%94%A8%E8%81%B2%E6%98%8E_%E6%AD%A3%E8%B2%A8%E8%81%B2%E6%98%8E_0314-768x394.jpg" 
+           alt="費用聲明" 
+           class="w-full h-auto rounded-lg mb-4">
+      <div class="text-center">
+        <h3 class="font-bold text-lg mb-2">💡 透明收費，無隱藏費用</h3>
+        <p class="text-sm text-gray-700 mb-3">
+          我們提供透明的收費標準，所有費用都會在估價時清楚說明，絕無隱藏費用。
+        </p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+          <div class="bg-white p-2 rounded text-center">
+            <div class="font-bold text-green-600">✓ 免費丈量</div>
+          </div>
+          <div class="bg-white p-2 rounded text-center">
+            <div class="font-bold text-blue-600">✓ 透明報價</div>
+          </div>
+          <div class="bg-white p-2 rounded text-center">
+            <div class="font-bold text-purple-600">✓ 無隱藏費</div>
+          </div>
+          <div class="bg-white p-2 rounded text-center">
+            <div class="font-bold text-orange-600">✓ 售後服務</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 六大困擾解決方案 -->
+  <div class="card">
+    <h2 class="text-xl font-bold text-center mb-4 text-gray-800">🔧 解決您的六大困擾</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div class="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/2927/2927347.png" 
+             alt="空氣污染" 
+             class="w-12 h-12 mx-auto mb-2">
+        <h3 class="font-bold text-sm mb-1">空氣污染</h3>
+        <p class="text-xs text-gray-600">PM2.5、過敏原</p>
+      </div>
+      <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/3099/3099447.png" 
+             alt="蚊蟲入侵" 
+             class="w-12 h-12 mx-auto mb-2">
+        <h3 class="font-bold text-sm mb-1">蚊蟲入侵</h3>
+        <p class="text-xs text-gray-600">蚊子、蒼蠅</p>
+      </div>
+      <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/2745/2745689.png" 
+             alt="異味困擾" 
+             class="w-12 h-12 mx-auto mb-2">
+        <h3 class="font-bold text-sm mb-1">異味困擾</h3>
+        <p class="text-xs text-gray-600">油煙、異味</p>
+      </div>
+      <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/3774/3774287.png" 
+             alt="噪音干擾" 
+             class="w-12 h-12 mx-auto mb-2">
+        <h3 class="font-bold text-sm mb-1">噪音干擾</h3>
+        <p class="text-xs text-gray-600">交通噪音</p>
+      </div>
+      <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png" 
+             alt="隱私安全" 
+             class="w-12 h-12 mx-auto mb-2">
+        <h3 class="font-bold text-sm mb-1">隱私安全</h3>
+        <p class="text-xs text-gray-600">防盜、隱私</p>
+      </div>
+      <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png" 
+             alt="維護保養" 
+             class="w-12 h-12 mx-auto mb-2">
+        <h3 class="font-bold text-sm mb-1">維護保養</h3>
+        <p class="text-xs text-gray-600">清潔、保養</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 產品應用案例 -->
+  <div class="card">
+    <h2 class="text-xl font-bold text-center mb-4 text-gray-800">🏠 產品應用案例</h2>
+    
+    <!-- 大面積紗窗 -->
+    <div class="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg mb-4">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <h3 class="font-bold text-lg mb-2 text-blue-800">🏢 大面積紗窗</h3>
+          <p class="text-sm text-gray-700 mb-3">
+            常運用於工作陽台工程。厭惡陽台總是灰塵、雨水、骯髒、蚊蟲眾多等問題？普特絲陽台防塵專家為您打造全新的陽台風貌，讓陽台重現乾淨清爽的空間氛圍。
+          </p>
+          <div class="text-xs text-gray-600">
+            <div class="mb-1">• 可使用固定窗框或捲軸紗窗</div>
+            <div class="mb-1">• 針對管線強排進行洗洞</div>
+            <div>• 完整的細節包覆工程</div>
+          </div>
+        </div>
+        <div>
+          <img src="https://www.poll-tex.com.tw/wp-content/uploads/20211012_104405_S1-768x432.jpg" 
+               alt="大面積紗窗應用" 
+               class="w-full h-40 object-cover rounded-lg">
+        </div>
+      </div>
+    </div>
+
+    <!-- 一般半身窗/推拉窗 -->
+    <div class="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg mb-4">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <img src="https://www.poll-tex.com.tw/wp-content/uploads/IMG_8917_S1-768x432.jpg" 
+               alt="一般半身窗應用" 
+               class="w-full h-40 object-cover rounded-lg">
+        </div>
+        <div>
+          <h3 class="font-bold text-lg mb-2 text-green-800">🪟 一般半身窗/推拉窗</h3>
+          <p class="text-sm text-gray-700 mb-3">
+            常見於臥室、客廳、浴室。推射窗通常會搭配折疊式隱藏紗窗，普特絲將會為您重新訂製專利定位捲軸紗窗。
+          </p>
+          <div class="text-xs text-gray-600">
+            <div class="mb-1">• 適用於臥室、客廳、浴室</div>
+            <div class="mb-1">• 專利定位捲軸紗窗</div>
+            <div>• 費用須至現場評估</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 落地窗 -->
+    <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg mb-4">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <h3 class="font-bold text-lg mb-2 text-purple-800">🚪 落地窗/落地門</h3>
+          <p class="text-sm text-gray-700 mb-3">
+            常見於客廳、主臥室等。SEIKI日本原裝進口窗框，搭配荷蘭製普特絲防霾紗網。
+          </p>
+          <div class="text-xs text-gray-600">
+            <div class="mb-1">• 適用於客廳、主臥室</div>
+            <div class="mb-1">• SEIKI日本原裝進口窗框</div>
+            <div>• 荷蘭製普特絲防霾紗網</div>
+          </div>
+        </div>
+        <div>
+          <img src="https://www.poll-tex.com.tw/wp-content/uploads/%EF%BC%88%E5%85%A8%E6%B0%91%E8%90%AC%E6%AD%B2%EF%BC%89%E9%AB%98%E9%9B%84%E6%A9%8B%E9%A0%AD%E5%8D%80%E7%8E%8B%E5%B0%8F%E5%A7%90%E8%87%AA%E5%AE%85_210601_3_S1-768x432.jpg" 
+               alt="落地窗應用" 
+               class="w-full h-40 object-cover rounded-lg">
+        </div>
+      </div>
+    </div>
+
+    <!-- 三合一通風門 -->
+    <div class="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 rounded-lg">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <img src="https://www.poll-tex.com.tw/wp-content/uploads/110.12_S3-768x432.jpg" 
+               alt="三合一通風門應用" 
+               class="w-full h-40 object-cover rounded-lg">
+        </div>
+        <div>
+          <h3 class="font-bold text-lg mb-2 text-orange-800">🚪 三合一通風門</h3>
+          <p class="text-sm text-gray-700 mb-3">
+            常見於廚房連接陽台的紗門。通風門雖然結構複雜，但仍然可以更換Poll-tex防霾紗網。
+          </p>
+          <div class="text-xs text-gray-600">
+            <div class="mb-1">• 適用於廚房連接陽台</div>
+            <div class="mb-1">• 結構複雜仍可更換</div>
+            <div class="mb-1">• 窗框無損壞不需訂製</div>
+            <div>• 費用以現場丈量評估為準</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 注意事項 -->
+    <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+      <h4 class="font-bold text-sm mb-2">⚠️ 注意事項</h4>
+      <div class="text-xs text-gray-600 space-y-1">
+        <div>• 依照才數面積大小，以及窗框是否一併更換等狀態，實際費用仍以現場丈量評估為準</div>
+        <div>• 施工時會將紗窗窗框擦拭乾淨，但不包含窗戶軌道和玻璃清潔</div>
+        <div>• 專利定位捲軸紗門的客製化訂製服務，費用包含訂製、鋁料五金、烤漆、機構等要素</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 技術原理緊湊版 -->
+  <div class="card">
+    <h2 class="text-xl font-bold text-center mb-4 text-gray-800">🔬 荷蘭專利靜電技術</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg">
+        <h3 class="font-bold mb-2 text-blue-800">🇳🇱 165年紡織大廠技術</h3>
+        <p class="text-sm text-gray-700 mb-3">2007年成功將專利靜電技術應用在紗窗，天然四價貴金屬混紡紗線，自動形成穩定靜電層。</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">✓ 天然貴金屬</span>
+          <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">✓ 自動靜電層</span>
+          <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">✓ 穩定正電荷</span>
+        </div>
+      </div>
+      <div class="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
+        <h3 class="font-bold mb-2 text-green-800">⚡ 靜電吸附原理</h3>
+        <p class="text-sm text-gray-700 mb-3">空氣粒子帶有電荷，普特絲防霾紗窗進行吸附作用，有效過濾有害物質。</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">🎯 過敏原</span>
+          <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">🚭 二手煙</span>
+          <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">🌫️ PM2.5</span>
+          <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">🏆 六國認證</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- 醫生推薦緊湊版 -->
+  <div class="card">
+    <h2 class="text-xl font-bold text-center mb-4 text-gray-800">👨‍⚕️ 百位醫生推薦</h2>
+    
+    <!-- 醫生推薦橫向滾動 -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div class="bg-blue-50 p-3 rounded-lg text-center">
+        <img src="https://www.poll-tex.com.tw/wp-content/uploads/%E9%99%B3%E4%BF%8A%E6%97%AD_3_3-1-300x300.jpg" 
+             alt="陳俊旭醫生" 
+             class="w-12 h-12 rounded-full mx-auto mb-2 object-cover">
+        <h4 class="font-bold text-sm">陳俊旭 醫生</h4>
+        <p class="text-xs text-blue-600">美國自然醫學博士</p>
+      </div>
+      <div class="bg-green-50 p-3 rounded-lg text-center">
+        <img src="https://www.poll-tex.com.tw/wp-content/uploads/%E9%AB%98%E6%95%8F%E6%95%8F_2-300x300.jpg" 
+             alt="高敏敏營養師" 
+             class="w-12 h-12 rounded-full mx-auto mb-2 object-cover">
+        <h4 class="font-bold text-sm">高敏敏 營養師</h4>
+        <p class="text-xs text-green-600">營養師</p>
+      </div>
+      <div class="bg-purple-50 p-3 rounded-lg text-center">
+        <img src="https://www.poll-tex.com.tw/wp-content/uploads/%E5%A8%81%E5%8A%9B%E9%86%AB%E7%94%9F-300x300.jpg" 
+             alt="王韋力醫生" 
+             class="w-12 h-12 rounded-full mx-auto mb-2 object-cover">
+        <h4 class="font-bold text-sm">王韋力 醫生</h4>
+        <p class="text-xs text-purple-600">小兒科醫生</p>
+      </div>
+      <div class="bg-orange-50 p-3 rounded-lg text-center">
+        <img src="https://www.poll-tex.com.tw/wp-content/uploads/%E9%99%B3%E5%A5%95%E6%88%90-300x300.jpg" 
+             alt="陳奕成醫師" 
+             class="w-12 h-12 rounded-full mx-auto mb-2 object-cover">
+        <h4 class="font-bold text-sm">陳奕成 醫師</h4>
+        <p class="text-xs text-orange-600">兒童內分泌專科</p>
+      </div>
+    </div>
+
+    <!-- 推薦統計 -->
+    <div class="bg-gradient-to-r from-blue-100 to-green-100 p-4 rounded-lg text-center">
+      <h3 class="font-bold mb-3">🏆 專業醫療團隊一致推薦</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div>
+          <div class="text-xl font-bold text-blue-600">100+</div>
+          <div class="text-xs text-gray-600">專業醫師推薦</div>
+        </div>
+        <div>
+          <div class="text-xl font-bold text-green-600">98.8%</div>
+          <div class="text-xs text-gray-600">PM2.5阻隔率</div>
+        </div>
+        <div>
+          <div class="text-xl font-bold text-purple-600">10年</div>
+          <div class="text-xs text-gray-600">歐盟認證</div>
+        </div>
+        <div>
+          <div class="text-xl font-bold text-orange-600">300+</div>
+          <div class="text-xs text-gray-600">建案標配</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 服務區域與地圖整合 -->
+  <div class="card">
+    <h2 class="text-xl font-bold text-center mb-4 text-gray-800">🗺️ 服務區域</h2>
+    
+    <!-- 服務區域標籤 -->
+    <div class="grid grid-cols-4 md:grid-cols-8 gap-2 mb-4">
+      <div class="bg-blue-50 p-2 rounded text-center text-xs">楊梅區</div>
+      <div class="bg-blue-50 p-2 rounded text-center text-xs">中壢區</div>
+      <div class="bg-blue-50 p-2 rounded text-center text-xs">平鎮區</div>
+      <div class="bg-blue-50 p-2 rounded text-center text-xs">龍潭區</div>
+      <div class="bg-blue-50 p-2 rounded text-center text-xs">新屋區</div>
+      <div class="bg-blue-50 p-2 rounded text-center text-xs">觀音區</div>
+      <div class="bg-blue-50 p-2 rounded text-center text-xs">大園區</div>
+      <div class="bg-blue-50 p-2 rounded text-center text-xs">蘆竹區</div>
+    </div>
+
+    <!-- 地圖位置 -->
+    <div class="map-container">
+      <iframe src="https://www.google.com/maps/embed?pb=!4v1761530047374!6m8!1m7!1sJTYPV0dqBn1XobhGl3PyNw!2m2!1d24.90960418962507!2d121.175138759743!3f230.48454930962262!4f3.738888988926689!5f1.3120754027841284" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <div class="text-center mt-3">
+      <p class="text-sm text-gray-600 mb-1">📍 326桃園市楊梅區梅獅路二段42號</p>
+      <p class="text-xs text-gray-500">營業時間：週一至週日 9:00-18:00</p>
+    </div>
+  </div>
+
+  <!-- 聯絡我們 -->
+  <div class="card">
+    <h2 class="text-xl font-bold text-center mb-4 text-gray-800">📞 聯絡我們</h2>
+    
+    <div class="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-white p-3 rounded-lg text-center">
+          <div class="text-2xl mb-2">👨‍💼</div>
+          <h3 class="font-bold text-gray-800 mb-1 text-sm">蔡店長</h3>
+          <a href="tel:0928776755" class="text-blue-600 font-bold hover:text-blue-800 text-xs">0928-776755</a>
+        </div>
+        <div class="bg-white p-3 rounded-lg text-center">
+          <div class="text-2xl mb-2">💬</div>
+          <h3 class="font-bold text-gray-800 mb-1 text-sm">LINE官方</h3>
+          <a href="https://lin.ee/kWylLCu" 
+             target="_blank" 
+             class="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-bold hover:from-green-600 hover:to-green-700 transition inline-block">
+            LINE諮詢
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>物件管理後台（資料庫版）| 住商不動產</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/property-admin-db.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 物件管理</h1>
+            <p>先完成必填資料，再補圖片與特色，最後確認上架狀態。</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" id="add-tab-button" onclick="switchTab('add', this)">➕ 新增物件</button>
+            <button class="tab" id="list-tab-button" onclick="switchTab('list', this)">📋 物件列表</button>
+            <button class="tab" id="inquiries-tab-button" onclick="switchTab('inquiries', this)">📨 客戶詢問</button>
+            <button class="tab tab-system" id="config-tab-button" onclick="switchTab('config', this)" style="display: none;">⚙️ 系統設定</button>
+        </div>
+        
+        <!-- Supabase 設定 -->
+        <div id="config-tab" class="tab-content">
+            <div class="config-section">
+                <h3>⚙️ 系統設定</h3>
+                <p class="section-helper">這裡是資料庫連線設定，日常新增或編輯物件不需要調整。</p>
+                <div class="form-group">
+                    <label>Supabase URL *</label>
+                    <input type="text" id="supabase-url" placeholder="https://cnzqtuuegdqwkgvletaa.supabase.co" value="https://cnzqtuuegdqwkgvletaa.supabase.co">
+                </div>
+                <div class="form-group">
+                    <label>Supabase Anon Key *</label>
+                    <input type="text" id="supabase-anon-key" placeholder="輸入您的 Supabase Anon Key" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuenF0dXVlZ2Rxd2tndmxldGFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMjUxMTksImV4cCI6MjA4MzcwMTExOX0.gsO3RKdMu2bUXW4b5aHseouIkjXtJyIqqP_0x3Y6trE">
+                </div>
+                <p style="color: #856404; font-size: 0.9rem; margin-top: 0.5rem;">
+                    <strong>維護提醒：</strong>只有更換資料庫專案時才需要修改這裡。
+                </p>
+                <div style="margin-top: 1rem; padding: 1rem; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #2196F3;">
+                    <h4 style="margin: 0 0 0.5rem 0; color: #1976D2;">📝 Supabase 設定說明</h4>
+                    <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem; color: #424242;">
+                        <li><strong>Supabase URL：</strong>您的 Supabase 專案 URL（例如：https://cnzqtuuegdqwkgvletaa.supabase.co）</li>
+                        <li><strong>Anon Key：</strong>從 Supabase Dashboard 的 API 設定中取得</li>
+                        <li><strong>圖片上傳：</strong>圖片會自動上傳到 Supabase Storage</li>
+                        <li><strong>資料夾結構：</strong>每個物件的圖片會儲存在 <code>junyang666/properties/{物件編號}/</code> 資料夾中</li>
+                        <li><strong>上架/下架：</strong>物件可以設定為上架（is_published: true）或下架（is_published: false）狀態</li>
+                    </ul>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button class="btn btn-success" onclick="saveSupabaseConfig()" style="flex: 1;">
+                        💾 儲存設定
+                    </button>
+                    <button class="btn btn-primary" onclick="testSupabaseConnection()" style="flex: 1;">
+                        🔍 測試連接
+                    </button>
+                </div>
+                <div style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <p style="margin: 0; font-size: 0.9rem; color: #856404;">
+                        <strong>提示：</strong>設定完成並成功連接後，這個分頁會自動收起，避免一般操作時誤改連線資料。
+                    </p>
+                </div>
+                <div id="supabase-status" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; display: none;">
+                    <h4 style="margin: 0 0 0.5rem 0;">🔍 連接狀態</h4>
+                    <div id="supabase-status-content"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新增物件 -->
+        <div id="add-tab" class="tab-content active">
+            <div id="alert-container"></div>
+            
+            <div class="operator-panel">
+                <div>
+                    <strong>新增物件流程</strong>
+                    <p>先填基本資料與坪數，照片可以後補；預設先下架保存，確認後再上架。</p>
+                </div>
+                <div class="operator-steps" aria-label="新增物件流程">
+                    <span>1 基本資料</span>
+                    <span>2 圖片</span>
+                    <span>3 特色交通</span>
+                    <span>4 預覽儲存</span>
+                </div>
+            </div>
+
+            <div id="form-progress" class="form-progress-panel">
+                <div class="progress-header">
+                    <span>必填欄位進度</span>
+                    <span id="progress-percentage">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <p id="progress-text">請先完成標示 * 的欄位。</p>
+            </div>
+            
+            <form id="property-form">
+                <!-- 基本資訊 -->
+	                <div class="form-section" data-ux-section="basic">
+	                    <h3>📝 基本資訊 <span class="section-tag required">必填優先</span></h3>
+                        <p class="section-helper">標題、房型、地址與價格會直接影響前台物件卡片，先把這一段填完整。</p>
+	                    <div class="form-grid">
+                        <div class="form-group small">
+                            <label>物件來源 *</label>
+                            <select id="is_external" required onchange="onExternalSourceChange()">
+                                <option value="false">🏠 本店物件</option>
+                                <option value="true">🏢 非本店物件</option>
+                            </select>
+                            <small style="color: #999; font-size: 0.75rem; margin-top: 0.25rem; display: block; opacity: 0.7;">
+                                非本店物件使用獨立編號系統
+                            </small>
+                        </div>
+                        <div class="form-group small" style="display: none;">
+                            <label>物件編號</label>
+                            <input type="text" id="number" placeholder="選擇房型後自動生成" style="flex: 1;" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>物件標題 *</label>
+                            <input type="text" id="title" placeholder="例如: 低自備 | 近龍科 | 2房+車位" required>
+                        </div>
+                        <div class="form-group">
+                            <label>房型 *</label>
+                            <select id="type" required onchange="onTypeChange(); checkAndShowExtensionFloor();">
+                                <option value="">請選擇</option>
+                                <option value="套房">套房</option>
+                                <option value="2房">2房</option>
+                                <option value="3房">3房</option>
+                                <option value="4房">4房</option>
+                                <option value="華廈">華廈</option>
+                                <option value="公寓">公寓</option>
+                                <option value="透天">透天</option>
+                                <option value="店面">店面</option>
+                                <option value="別墅">別墅</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>縣市 *</label>
+                            <select id="city" required onchange="updateDistricts()">
+                                <option value="">請選擇縣市</option>
+                                <option value="桃園市" selected>桃園市</option>
+                                <option value="台北市">台北市</option>
+                                <option value="新北市">新北市</option>
+                                <option value="台中市">台中市</option>
+                                <option value="台南市">台南市</option>
+                                <option value="高雄市">高雄市</option>
+                                <option value="基隆市">基隆市</option>
+                                <option value="新竹市">新竹市</option>
+                                <option value="新竹縣">新竹縣</option>
+                                <option value="苗栗縣">苗栗縣</option>
+                                <option value="彰化縣">彰化縣</option>
+                                <option value="南投縣">南投縣</option>
+                                <option value="雲林縣">雲林縣</option>
+                                <option value="嘉義市">嘉義市</option>
+                                <option value="嘉義縣">嘉義縣</option>
+                                <option value="屏東縣">屏東縣</option>
+                                <option value="宜蘭縣">宜蘭縣</option>
+                                <option value="花蓮縣">花蓮縣</option>
+                                <option value="台東縣">台東縣</option>
+                                <option value="澎湖縣">澎湖縣</option>
+                                <option value="金門縣">金門縣</option>
+                                <option value="連江縣">連江縣</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>區域 *</label>
+                            <select id="district" required>
+                                <option value="">請先選擇縣市</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>詳細地址 *</label>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                                    <input type="text" id="address" placeholder="例如: 梅獅路二段232巷***號10樓" required style="flex: 1;">
+                                    <button type="button" onclick="openGoogleStreetView()" class="btn btn-secondary" style="white-space: nowrap; padding: 0.7rem 1rem; font-size: 0.9rem;">
+                                        🏙️ 打開 Google 街景
+                                    </button>
+                                </div>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal; font-size: 0.9rem; color: #666;">
+                                    <input type="checkbox" id="hide_address_number" style="width: auto; margin: 0;">
+                                    <span>隱藏門牌號碼（僅顯示路名、巷弄，不顯示號碼）</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>社區名稱</label>
+                            <input type="text" id="community" placeholder="例如: 世紀城">
+                        </div>
+                        <div class="form-group">
+                            <label>售價 *</label>
+                            <input type="text" id="price" placeholder="例如: 896萬" required inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <div class="form-group">
+	                            <label>上架狀態 *</label>
+	                            <select id="is_published" required>
+	                                <option value="false" selected>❌ 下架保存（不顯示在前台）</option>
+	                                <option value="true">✅ 確認上架（顯示在前台）</option>
+	                            </select>
+	                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+	                                建議先下架保存，檢查圖片與文案後再上架。
+	                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label>物件狀態</label>
+                            <select id="status" onchange="onStatusChange()">
+                                <option value="">一般物件</option>
+                                <option value="new">新上架</option>
+                                <option value="urgent">急售</option>
+                                <option value="selling">熱銷中</option>
+                                <option value="below-appraisal">低於鑑價</option>
+                                <option value="sold">已售出</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>狀態文字</label>
+                            <select id="statusText" onchange="onStatusTextChange()" style="margin-bottom: 0.5rem;">
+                                <option value="">請選擇或手動輸入</option>
+                                <option value="新上架">新上架</option>
+                                <option value="急售">急售</option>
+                                <option value="銷售中">銷售中</option>
+                                <option value="熱銷中">熱銷中</option>
+                                <option value="熱賣物件">熱賣物件</option>
+                                <option value="搶手件">搶手件</option>
+                                <option value="低於鑑價">低於鑑價</option>
+                                <option value="已售出">已售出</option>
+                                <option value="custom">自訂（手動輸入）</option>
+                            </select>
+                            <input type="text" id="statusTextInput" placeholder="若選擇「自訂」，請在此輸入自訂狀態文字" style="display: none;">
+                            <div id="status-text-tags" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                <button type="button" class="status-tag-btn" onclick="setStatusTextFromTag('新上架')">新上架</button>
+                                <button type="button" class="status-tag-btn" onclick="setStatusTextFromTag('急售')">急售</button>
+                                <button type="button" class="status-tag-btn" onclick="setStatusTextFromTag('銷售中')">銷售中</button>
+                                <button type="button" class="status-tag-btn" onclick="setStatusTextFromTag('熱銷中')">熱銷中</button>
+                                <button type="button" class="status-tag-btn" onclick="setStatusTextFromTag('熱賣物件')">熱賣物件</button>
+                                <button type="button" class="status-tag-btn" onclick="setStatusTextFromTag('搶手件')">搶手件</button>
+                            </div>
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.5rem; display: block;">
+                                💡 可直接從下拉選單選擇，或點擊上方標籤快速選擇
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 物件詳情 -->
+	                <div class="form-section" data-ux-section="details">
+	                    <h3>📏 物件詳情 <span class="section-tag required">必填優先</span></h3>
+                        <p class="section-helper">格局與坪數是客人最常比較的資訊，其他欄位可依資料完整度補上。</p>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>格局 *</label>
+                            <input type="text" id="layout" placeholder="例如: 3/2/2 或 3房2廳2衛 或 0/4/3（開放式）" required onblur="formatLayoutInput(this)">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：可輸入「3/2/2」自動轉換為「3房2廳2衛」<br>
+                                💡 開放式格局：輸入「0/4/3」會自動轉換為「0房4廳3衛（開放式）」<br>
+                                💡 套房格局：輸入「1/0/1」會自動轉換為「1房0廳1衛（套房）」
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label>總坪數 *</label>
+                            <input type="text" id="total_area" placeholder="例如: 40.08（輸入數字即可，系統會自動加上「坪」）" required onblur="formatAreaInput(this)" inputmode="decimal" pattern="[0-9.]*">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：輸入數字即可，系統會自動加上「坪」字
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label>主建物坪數</label>
+                            <input type="text" id="main_area" placeholder="例如: 18.17（輸入數字即可）" onblur="formatAreaInput(this)" inputmode="decimal" pattern="[0-9.]*">
+                        </div>
+                        <div class="form-group">
+                            <label>附屬建物坪數</label>
+                            <input type="text" id="auxiliary_area" placeholder="例如: 1.63（輸入數字即可）" onblur="formatAreaInput(this)" inputmode="decimal" pattern="[0-9.]*">
+                        </div>
+                        <div class="form-group">
+                            <label>公設坪數</label>
+                            <input type="text" id="common_area" placeholder="例如: 9.07（輸入數字即可）" onblur="formatAreaInput(this)" inputmode="decimal" pattern="[0-9.]*">
+                        </div>
+                        <div class="form-group">
+                            <label>土地坪數</label>
+                            <input type="text" id="land_area" placeholder="例如: 5.22（輸入數字即可）" onblur="formatAreaInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label>車位坪數</label>
+                            <input type="text" id="parking_area" placeholder="例如: 8.5（輸入數字即可）" onblur="formatAreaInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label>屋齡</label>
+                            <input type="text" id="age" placeholder="例如: 11（輸入數字即可，系統會自動加上「年」）" onblur="formatAgeInput(this)">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：輸入數字即可，系統會自動加上「年」字
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label>樓層</label>
+                            <input type="text" id="floor" placeholder="例如: 1-2樓 或 10/14樓" onchange="onFloorChange()">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：透天可輸入「1-2樓」，大樓可輸入「10/14樓」
+                            </small>
+                        </div>
+                        <div class="form-group" id="extension-floor-group" style="display: none;">
+                            <label>增建樓層 <span style="color: #e74c3c; font-size: 0.8rem;">（僅透天）</span></label>
+                            <input type="text" id="extension_floor" placeholder="例如: 3-4樓">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：如有增建樓層，請在此輸入（例如：3-4樓、5樓等）
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label>建築類型</label>
+                            <select id="building_type">
+                                <option value="">請選擇</option>
+                                <option value="電梯大樓">電梯大樓</option>
+                                <option value="華廈">華廈</option>
+                                <option value="公寓">公寓</option>
+                                <option value="透天">透天</option>
+                                <option value="別墅">別墅</option>
+                                <option value="店面">店面</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>座向</label>
+                            <select id="orientation">
+                                <option value="">請選擇</option>
+                                <option value="座北朝南">座北朝南</option>
+                                <option value="座南朝北">座南朝北</option>
+                                <option value="座東朝西">座東朝西</option>
+                                <option value="座西朝東">座西朝東</option>
+                                <option value="座東北朝西南">座東北朝西南</option>
+                                <option value="座西南朝東北">座西南朝東北</option>
+                                <option value="座西北朝東南">座西北朝東南</option>
+                                <option value="座東南朝西北">座東南朝西北</option>
+                                <option value="座北">座北</option>
+                                <option value="座南">座南</option>
+                                <option value="座東">座東</option>
+                                <option value="座西">座西</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>管理費</label>
+                            <input type="text" id="management_fee" placeholder="例如: 2,077元/月">
+                        </div>
+                        <div class="form-group">
+                            <label>車位類型</label>
+                            <select id="parking_type">
+                                <option value="">請選擇</option>
+                                <option value="平面車位">平面車位</option>
+                                <option value="機械車位">機械車位</option>
+                                <option value="門口停車">門口停車</option>
+                                <option value="室外停車">室外停車</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>車位編號</label>
+                            <input type="text" id="parking_space" placeholder="例如: B3-14">
+                        </div>
+                        <div class="form-group">
+                            <label>現況</label>
+                            <input type="text" id="current_status" placeholder="例如: 空屋">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 圖片上傳 -->
+	                <div class="form-section" data-ux-section="images">
+	                    <h3>📷 物件圖片 <span class="section-tag optional">可後補</span></h3>
+                        <p class="section-helper">建議至少放 5 張：外觀、客廳、廚房、主臥、衛浴。第一張會作為主要展示圖。</p>
+                    <div class="image-upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+                        <div class="image-upload-icon">📸</div>
+                        <p style="font-size: 1.1rem; font-weight: 600; color: #667eea; margin-bottom: 0.5rem;">
+                            點擊或拖曳圖片到此處上傳
+                        </p>
+                        <p style="color: #666; font-size: 0.9rem;">
+                            支援 JPG、PNG、WEBP 格式，可一次選擇多張圖片（最多 10 張）
+                        </p>
+                        <input type="file" id="file-input" multiple accept="image/*">
+                    </div>
+                    <div id="image-preview-grid" class="image-preview-grid"></div>
+                    <p style="text-align: center; color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+                        💡 提示：可上傳最多 10 張圖片，點擊「儲存到資料庫」時才會上傳；拖曳圖片可調整排序
+                    </p>
+                </div>
+                
+                <!-- 交通與設施 -->
+	                <div class="form-section" data-ux-section="traffic">
+	                    <h3>🚗 交通與設施 <span class="section-tag optional">加分資訊</span></h3>
+                        <p class="section-helper">點選常用標籤即可加入，沒有把握的資訊可以先留空。</p>
+                    <div class="form-grid">
+                        <!-- 生活設施 -->
+                        <div class="form-group">
+                            <label>生活設施</label>
+                            <div class="tag-selector-container" data-type="facilities">
+                                <div class="tag-input-wrapper">
+                                    <input type="text" class="tag-input" placeholder="輸入或選擇生活設施..." id="facilities-input">
+                                    <button type="button" class="tag-add-btn" onclick="addCustomTag('facilities')">新增</button>
+                        </div>
+                                <div class="selected-tags" id="facilities-selected"></div>
+                                <div class="tag-options" id="facilities-options">
+                                    <span class="tag-option" onclick="toggleTag('facilities', '全聯福利中心')">
+                                        <span class="tag-option-text">全聯福利中心</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '全聯福利中心', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '全聯福利中心', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '家樂福')">
+                                        <span class="tag-option-text">家樂福</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '家樂福', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '家樂福', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '7-ELEVEN')">
+                                        <span class="tag-option-text">7-ELEVEN</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '7-ELEVEN', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '7-ELEVEN', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '全家便利商店')">
+                                        <span class="tag-option-text">全家便利商店</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '全家便利商店', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '全家便利商店', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', 'OK便利商店')">
+                                        <span class="tag-option-text">OK便利商店</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', 'OK便利商店', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', 'OK便利商店', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '萊爾富')">
+                                        <span class="tag-option-text">萊爾富</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '萊爾富', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '萊爾富', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '康是美')">
+                                        <span class="tag-option-text">康是美</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '康是美', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '康是美', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '屈臣氏')">
+                                        <span class="tag-option-text">屈臣氏</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '屈臣氏', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '屈臣氏', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '頂好超市')">
+                                        <span class="tag-option-text">頂好超市</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '頂好超市', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '頂好超市', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '美聯社')">
+                                        <span class="tag-option-text">美聯社</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '美聯社', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '美聯社', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '松青超市')">
+                                        <span class="tag-option-text">松青超市</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '松青超市', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '松青超市', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '星巴克')">
+                                        <span class="tag-option-text">星巴克</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '星巴克', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '星巴克', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '麥當勞')">
+                                        <span class="tag-option-text">麥當勞</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '麥當勞', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '麥當勞', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '肯德基')">
+                                        <span class="tag-option-text">肯德基</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '肯德基', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '肯德基', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '銀行')">
+                                        <span class="tag-option-text">銀行</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '銀行', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '銀行', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '郵局')">
+                                        <span class="tag-option-text">郵局</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '郵局', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '郵局', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '診所')">
+                                        <span class="tag-option-text">診所</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '診所', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '診所', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '醫院')">
+                                        <span class="tag-option-text">醫院</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '醫院', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '醫院', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '藥局')">
+                                        <span class="tag-option-text">藥局</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '藥局', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '藥局', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('facilities', '商圈')">
+                                        <span class="tag-option-text">商圈</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('facilities', '商圈', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('facilities', '商圈', event)" title="刪除">×</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 交通設施 -->
+                        <div class="form-group">
+                            <label>交通設施</label>
+                            <div class="tag-selector-container" data-type="transport">
+                                <div class="tag-input-wrapper">
+                                    <input type="text" class="tag-input" placeholder="輸入或選擇交通設施..." id="transport-input">
+                                    <button type="button" class="tag-add-btn" onclick="addCustomTag('transport')">新增</button>
+                        </div>
+                                <div class="selected-tags" id="transport-selected"></div>
+                                <div class="tag-options" id="transport-options">
+                                    <span class="tag-option" onclick="toggleTag('transport', '台1線')">
+                                        <span class="tag-option-text">台1線</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '台1線', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '台1線', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '台3線')">
+                                        <span class="tag-option-text">台3線</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '台3線', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '台3線', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '台61線')">
+                                        <span class="tag-option-text">台61線</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '台61線', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '台61線', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '國道1號')">
+                                        <span class="tag-option-text">國道1號</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '國道1號', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '國道1號', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '國道3號')">
+                                        <span class="tag-option-text">國道3號</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '國道3號', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '國道3號', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '楊梅交流道')">
+                                        <span class="tag-option-text">楊梅交流道</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '楊梅交流道', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '楊梅交流道', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '湖口交流道')">
+                                        <span class="tag-option-text">湖口交流道</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '湖口交流道', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '湖口交流道', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '埔心火車站')">
+                                        <span class="tag-option-text">埔心火車站</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '埔心火車站', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '埔心火車站', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '楊梅火車站')">
+                                        <span class="tag-option-text">楊梅火車站</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '楊梅火車站', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '楊梅火車站', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '富岡火車站')">
+                                        <span class="tag-option-text">富岡火車站</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '富岡火車站', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '富岡火車站', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '新富火車站')">
+                                        <span class="tag-option-text">新富火車站</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '新富火車站', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '新富火車站', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '高鐵桃園站')">
+                                        <span class="tag-option-text">高鐵桃園站</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '高鐵桃園站', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '高鐵桃園站', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '機捷A18站')">
+                                        <span class="tag-option-text">機捷A18站</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '機捷A18站', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '機捷A18站', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '機捷A19站')">
+                                        <span class="tag-option-text">機捷A19站</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '機捷A19站', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '機捷A19站', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '公車站')">
+                                        <span class="tag-option-text">公車站</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '公車站', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '公車站', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('transport', '客運站')">
+                                        <span class="tag-option-text">客運站</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('transport', '客運站', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('transport', '客運站', event)" title="刪除">×</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 學區 -->
+                        <div class="form-group">
+                            <label>學區</label>
+                            <div class="tag-selector-container" data-type="schools">
+                                <div class="tag-input-wrapper">
+                                    <input type="text" class="tag-input" placeholder="輸入或選擇學校..." id="schools-input">
+                                    <button type="button" class="tag-add-btn" onclick="addCustomTag('schools')">新增</button>
+                        </div>
+                                <div class="selected-tags" id="schools-selected"></div>
+                                <div class="tag-options" id="schools-options">
+                                    <span class="tag-option" onclick="toggleTag('schools', '陽光國小')">
+                                        <span class="tag-option-text">陽光國小</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '陽光國小', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '陽光國小', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '瑞塘國小')">
+                                        <span class="tag-option-text">瑞塘國小</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '瑞塘國小', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '瑞塘國小', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '瑞原國小')">
+                                        <span class="tag-option-text">瑞原國小</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '瑞原國小', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '瑞原國小', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '楊梅國小')">
+                                        <span class="tag-option-text">楊梅國小</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '楊梅國小', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '楊梅國小', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '富岡國小')">
+                                        <span class="tag-option-text">富岡國小</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '富岡國小', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '富岡國小', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '瑞坪國中')">
+                                        <span class="tag-option-text">瑞坪國中</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '瑞坪國中', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '瑞坪國中', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '楊梅國中')">
+                                        <span class="tag-option-text">楊梅國中</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '楊梅國中', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '楊梅國中', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '富岡國中')">
+                                        <span class="tag-option-text">富岡國中</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '富岡國中', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '富岡國中', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '楊梅高中')">
+                                        <span class="tag-option-text">楊梅高中</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '楊梅高中', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '楊梅高中', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '大華中學')">
+                                        <span class="tag-option-text">大華中學</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '大華中學', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '大華中學', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '治平高中')">
+                                        <span class="tag-option-text">治平高中</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '治平高中', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '治平高中', event)" title="刪除">×</button>
+                                    </span>
+                                    <span class="tag-option" onclick="toggleTag('schools', '私立學校')">
+                                        <span class="tag-option-text">私立學校</span>
+                                        <button class="tag-option-edit" onclick="editTagOption('schools', '私立學校', event)" title="編輯">✏️</button>
+                                        <button class="tag-option-delete" onclick="deleteTagOption('schools', '私立學校', event)" title="刪除">×</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>市場</label>
+                            <input type="text" id="market" placeholder="例如: 萬大市場">
+                        </div>
+                        <div class="form-group">
+                            <label>公園</label>
+                            <input type="text" id="park" placeholder="例如: 四維公園">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 特色與描述 -->
+	                <div class="form-section" data-ux-section="story">
+	                    <h3>✨ 特色與描述 <span class="section-tag optional">銷售重點</span></h3>
+                        <p class="section-helper">特色建議一行一點，描述可以寫給客人看的短介紹。</p>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>物件特色 (每行一個)</label>
+                            <textarea id="features" placeholder="近學區&#10;交通便利&#10;管理完善"></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>物件描述</label>
+                            <textarea id="description" placeholder="詳細描述物件特色..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 其他資訊 -->
+	                <div class="form-section" data-ux-section="more">
+	                    <h3>🔗 其他資訊 <span class="section-tag optional">進階</span></h3>
+                        <p class="section-helper">街景、TikTok 與參考連結都可之後再補，不影響先建立物件。</p>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Google 街景網址</label>
+                            <input type="text" id="google_maps" placeholder="https://www.google.com/maps/embed?pb=...（從 Google 街景頁面複製嵌入網址）">
+                            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                💡 提示：<br>
+                                1. 輸入地址後，點擊「🏙️ 打開 Google 街景」按鈕<br>
+                                2. 在新開啟的 Google 街景頁面中，點擊「分享」→「嵌入地圖」<br>
+                                3. 複製嵌入網址並貼到此欄位
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label>TikTok 影片 ID</label>
+                            <input type="text" id="tiktok_video_id" placeholder="例如: 7531311616948948230">
+                        </div>
+                        <div class="form-group">
+                            <label>TikTok 使用者名稱</label>
+                            <input type="text" id="tiktok_username" placeholder="例如: @aihouse168">
+                        </div>
+                        <div class="form-group">
+                            <label>參考連結</label>
+                            <input type="text" id="reference_link" placeholder="https://...">
+                        </div>
+                    </div>
+                </div>
+                
+	                <div class="btn-group sticky-actions">
+                        <button type="button" class="btn btn-secondary" onclick="previewPropertyBeforeSave()">
+                            👁️ 預覽資料
+                        </button>
+	                    <button type="button" class="btn btn-primary" onclick="saveProperty()" id="save-btn">
+	                        💾 儲存到資料庫
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        🔄 重設表單
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 物件列表 -->
+	        <div id="list-tab" class="tab-content">
+	            <div class="form-section">
+	                <h3>📋 現有物件列表</h3>
+                    <p class="section-helper">用搜尋或篩選先縮小範圍，再進行編輯、上架或下架。</p>
+                    <div class="list-toolbar">
+                        <label class="list-search">
+                            <span>搜尋物件</span>
+                            <input type="search" id="property-search" placeholder="輸入編號、標題、地址、價格" oninput="renderPropertyList()">
+                        </label>
+                        <label class="list-filter">
+                            <span>狀態篩選</span>
+                            <select id="property-status-filter" onchange="renderPropertyList()">
+                                <option value="all">全部物件</option>
+                                <option value="published">已上架</option>
+                                <option value="unpublished">已下架</option>
+                                <option value="internal">本店物件</option>
+                                <option value="external">非本店物件</option>
+                                <option value="sold">已售出</option>
+                                <option value="missing-images">缺少圖片</option>
+                            </select>
+                        </label>
+                        <button class="btn btn-success" onclick="loadProperties()">
+                            🔄 重新載入
+                        </button>
+                    </div>
+                    <div id="property-list-summary" class="list-summary">
+                        尚未載入物件資料
+                    </div>
+	                <div id="property-list" class="property-list">
+                    <p style="text-align: center; color: #666; padding: 2rem;">
+                        點擊「重新載入」按鈕載入物件資料
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 客戶詢問 -->
+        <div id="inquiries-tab" class="tab-content">
+            <div class="form-section">
+                <h3>📨 客戶詢問與預約</h3>
+                <p class="section-helper">前台送出的問房與預約會集中在這裡，可快速回撥、用 LINE 回覆，並標記處理狀態。</p>
+                <div class="list-toolbar">
+                    <label class="list-search">
+                        <span>搜尋客戶</span>
+                        <input type="search" id="customer-inquiry-search" placeholder="輸入姓名、電話、物件編號" oninput="renderCustomerInquiryList()">
+                    </label>
+                    <label class="list-filter">
+                        <span>處理狀態</span>
+                        <select id="customer-inquiry-status-filter" onchange="renderCustomerInquiryList()">
+                            <option value="all">全部詢問</option>
+                            <option value="new">新詢問</option>
+                            <option value="contacted">已聯絡</option>
+                            <option value="scheduled">已約看</option>
+                            <option value="closed">已結案</option>
+                        </select>
+                    </label>
+                    <button class="btn btn-success" onclick="loadCustomerInquiries()">
+                        🔄 重新載入
+                    </button>
+                </div>
+                <div id="customer-inquiry-summary" class="list-summary">
+                    尚未載入客戶詢問
+                </div>
+                <div id="customer-inquiry-list" class="customer-inquiry-list">
+                    <p class="empty-list-state">點擊「重新載入」載入客戶詢問。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <script src="js/property-admin-db.js"></script>
+</body>
+</html>

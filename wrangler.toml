@@ -1,0 +1,6 @@
+name = "junyang666-property-website"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "."
+
+[env.production]
+name = "junyang666-property-website"

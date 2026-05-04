@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Permissions Policy: 允許 Google Maps 使用感測器功能 -->
+    <meta http-equiv="Permissions-Policy" content="accelerometer=*, gyroscope=*, geolocation=*">
+    <title>物件詳細資訊 | 住商不動產</title>
+    
+    <!-- Open Graph / Facebook / LINE 連結預覽（爬蟲不執行 JS，需在 HTML 預設或由 Edge Function 注入） -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:title" content="物件詳細資訊 | 住商不動產">
+    <meta property="og:description" content="查看物件詳細資訊">
+    <meta property="og:image" content="https://placehold.co/1200x630/667eea/ffffff/png?text=Property">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="物件預覽">
+    <meta property="og:site_name" content="住商不動產 濬瑒">
+    <meta property="og:locale" content="zh_TW">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="">
+    <meta name="twitter:title" content="物件詳細資訊 | 住商不動產">
+    <meta name="twitter:description" content="查看物件詳細資訊">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/667eea/ffffff/png?text=Property">
+    <meta name="twitter:image:alt" content="物件預覽">
+    
+    <!-- 標準描述 -->
+    <meta name="description" content="查看物件詳細資訊">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/property-detail.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-button" id="back-button-link">
+                <i class="fas fa-arrow-left"></i> 返回首頁
+            </a>
+            <h1 style="font-size: 1.2rem; margin: 0;">物件詳細資訊</h1>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>載入中...</p>
+        </div>
+        
+        <div id="error" class="error" style="display: none;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p id="error-message">找不到物件</p>
+        </div>
+        
+        <div id="property-page" class="property-page" style="display: none;">
+            <!-- 內容將由 JavaScript 動態生成 -->
+        </div>
+    </div>
+    
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <!-- 統一 Supabase 配置（必須先於 property-detail.js，避免非同步載入時序問題） -->
+    <script src="supabase-config.js"></script>
+    <!-- 客戶端快取（單筆物件暫存瀏覽器，減少重複請求） -->
+    <script src="js/lib/client-cache.js"></script>
+    <!-- React Query 風格：快取時間與重新驗證 -->
+    <script src="js/lib/query-client.js"></script>
+    <!-- 圖片優化：壓縮畫質、WebP、首屏主圖預載入 -->
+    <script src="js/lib/image-optimizer.js"></script>
+    <!-- 相關連結前端顯示（與首頁共用模組） -->
+    <script src="modules/related-links/frontend.js"></script>
+    <!-- 客戶問房 / 預約看屋 -->
+    <script src="js/lib/customer-inquiry.js"></script>
+    <script src="js/property-detail.js"></script>
+</body>
+</html>

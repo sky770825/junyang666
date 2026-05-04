@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在地生活 - 濬瑒房產生活平台</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --grad-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --grad-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --grad-warning: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.25rem;
+  --spacing-2xl: 1.5rem;
+  --border-radius: 12px;
+  --border-radius-lg: 16px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--grad-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.local-card {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.local-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
+}
+
+.category-tab {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: 0;
+}
+
+.tab-btn {
+  background: rgba(255, 255, 255, 0.95);
+  color: #667eea;
+  border: 2px solid transparent;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  border-color: transparent;
+}
+
+.tab-btn:hover:not(.active) {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: #667eea;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-sm);
+  background: rgba(102, 126, 234, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.service-item:hover {
+  background: rgba(102, 126, 234, 0.08);
+  transform: translateX(5px);
+  border-color: rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.restaurant-item {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.restaurant-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 圖片展示樣式 */
+.restaurant-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.restaurant-image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.restaurant-compact-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: var(--spacing-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.restaurant-compact-image:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 圖片放大模態框 */
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease;
+}
+
+.image-modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: zoomIn 0.3s ease;
+}
+
+.image-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 2001;
+  transition: transform 0.2s ease;
+}
+
+.image-modal-close:hover {
+  transform: scale(1.2);
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 置頂展示商家 */
+.featured-restaurant {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  color: white;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.35);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.featured-restaurant:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+}
+
+.featured-restaurant::before {
+  content: '⭐ 精選';
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.featured-restaurant .restaurant-title {
+  color: white;
+  font-size: 1.25rem;
+}
+
+.featured-restaurant .restaurant-rating {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.featured-restaurant .restaurant-meta span {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.featured-restaurant .restaurant-description {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 緊湊商家卡片 */
+.restaurant-compact {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.restaurant-compact:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.restaurant-compact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-xs);
+}
+
+.restaurant-compact-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.restaurant-compact-rating {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.restaurant-compact-meta {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  line-height: 1.6;
+}
+
+.restaurant-compact-tags {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.restaurant-compact-tag {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  padding: 3px var(--spacing-sm);
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.dark .restaurant-compact {
+  background: rgba(30, 30, 30, 0.95);
+}
+
+.dark .restaurant-compact-title {
+  color: #f9fafb;
+}
+
+.dark .restaurant-compact-tag {
+  background: rgba(129, 140, 248, 0.2);
+  color: #a78bfa;
+  border-color: rgba(129, 140, 248, 0.3);
+}
+
+.restaurant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.restaurant-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: var(--spacing-xs);
+}
+
+.restaurant-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.restaurant-meta {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  font-size: 0.85rem;
+  color: #6b7280;
+  flex-wrap: wrap;
+}
+
+.restaurant-description {
+  color: #4b5563;
+  line-height: 1.5;
+  margin-bottom: var(--spacing-md);
+  font-size: 0.9rem;
+}
+
+.restaurant-tags {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.event-item {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  border-left: 3px solid #10b981;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.event-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.event-title {
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.event-date {
+  font-size: 0.75rem;
+  color: #10b981;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.event-location {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: var(--spacing-xs);
+}
+
+.event-description {
+  color: #4b5563;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+#themeToggle {
+  position: fixed;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 1000;
+  background: var(--grad-primary);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#themeToggle:hover {
+  transform: scale(1.05);
+}
+
+.back-btn {
+  position: fixed;
+  top: var(--spacing-lg);
+  left: var(--spacing-lg);
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.dark {
+  --grad-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.dark .local-card,
+.dark .restaurant-item,
+.dark .event-item {
+  background: rgba(30, 30, 30, 0.95);
+  color: white;
+}
+
+.dark .service-item:hover {
+  background: rgba(102, 126, 234, 0.2);
+}
+
+.dark .tab-btn {
+  background: rgba(30, 30, 30, 0.95);
+  border-color: transparent;
+  color: #818cf8;
+}
+
+.dark .tab-btn.active {
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(129, 140, 248, 0.4);
+}
+
+.dark .tab-btn:hover:not(.active) {
+  background: rgba(129, 140, 248, 0.15);
+  border-color: #818cf8;
+}
+
+.dark .restaurant-title,
+.dark .event-title {
+  color: #f9fafb;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 內容區域初始狀態 */
+[data-category] {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+  
+  .category-tab {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-xs);
+  }
+  
+  .tab-btn {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .restaurant-meta {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .local-card {
+    padding: var(--spacing-md);
+  }
+  
+  .service-item {
+    padding: var(--spacing-sm);
+  }
+  
+  .service-item .text-3xl {
+    font-size: 1.5rem;
+  }
+  
+  #themeToggle, .back-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  /* 平板版商家網格調整 */
+  .restaurant-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .category-tab {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .restaurant-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .restaurant-tags {
+    gap: var(--spacing-xs);
+  }
+  
+  .tag {
+    font-size: 0.7rem;
+    padding: 2px var(--spacing-xs);
+  }
+  
+  /* 手機版商家網格調整 */
+  .restaurant-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .restaurant-compact {
+    padding: var(--spacing-sm);
+  }
+  
+  .featured-restaurant {
+    padding: var(--spacing-md);
+  }
+  
+  .featured-restaurant .restaurant-title {
+    font-size: 1.1rem;
+  }
+  
+  /* 手機版圖片調整 */
+  .restaurant-image {
+    height: 150px;
+  }
+  
+  .restaurant-compact-image {
+    height: 120px;
+  }
+  
+  .image-modal-close {
+    font-size: 30px;
+    top: 10px;
+    right: 20px;
+  }
+}
+
+/* 小螢幕（640px以下）聯絡資訊3欄調整 */
+@media (max-width: 640px) {
+  .glass.rounded-2xl .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+  }
+  
+  .glass.rounded-2xl .text-xs {
+    font-size: 0.65rem;
+    line-height: 1.3;
+  }
+  
+  /* 手機版導航列優化 */
+  .bottom-nav {
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .bottom-nav button {
+    flex: 1;
+    min-width: 0;
+    padding: 0.25rem 0.1rem;
+    font-size: 0.7rem;
+  }
+  
+  .bottom-nav button span:first-child {
+    font-size: 1rem;
+    margin-bottom: 0.125rem;
+  }
+  
+  .glass.rounded-2xl .text-sm {
+    font-size: 0.75rem;
+  }
+  
+  .glass.rounded-2xl .text-2xl {
+    font-size: 1.5rem;
+  }
+  
+  .glass.rounded-2xl {
+    padding: var(--spacing-md);
+  }
+}
+
+/* 超小螢幕（480px以下）聯絡資訊調整 */
+@media (max-width: 480px) {
+  .glass.rounded-2xl .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-xs);
+  }
+  
+  .glass.rounded-2xl .text-xs {
+    font-size: 0.6rem;
+  }
+  
+  .glass.rounded-2xl .text-sm {
+    font-size: 0.7rem;
+  }
+  
+  .glass.rounded-2xl .text-2xl {
+    font-size: 1.25rem;
+  }
+}
+
+/* 現代化動畫效果 */
+@media (prefers-reduced-motion: no-preference) {
+  .local-card, .service-item, .restaurant-item, .event-item {
+    animation: slideInUp 0.6s ease-out;
+  }
+  
+  .local-card:nth-child(1) { animation-delay: 0.1s; }
+  .local-card:nth-child(2) { animation-delay: 0.2s; }
+  .local-card:nth-child(3) { animation-delay: 0.3s; }
+  .local-card:nth-child(4) { animation-delay: 0.4s; }
+  .local-card:nth-child(5) { animation-delay: 0.5s; }
+  .local-card:nth-child(6) { animation-delay: 0.6s; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 現代化滾動條 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.5);
+}
+</style>
+</head>
+<body>
+<!-- 主題切換按鈕 -->
+<button id="themeToggle" onclick="toggleTheme()">🌓</button>
+
+<!-- 返回按鈕 -->
+<button class="back-btn" onclick="goBack()" title="返回主頁">←</button>
+
+<!-- 頁面標題 -->
+<div class="container mx-auto px-3 py-4 pb-16 max-w-7xl">
+  <div class="text-center mb-6">
+    <h1 class="text-3xl md:text-5xl font-bold text-white mb-3 drop-shadow-lg">🍹 楊梅在地生活</h1>
+    <p class="text-base md:text-lg text-white opacity-95">探索桃園楊梅區在地生活，享受美好時光</p>
+  </div>
+
+  <!-- 類別標籤 -->
+  <div class="local-card mb-6">
+    <h2 class="text-lg font-bold mb-4 flex items-center">
+      <span class="text-xl mr-2">🏷️</span>
+      生活類別
+    </h2>
+    <div class="category-tab">
+      <button class="tab-btn active" onclick="showCategory('all')">全部</button>
+      <button class="tab-btn" onclick="showCategory('food')">美食</button>
+      <button class="tab-btn" onclick="showCategory('shopping')">購物</button>
+      <button class="tab-btn" onclick="showCategory('entertainment')">娛樂</button>
+      <button class="tab-btn" onclick="showCategory('transport')">交通</button>
+      <button class="tab-btn" onclick="showCategory('health')">醫療</button>
+      <button class="tab-btn" onclick="showCategory('education')">教育</button>
+    </div>
+  </div>
+
+  <!-- 生活服務 -->
+  <div id="servicesContent">
+    <!-- 美食推薦 -->
+    <div data-category="food" class="mb-8">
+      <h2 class="text-xl md:text-2xl font-bold mb-6 flex items-center text-white">
+        <span class="text-2xl md:text-3xl mr-3">🍽️</span>
+        美食推薦
+      </h2>
+      
+      <!-- 置頂展示商家 -->
+      <div class="featured-restaurant">
+        <img src="https://images.unsplash.com/photo-1529042410759-befb1204b468?w=800&h=400&fit=crop" 
+             alt="楊梅阿婆滷肉飯" 
+             class="restaurant-image"
+             onclick="openImageModal(this.src)">
+        <div class="restaurant-header">
+          <div>
+            <div class="restaurant-title">楊梅阿婆滷肉飯</div>
+            <div class="restaurant-rating">
+              <span>⭐⭐⭐⭐⭐</span>
+              <span class="text-sm">4.7分</span>
+            </div>
+          </div>
+        </div>
+        <div class="restaurant-meta">
+          <span>📍 楊梅區大成路</span>
+          <span>💰 $50-100</span>
+          <span>🕒 11:00-21:00</span>
+        </div>
+        <div class="restaurant-description">
+          楊梅在地老字號滷肉飯，傳承三代的好味道。使用獨家秘方滷製，肥瘦適中，香氣四溢。配菜豐富，價格親民，是楊梅居民的最愛。
+        </div>
+        <div class="restaurant-tags">
+          <span class="tag" style="background: rgba(255,255,255,0.2); color: white; border: none;">台菜</span>
+          <span class="tag" style="background: rgba(255,255,255,0.2); color: white; border: none;">平價</span>
+          <span class="tag" style="background: rgba(255,255,255,0.2); color: white; border: none;">老字號</span>
+        </div>
+      </div>
+
+      <!-- 其他商家 - 緊湊網格佈局 -->
+      <div class="restaurant-grid">
+        <div class="restaurant-compact">
+          <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop" 
+               alt="楊梅老街豆花" 
+               class="restaurant-compact-image"
+               onclick="openImageModal(this.src)">
+          <div class="restaurant-compact-header">
+            <div>
+              <div class="restaurant-compact-title">楊梅老街豆花</div>
+              <div class="restaurant-compact-rating">⭐⭐⭐⭐ 4.6分</div>
+            </div>
+          </div>
+          <div class="restaurant-compact-meta">
+            <span>📍 楊梅區老街</span>
+            <span>💰 $40-80</span>
+            <span>🕒 13:00-22:00</span>
+          </div>
+          <div class="restaurant-compact-tags">
+            <span class="restaurant-compact-tag">甜品</span>
+            <span class="restaurant-compact-tag">傳統</span>
+            <span class="restaurant-compact-tag">手工</span>
+          </div>
+        </div>
+
+        <div class="restaurant-compact">
+          <img src="https://images.unsplash.com/photo-1562962234-7d2487c2c38f?w=400&h=300&fit=crop" 
+               alt="楊梅夜市" 
+               class="restaurant-compact-image"
+               onclick="openImageModal(this.src)">
+          <div class="restaurant-compact-header">
+            <div>
+              <div class="restaurant-compact-title">楊梅夜市</div>
+              <div class="restaurant-compact-rating">⭐⭐⭐⭐ 4.4分</div>
+            </div>
+          </div>
+          <div class="restaurant-compact-meta">
+            <span>📍 楊梅區中正路</span>
+            <span>💰 $30-80</span>
+            <span>🕒 18:00-24:00</span>
+          </div>
+          <div class="restaurant-compact-tags">
+            <span class="restaurant-compact-tag">夜市</span>
+            <span class="restaurant-compact-tag">小吃</span>
+            <span class="restaurant-compact-tag">傳統</span>
+          </div>
+        </div>
+
+        <div class="restaurant-compact">
+          <img src="https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=400&h=300&fit=crop" 
+               alt="楊梅牛肉麵館" 
+               class="restaurant-compact-image"
+               onclick="openImageModal(this.src)">
+          <div class="restaurant-compact-header">
+            <div>
+              <div class="restaurant-compact-title">楊梅牛肉麵館</div>
+              <div class="restaurant-compact-rating">⭐⭐⭐⭐⭐ 4.8分</div>
+            </div>
+          </div>
+          <div class="restaurant-compact-meta">
+            <span>📍 楊梅區大成路</span>
+            <span>💰 $80-150</span>
+            <span>🕒 11:00-20:00</span>
+          </div>
+          <div class="restaurant-compact-tags">
+            <span class="restaurant-compact-tag">麵食</span>
+            <span class="restaurant-compact-tag">牛肉</span>
+            <span class="restaurant-compact-tag">推薦</span>
+          </div>
+        </div>
+
+        <div class="restaurant-compact">
+          <img src="https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&h=300&fit=crop" 
+               alt="楊梅燒烤店" 
+               class="restaurant-compact-image"
+               onclick="openImageModal(this.src)">
+          <div class="restaurant-compact-header">
+            <div>
+              <div class="restaurant-compact-title">楊梅燒烤店</div>
+              <div class="restaurant-compact-rating">⭐⭐⭐⭐ 4.5分</div>
+            </div>
+          </div>
+          <div class="restaurant-compact-meta">
+            <span>📍 楊梅區老街</span>
+            <span>💰 $100-300</span>
+            <span>🕒 17:00-01:00</span>
+          </div>
+          <div class="restaurant-compact-tags">
+            <span class="restaurant-compact-tag">燒烤</span>
+            <span class="restaurant-compact-tag">宵夜</span>
+            <span class="restaurant-compact-tag">聚餐</span>
+          </div>
+        </div>
+
+        <div class="restaurant-compact">
+          <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=300&fit=crop" 
+               alt="楊梅火鍋店" 
+               class="restaurant-compact-image"
+               onclick="openImageModal(this.src)">
+          <div class="restaurant-compact-header">
+            <div>
+              <div class="restaurant-compact-title">楊梅火鍋店</div>
+              <div class="restaurant-compact-rating">⭐⭐⭐⭐ 4.6分</div>
+            </div>
+          </div>
+          <div class="restaurant-compact-meta">
+            <span>📍 楊梅區中正路</span>
+            <span>💰 $200-500</span>
+            <span>🕒 11:30-22:00</span>
+          </div>
+          <div class="restaurant-compact-tags">
+            <span class="restaurant-compact-tag">火鍋</span>
+            <span class="restaurant-compact-tag">聚餐</span>
+            <span class="restaurant-compact-tag">套餐</span>
+          </div>
+        </div>
+
+        <div class="restaurant-compact">
+          <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop" 
+               alt="楊梅咖啡廳" 
+               class="restaurant-compact-image"
+               onclick="openImageModal(this.src)">
+          <div class="restaurant-compact-header">
+            <div>
+              <div class="restaurant-compact-title">楊梅咖啡廳</div>
+              <div class="restaurant-compact-rating">⭐⭐⭐⭐ 4.5分</div>
+            </div>
+          </div>
+          <div class="restaurant-compact-meta">
+            <span>📍 楊梅區老街</span>
+            <span>💰 $50-150</span>
+            <span>🕒 08:00-21:00</span>
+          </div>
+          <div class="restaurant-compact-tags">
+            <span class="restaurant-compact-tag">咖啡</span>
+            <span class="restaurant-compact-tag">輕食</span>
+            <span class="restaurant-compact-tag">休閒</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 購物資訊 -->
+    <div class="local-card" data-category="shopping">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <span class="text-2xl mr-3">🛍️</span>
+        購物資訊
+      </h2>
+      <div class="space-y-3">
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🏪</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅全聯福利中心</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">大成路店，日常生活用品，價格實惠</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🏬</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅家樂福</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">中正路店，大型量販店，商品齊全</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🏪</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅便利商店</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">7-11、全家等，24小時營業，服務便利</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('kungfu-tea.html')">
+          <div class="text-3xl mr-4">🍹</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅功夫茶</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">中正路店，專業茶飲，品質保證</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('food-truck.html')">
+          <div class="text-3xl mr-4">🚚</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅餐車排班</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">在地美味餐車，隨時為您服務</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 娛樂場所 -->
+    <div class="local-card" data-category="entertainment">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <span class="text-2xl mr-3">🎬</span>
+        娛樂場所
+      </h2>
+      <div class="space-y-3">
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🏞️</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅秀才步道</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">登山健行，欣賞自然美景</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🏛️</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅故事館</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">了解楊梅歷史文化</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🎭</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅圖書館</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">閱讀學習，文化活動</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 交通資訊 -->
+    <div class="local-card" data-category="transport">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <span class="text-2xl mr-3">🚌</span>
+        交通資訊
+      </h2>
+      <div class="space-y-3">
+        <div class="service-item" onclick="openTool('bus.html')">
+          <div class="text-3xl mr-4">🚌</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅公車即時</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">桃園客運、中壢客運到站時間查詢</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🚂</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅火車站</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">台鐵縱貫線，連接台北、新竹</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🚗</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅停車場</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">火車站前、市區停車場位置和費用</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 醫療服務 -->
+    <div class="local-card" data-category="health">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <span class="text-2xl mr-3">🏥</span>
+        醫療服務
+      </h2>
+      <div class="space-y-3">
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🏥</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅天成醫院</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">區域醫院，24小時急診服務</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🩺</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅區衛生所</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">預防保健、疫苗接種、健康檢查</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">💊</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅藥局</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">康是美、屈臣氏、在地藥局</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🦷</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅牙醫診所</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">一般牙科、矯正、植牙服務</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">👁️</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅眼科診所</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">視力檢查、眼疾治療</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 教育資源 -->
+    <div class="local-card" data-category="education">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <span class="text-2xl mr-3">🎓</span>
+        教育資源
+      </h2>
+      <div class="space-y-3">
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🏫</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅國小</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">楊梅區主要國小，優質教育環境</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🏫</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅國中</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">楊梅區主要國中，升學輔導完善</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">📚</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅圖書館</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">豐富藏書，親子活動，學習資源</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">✏️</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅補習班</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">升學補習、才藝課程、語言學習</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+        <div class="service-item" onclick="openTool('https://maps.google.com')">
+          <div class="text-3xl mr-4">🎨</div>
+          <div class="flex-1">
+            <div class="font-bold text-base mb-1">楊梅才藝班</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">音樂、美術、舞蹈等才藝課程</div>
+          </div>
+          <div class="text-2xl opacity-60 ml-2">→</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 聯絡資訊 -->
+  <div class="glass rounded-2xl p-6 md:p-8 text-center mt-10">
+    <h3 class="text-xl md:text-2xl font-bold text-white mb-6">📞 在地生活諮詢</h3>
+    <div class="grid grid-cols-3 gap-4 text-white">
+      <div class="flex flex-col items-center">
+        <div class="text-2xl mb-2">📱</div>
+        <div class="font-bold text-sm mb-1">諮詢專線</div>
+        <div class="text-xs opacity-90">0928-776-755</div>
+      </div>
+      <div class="flex flex-col items-center">
+        <div class="text-2xl mb-2">📧</div>
+        <div class="font-bold text-sm mb-1">生活信箱</div>
+        <div class="text-xs opacity-90 break-all">local@realtor.com</div>
+      </div>
+      <div class="flex flex-col items-center">
+        <div class="text-2xl mb-2">🕒</div>
+        <div class="font-bold text-sm mb-1">服務時間</div>
+        <div class="text-xs opacity-90">週一至週五<br>9:00-18:00</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 圖片放大模態框 -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal(event)">
+  <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+  <img id="modalImage" class="image-modal-content" src="" alt="放大圖片" onclick="event.stopPropagation()">
+</div>
+
+<script>
+// 主題切換
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+}
+
+// 載入主題
+function loadTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark');
+  }
+}
+
+// 返回主頁
+function goBack() {
+  window.location.href = 'index.html';
+}
+
+// 顯示類別
+function showCategory(category) {
+  const tabs = document.querySelectorAll('.tab-btn');
+  const contents = document.querySelectorAll('[data-category]');
+  
+  // 更新標籤狀態
+  tabs.forEach(tab => {
+    tab.classList.remove('active');
+    if (tab.textContent.trim() === getCategoryName(category)) {
+      tab.classList.add('active');
+    }
+  });
+  
+  // 使用更流暢的切換方式
+  contents.forEach(content => {
+    // 移除fade-in class避免重複動畫
+    content.classList.remove('fade-in');
+    
+    if (category === 'all' || content.dataset.category === category) {
+      // 顯示對應內容
+      content.style.display = 'block';
+      // 確保opacity為1
+      requestAnimationFrame(() => {
+        content.style.opacity = '1';
+        content.style.transform = 'translateY(0)';
+      });
+    } else {
+      // 隱藏其他內容
+      content.style.opacity = '0';
+      content.style.transform = 'translateY(-10px)';
+      // 使用setTimeout確保動畫完成後再隱藏display
+      setTimeout(() => {
+        if (content.style.opacity === '0') {
+          content.style.display = 'none';
+        }
+      }, 300);
+    }
+  });
+  
+  // 如果選擇了單個類別，平滑滾動到該內容區域（考慮固定按鈕的高度）
+  if (category !== 'all') {
+    const targetContent = document.querySelector(`[data-category="${category}"]`);
+    if (targetContent) {
+      setTimeout(() => {
+        const offset = 120; // 偏移量，避免被固定按鈕遮擋
+        const rect = targetContent.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const targetPosition = rect.top + scrollTop - offset;
+        
+        window.scrollTo({
+          top: Math.max(0, targetPosition),
+          behavior: 'smooth'
+        });
+      }, 200);
+    }
+  } else {
+    // 選擇"全部"時，滾動回頂部
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }, 200);
+  }
+}
+
+// 獲取類別名稱
+function getCategoryName(category) {
+  const categoryNames = {
+    'all': '全部',
+    'food': '美食',
+    'shopping': '購物',
+    'entertainment': '娛樂',
+    'transport': '交通',
+    'health': '醫療',
+    'education': '教育'
+  };
+  return categoryNames[category] || category;
+}
+
+// 開啟工具
+function openTool(url) {
+  if (url.startsWith('http')) {
+    // 檢測是否為手機版
+    const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // 手機版：在當前視窗打開外部連結
+      window.location.href = url;
+    } else {
+      // 桌面版：在新視窗打開外部連結
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  } else {
+    // 內部連結在原視窗打開
+    window.location.href = url;
+  }
+}
+
+// 開啟圖片放大模態框
+function openImageModal(imageSrc) {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImage');
+  if (modal && modalImg) {
+    modalImg.src = imageSrc;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // 防止背景滾動
+  }
+}
+
+// 關閉圖片放大模態框
+function closeImageModal(event) {
+  if (event && event.target.classList.contains('image-modal-content')) {
+    return; // 如果點擊的是圖片，不關閉
+  }
+  const modal = document.getElementById('imageModal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = ''; // 恢復滾動
+  }
+}
+
+// ESC鍵關閉模態框
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeImageModal();
+  }
+});
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+  loadTheme();
+  
+  // 初始化所有內容顯示狀態
+  const contents = document.querySelectorAll('[data-category]');
+  contents.forEach(content => {
+    content.style.display = 'block';
+    content.style.opacity = '1';
+    content.style.transform = 'translateY(0)';
+  });
+  
+  // 檢測URL hash並自動顯示對應分類
+  const hash = window.location.hash.substring(1); // 移除 # 符號
+  if (hash && ['food', 'shopping', 'entertainment', 'transport', 'health', 'education'].includes(hash)) {
+    // 如果是美食分類，隱藏分類標籤欄並更新標題
+    if (hash === 'food') {
+      const categoryTab = document.querySelector('.category-tab');
+      const categoryCard = categoryTab ? categoryTab.closest('.local-card') : null;
+      if (categoryCard) {
+        categoryCard.style.display = 'none';
+      }
+      // 更新頁面標題
+      const pageTitle = document.querySelector('h1');
+      if (pageTitle) {
+        pageTitle.innerHTML = '🍽️ 楊梅在地美食';
+      }
+      const pageSubtitle = document.querySelector('p');
+      if (pageSubtitle) {
+        pageSubtitle.textContent = '探索桃園楊梅區在地美食，享受美味時光';
+      }
+    }
+    // 延遲執行確保DOM完全載入
+    setTimeout(() => {
+      showCategory(hash);
+    }, 100);
+  } else {
+    // 沒有hash時，確保顯示"全部"
+    showCategory('all');
+  }
+});
+</script>
+
+<!-- 📍 底部導航 -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 flex justify-around py-2 bottom-nav z-50" role="navigation" aria-label="主要導航">
+  <button onclick="window.location.href='index.html'" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="回到首頁">
+    <span class="text-lg mb-1">🏠</span><span>首頁</span>
+  </button>
+  <button onclick="openTool('expense-tracker.html')" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="記帳">
+    <span class="text-lg mb-1">📝</span><span>記帳</span>
+  </button>
+  <button class="flex flex-col items-center text-indigo-600 text-xs font-semibold px-3 py-2 min-w-[60px]" aria-label="在地生活">
+    <span class="text-lg mb-1">🍹</span><span>生活</span>
+  </button>
+  <button onclick="openTool('worship.html')" class="flex flex-col items-center text-gray-600 text-xs hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg px-3 py-2 min-w-[60px]" aria-label="拜拜專區">
+    <span class="text-lg mb-1">🙏</span><span>拜拜</span>
+  </button>
+</nav>
+
+<script>
+// 工具開啟功能
+function openTool(url) {
+  if (url.startsWith('http')) {
+    // 檢測是否為手機版
+    const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // 手機版：在當前視窗打開外部連結
+      window.location.href = url;
+    } else {
+      // 桌面版：在新視窗打開外部連結
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  } else {
+    // 內部連結在原視窗打開
+    window.location.href = url;
+  }
+}
+</script>
+</body>
+</html>
